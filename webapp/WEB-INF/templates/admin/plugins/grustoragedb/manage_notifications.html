@@ -1,0 +1,56 @@
+<#include "managegrudata_tabs.html" />
+<@tabs tab="notification" />
+
+<@rowBox>
+    <@boxHeader i18nTitleKey="grustoragedb.manage_notifications.tableLabel">
+        <@headerButtons>
+
+        
+        <form class="form-inline pull-right" method="post" name="manage_notifications" action="jsp/admin/plugins/grustoragedb/ManageNotifications.jsp">
+            <!-- Add pull-right to class1 -->
+            <@actionButtons button1Name="view_createNotification" icon1="icon-plus icon-white" i18nValue1Key="grustoragedb.manage_notifications.buttonAdd" />
+        </form>
+        
+    </@headerButtons>
+    </@boxHeader>
+    <@boxBody>    
+    <@messages infos=infos />
+    <@paginationAdmin paginator=paginator combo=1 />
+    
+    <@table>
+        <tr>
+            <input type="hidden" id="id" name="id"/>
+            <th>#i18n{grustoragedb.manage_notifications.columnIdDemand}</th>
+            <th>#i18n{grustoragedb.manage_notifications.columnJson}</th>
+            <th>#i18n{portal.util.labelActions}</th>
+        </tr>
+        <@tableHeadBodySeparator />
+            <#list notification_list as notification >
+        <tr>
+            <input type="hidden" id="id" name="id"/>
+            <td>
+                ${notification.idDemand}
+            </td>
+            <td>
+                ${notification.json}
+            </td>
+        <td>
+            <a href="jsp/admin/plugins/grustoragedb/ManageNotifications.jsp?view=modifyNotification&id=${notification.id}"
+               class="btn btn-primary btn-small" title="#i18n{portal.util.labelModify}">
+                <i class="fa fa-pencil"></i>
+            </a>
+
+            <a href="jsp/admin/plugins/grustoragedb/ManageNotifications.jsp?action=confirmRemoveNotification&id=${notification.id}"
+               class="btn btn-danger btn-small" title="#i18n{portal.util.labelDelete}" >
+                <i class="fa fa-trash"></i>
+            </a>
+        </td>
+        </tr>
+        </#list>
+    </@table>
+
+    <@paginationAdmin paginator=paginator />
+
+  </@boxBody>
+</@rowBox>
+

@@ -1,0 +1,60 @@
+<#include "managegrudata_tabs.html" />
+<@tabs tab="customer" />
+
+<@rowBox>
+    <@boxHeader i18nTitleKey="grustoragedb.manage_customers.tableLabel">
+        <@headerButtons>
+
+        
+        <form class="form-inline pull-right" method="post" name="manage_customers" action="jsp/admin/plugins/grustoragedb/ManageCustomers.jsp">
+            <!-- Add pull-right to class1 -->
+            <@actionButtons button1Name="view_createCustomer" icon1="icon-plus icon-white" i18nValue1Key="grustoragedb.manage_customers.buttonAdd" />
+        </form>
+        
+    </@headerButtons>
+    </@boxHeader>
+    <@boxBody>    
+    <@messages infos=infos />
+    <@paginationAdmin paginator=paginator combo=1 />
+    
+    <@table>
+        <tr>
+            <input type="hidden" id="id" name="id"/>
+            <th>#i18n{grustoragedb.manage_customers.columnCustomerId}</th>
+            <th>#i18n{grustoragedb.manage_customers.columnGuid}</th>
+            <th>#i18n{grustoragedb.manage_customers.columnCustomerEmail}</th>
+            <th>#i18n{portal.util.labelActions}</th>
+        </tr>
+        <@tableHeadBodySeparator />
+            <#list customer_list as customer >
+        <tr>
+            <input type="hidden" id="id" name="id"/>
+            <td>
+                ${customer.customerId}
+            </td>
+            <td>
+                ${customer.guid}
+            </td>
+            <td>
+                ${customer.customerEmail}
+            </td>
+        <td>
+            <a href="jsp/admin/plugins/grustoragedb/ManageCustomers.jsp?view=modifyCustomer&id=${customer.id}"
+               class="btn btn-primary btn-small" title="#i18n{portal.util.labelModify}">
+                <i class="fa fa-pencil"></i>
+            </a>
+
+            <a href="jsp/admin/plugins/grustoragedb/ManageCustomers.jsp?action=confirmRemoveCustomer&id=${customer.id}"
+               class="btn btn-danger btn-small" title="#i18n{portal.util.labelDelete}" >
+                <i class="fa fa-trash"></i>
+            </a>
+        </td>
+        </tr>
+        </#list>
+    </@table>
+
+    <@paginationAdmin paginator=paginator />
+
+  </@boxBody>
+</@rowBox>
+

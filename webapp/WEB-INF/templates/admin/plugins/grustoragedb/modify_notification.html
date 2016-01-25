@@ -1,0 +1,14 @@
+<#include "managegrudata_tabs.html" />
+<@tabs tab="notification" />
+
+<@rowBoxHeader i18nTitleKey="grustoragedb.modify_notification.pageTitle">
+    <form class="form-horizontal" method="post" name="modify_notification" action="jsp/admin/plugins/grustoragedb/ManageNotifications.jsp">
+        <@messages errors=errors />
+        <input type="hidden" id="id" name="id" value="${notification.id}"/>
+        
+        <@fieldInputText i18nLabelKey="grustoragedb.modify_notification.labelIdDemand" inputName="id_demand" mandatory=true value="${notification.idDemand}" i18nHelpBlockKey="grustoragedb.modify_notification.labelIdDemand.help" />
+        <@fieldInputText i18nLabelKey="grustoragedb.modify_notification.labelJson" inputName="json"  value="${notification.json}" i18nHelpBlockKey="grustoragedb.modify_notification.labelJson.help" />
+        <@actionButtons button1Name="action_modifyNotification" button2Name="view_manageNotifications"/>
+    </form>
+</@rowBoxHeader>
+

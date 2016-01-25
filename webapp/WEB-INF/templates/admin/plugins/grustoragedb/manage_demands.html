@@ -1,0 +1,72 @@
+<#include "managegrudata_tabs.html" />
+<@tabs tab="demand" />
+
+<@rowBox>
+    <@boxHeader i18nTitleKey="grustoragedb.manage_demands.tableLabel">
+        <@headerButtons>
+
+        
+        <form class="form-inline pull-right" method="post" name="manage_demands" action="jsp/admin/plugins/grustoragedb/ManageDemands.jsp">
+            <!-- Add pull-right to class1 -->
+            <@actionButtons button1Name="view_createDemand" icon1="icon-plus icon-white" i18nValue1Key="grustoragedb.manage_demands.buttonAdd" />
+        </form>
+        
+    </@headerButtons>
+    </@boxHeader>
+    <@boxBody>    
+    <@messages infos=infos />
+    <@paginationAdmin paginator=paginator combo=1 />
+    
+    <@table>
+        <tr>
+            <input type="hidden" id="id" name="id"/>
+            <th>#i18n{grustoragedb.manage_demands.columnIdCustomer}</th>
+            <th>#i18n{grustoragedb.manage_demands.columnDemandId}</th>
+            <th>#i18n{grustoragedb.manage_demands.columnDemandTypeId}</th>
+            <th>#i18n{grustoragedb.manage_demands.columnDemandState}</th>
+            <th>#i18n{grustoragedb.manage_demands.columnMaxSteps}</th>
+            <th>#i18n{grustoragedb.manage_demands.columnCurrentStep}</th>
+            <th>#i18n{portal.util.labelActions}</th>
+        </tr>
+        <@tableHeadBodySeparator />
+            <#list demand_list as demand >
+        <tr>
+            <input type="hidden" id="id" name="id"/>
+            <td>
+                ${demand.idCustomer}
+            </td>
+            <td>
+                ${demand.demandId}
+            </td>
+            <td>
+                ${demand.demandTypeId}
+            </td>
+            <td>
+                ${demand.demandState}
+            </td>
+            <td>
+                ${demand.maxSteps}
+            </td>
+            <td>
+                ${demand.currentStep}
+            </td>
+        <td>
+            <a href="jsp/admin/plugins/grustoragedb/ManageDemands.jsp?view=modifyDemand&id=${demand.id}"
+               class="btn btn-primary btn-small" title="#i18n{portal.util.labelModify}">
+                <i class="fa fa-pencil"></i>
+            </a>
+
+            <a href="jsp/admin/plugins/grustoragedb/ManageDemands.jsp?action=confirmRemoveDemand&id=${demand.id}"
+               class="btn btn-danger btn-small" title="#i18n{portal.util.labelDelete}" >
+                <i class="fa fa-trash"></i>
+            </a>
+        </td>
+        </tr>
+        </#list>
+    </@table>
+
+    <@paginationAdmin paginator=paginator />
+
+  </@boxBody>
+</@rowBox>
+
