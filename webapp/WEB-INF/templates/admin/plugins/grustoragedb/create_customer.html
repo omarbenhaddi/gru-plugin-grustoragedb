@@ -7,7 +7,6 @@
         <input type="hidden" id="id" name="id"/>
         
         <@fieldInputText i18nLabelKey="grustoragedb.create_customer.labelCustomerId" inputName="customer_id" mandatory=true value="${customer.customerId!''}" i18nHelpBlockKey="grustoragedb.create_customer.labelCustomerId.help" />
-        <@fieldInputText i18nLabelKey="grustoragedb.create_customer.labelGuid" inputName="guid"  value="${customer.guid!''}" i18nHelpBlockKey="grustoragedb.create_customer.labelGuid.help" />
         <@fieldInputText i18nLabelKey="grustoragedb.create_customer.labelCustomerEmail" inputName="customer_email"  value="${customer.customerEmail!''}" i18nHelpBlockKey="grustoragedb.create_customer.labelCustomerEmail.help" />
         <@actionButtons button1Name="action_createCustomer" button2Name="view_manageCustomers"/>
     </form>

@@ -95,24 +95,6 @@ public class DbCustomer implements Serializable
     }
 
     /**
-     * Returns the Guid
-     * @return The Guid
-     */
-    public String getGuid(  )
-    {
-        return _strGuid;
-    }
-
-    /**
-     * Sets the Guid
-     * @param strGuid The Guid
-     */
-    public void setGuid( String strGuid )
-    {
-        _strGuid = strGuid;
-    }
-
-    /**
      * Returns the CustomerEmail
      * @return The CustomerEmail
      */

@@ -7,8 +7,7 @@ DROP TABLE IF EXISTS grustoragedb_customer;
 CREATE TABLE grustoragedb_customer (
 id_customer int(6) NOT NULL,
 customer_id varchar(50) NOT NULL default '',
-guid varchar(50) NOT NULL default '',
-customer_email varchar(255) NOT NULL default '',
+customer_email varchar(255) NULL default '',
 PRIMARY KEY (id_customer)
 );
 

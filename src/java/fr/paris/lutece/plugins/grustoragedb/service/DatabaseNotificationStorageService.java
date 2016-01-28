@@ -38,6 +38,7 @@ import fr.paris.lutece.plugins.grustoragedb.business.DbCustomerHome;
 import fr.paris.lutece.plugins.grustoragedb.business.DbDemand;
 import fr.paris.lutece.plugins.grustoragedb.business.DbDemandHome;
 import fr.paris.lutece.plugins.grustoragedb.business.DbNotification;
+import fr.paris.lutece.plugins.grustoragedb.business.DbNotificationHome;
 import fr.paris.lutece.plugins.grusupply.business.Customer;
 import fr.paris.lutece.plugins.grusupply.business.Demand;
 import fr.paris.lutece.plugins.grusupply.business.Notification;
@@ -65,8 +66,9 @@ public class DatabaseNotificationStorageService implements INotificationStorageS
             dbc = new DbCustomer(  );
         }
 
+        dbc.setCustomerId( String.valueOf( nCustomerId ) );
         dbc.setCustomerEmail( customer.getEmail(  ) );
-        dbc.setGuid( customer.getGUID(  ) );
+        
 
         if ( bCreate )
         {
@@ -96,9 +98,10 @@ public class DatabaseNotificationStorageService implements INotificationStorageS
             dbd = new DbDemand(  );
         }
 
-        // dbd.setCustomerId( ... ); FIXME
+        dbd.setCustomerId( String.valueOf( demand.getUserCid() ));
         dbd.setDemandId( strDemandId );
         dbd.setDemandTypeId( strDemandTypeId );
+        dbd.setReference(  demand.getReference());
         dbd.setDemandState( demand.getDemandState(  ) );
         dbd.setMaxSteps( demand.getDemandMaxStep(  ) );
         dbd.setCurrentStep( demand.getDemandUserCurrentStep(  ) );
@@ -124,7 +127,7 @@ public class DatabaseNotificationStorageService implements INotificationStorageS
         String strDemandTypeId = String.valueOf( notification.getDemandIdType(  ) );
         DbDemand dbd = DbDemandHome.findByIdAndType( strDemandId, strDemandTypeId );
         dbn.setIdDemand( dbd.getId(  ) );
-
-        // dbn.setJson( ... );  FIXME
+        dbn.setJson( notification.getJson() );
+        DbNotificationHome.create( dbn );
     }
 }

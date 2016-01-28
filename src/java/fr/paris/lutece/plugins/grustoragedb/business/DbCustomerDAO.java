@@ -47,11 +47,11 @@ public final class DbCustomerDAO implements IDbCustomerDAO
 {
     // Constants
     private static final String SQL_QUERY_NEW_PK = "SELECT max( id_customer ) FROM grustoragedb_customer";
-    private static final String SQL_QUERY_SELECT = "SELECT id_customer, customer_id, guid, customer_email FROM grustoragedb_customer WHERE id_customer = ?";
-    private static final String SQL_QUERY_INSERT = "INSERT INTO grustoragedb_customer ( id_customer, customer_id, guid, customer_email ) VALUES ( ?, ?, ?, ? ) ";
+    private static final String SQL_QUERY_SELECT = "SELECT id_customer, customer_id, customer_email FROM grustoragedb_customer WHERE id_customer = ?";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO grustoragedb_customer ( id_customer, customer_id, customer_email ) VALUES ( ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM grustoragedb_customer WHERE id_customer = ? ";
-    private static final String SQL_QUERY_UPDATE = "UPDATE grustoragedb_customer SET id_customer = ?, customer_id = ?, guid = ?, customer_email = ? WHERE id_customer = ?";
-    private static final String SQL_QUERY_SELECTALL = "SELECT id_customer, customer_id, guid, customer_email FROM grustoragedb_customer";
+    private static final String SQL_QUERY_UPDATE = "UPDATE grustoragedb_customer SET id_customer = ?, customer_id = ?, customer_email = ? WHERE id_customer = ?";
+    private static final String SQL_QUERY_SELECTALL = "SELECT id_customer, customer_id, customer_email FROM grustoragedb_customer";
     private static final String SQL_QUERY_SELECTALL_ID = "SELECT id_customer FROM grustoragedb_customer";
 
     /**
@@ -90,7 +90,6 @@ public final class DbCustomerDAO implements IDbCustomerDAO
         daoUtil.setInt( nIndex++, customer.getId(  ) );
 
         daoUtil.setString( nIndex++, customer.getCustomerId(  ) );
-        daoUtil.setString( nIndex++, customer.getGuid(  ) );
         daoUtil.setString( nIndex++, customer.getCustomerEmail(  ) );
 
         daoUtil.executeUpdate(  );
@@ -115,7 +114,6 @@ public final class DbCustomerDAO implements IDbCustomerDAO
             customer = new DbCustomer(  );
             customer.setId( daoUtil.getInt( nIndex++ ) );
             customer.setCustomerId( daoUtil.getString( nIndex++ ) );
-            customer.setGuid( daoUtil.getString( nIndex++ ) );
             customer.setCustomerEmail( daoUtil.getString( nIndex++ ) );
         }
 
@@ -147,7 +145,6 @@ public final class DbCustomerDAO implements IDbCustomerDAO
         int nIndex = 1;
         daoUtil.setInt( nIndex++, customer.getId(  ) );
         daoUtil.setString( nIndex++, customer.getCustomerId(  ) );
-        daoUtil.setString( nIndex++, customer.getGuid(  ) );
         daoUtil.setString( nIndex++, customer.getCustomerEmail(  ) );
         daoUtil.setInt( nIndex, customer.getId(  ) );
 
@@ -171,7 +168,6 @@ public final class DbCustomerDAO implements IDbCustomerDAO
             int nIndex = 1;
             customer.setId( daoUtil.getInt( nIndex++ ) );
             customer.setCustomerId( daoUtil.getString( nIndex++ ) );
-            customer.setGuid( daoUtil.getString( nIndex++ ) );
             customer.setCustomerEmail( daoUtil.getString( nIndex++ ) );
 
             customerList.add( customer );

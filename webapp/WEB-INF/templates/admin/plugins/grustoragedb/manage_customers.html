@@ -21,7 +21,6 @@
         <tr>
             <input type="hidden" id="id" name="id"/>
             <th>#i18n{grustoragedb.manage_customers.columnCustomerId}</th>
-            <th>#i18n{grustoragedb.manage_customers.columnGuid}</th>
             <th>#i18n{grustoragedb.manage_customers.columnCustomerEmail}</th>
             <th>#i18n{portal.util.labelActions}</th>
         </tr>
@@ -33,10 +32,7 @@
                 ${customer.customerId}
             </td>
             <td>
-                ${customer.guid}
-            </td>
-            <td>
-                ${customer.customerEmail}
+                ${customer.customerEmail!''}
             </td>
         <td>
             <a href="jsp/admin/plugins/grustoragedb/ManageCustomers.jsp?view=modifyCustomer&id=${customer.id}"
