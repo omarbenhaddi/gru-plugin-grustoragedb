@@ -40,8 +40,6 @@ public class CustomerBusinessTest extends LuteceTestCase
 {
     private final static String CUSTOMERID1 = "CustomerId1";
     private final static String CUSTOMERID2 = "CustomerId2";
-    private final static String GUID1 = "Guid1";
-    private final static String GUID2 = "Guid2";
     private final static String CUSTOMEREMAIL1 = "CustomerEmail1";
     private final static String CUSTOMEREMAIL2 = "CustomerEmail2";
 
@@ -50,7 +48,6 @@ public class CustomerBusinessTest extends LuteceTestCase
         // Initialize an object
         DbCustomer customer = new DbCustomer(  );
         customer.setCustomerId( CUSTOMERID1 );
-        customer.setGuid( GUID1 );
         customer.setCustomerEmail( CUSTOMEREMAIL1 );
 
         // Create test
@@ -58,17 +55,14 @@ public class CustomerBusinessTest extends LuteceTestCase
 
         DbCustomer customerStored = DbCustomerHome.findByPrimaryKey( customer.getId(  ) );
         assertEquals( customerStored.getCustomerId(  ), customer.getCustomerId(  ) );
-        assertEquals( customerStored.getGuid(  ), customer.getGuid(  ) );
         assertEquals( customerStored.getCustomerEmail(  ), customer.getCustomerEmail(  ) );
 
         // Update test
         customer.setCustomerId( CUSTOMERID2 );
-        customer.setGuid( GUID2 );
         customer.setCustomerEmail( CUSTOMEREMAIL2 );
         DbCustomerHome.update( customer );
         customerStored = DbCustomerHome.findByPrimaryKey( customer.getId(  ) );
         assertEquals( customerStored.getCustomerId(  ), customer.getCustomerId(  ) );
-        assertEquals( customerStored.getGuid(  ), customer.getGuid(  ) );
         assertEquals( customerStored.getCustomerEmail(  ), customer.getCustomerEmail(  ) );
 
         // List test

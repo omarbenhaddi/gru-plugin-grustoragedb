@@ -68,8 +68,7 @@ public class DatabaseDemandService implements IDemandService
 
         for ( DbNotification dbn : listDbNotifications )
         {
-            Notification notification = new Notification(  );
-            NotificationService.parseJSON( notification, dbn.getJson(  ) );
+            Notification notification = NotificationService.parseJSON( dbn.getJson(  ) );
             demand.addNotification( notification );
         }
 
