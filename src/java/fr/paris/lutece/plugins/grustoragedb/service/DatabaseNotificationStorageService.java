@@ -98,7 +98,7 @@ public class DatabaseNotificationStorageService implements INotificationStorageS
             dbd = new DbDemand(  );
         }
 
-        dbd.setCustomerId( String.valueOf( demand.getUserCid() ));
+        dbd.setCustomerId( String.valueOf( demand.getCustomer( ).getCustomerId( ) ));
         dbd.setDemandId( strDemandId );
         dbd.setDemandTypeId( strDemandTypeId );
         dbd.setReference(  demand.getReference());
@@ -123,8 +123,8 @@ public class DatabaseNotificationStorageService implements INotificationStorageS
     public void store( Notification notification )
     {
         DbNotification dbn = new DbNotification(  );
-        String strDemandId = String.valueOf( notification.getDemandId(  ) );
-        String strDemandTypeId = String.valueOf( notification.getDemandIdType(  ) );
+        String strDemandId = String.valueOf( notification.getDemand().getDemandId(  ) );
+        String strDemandTypeId = String.valueOf( notification.getDemand().getDemandIdType(  ) );
         DbDemand dbd = DbDemandHome.findByIdAndType( strDemandId, strDemandTypeId );
         dbn.setIdDemand( dbd.getId(  ) );
         dbn.setJson( notification.getJson() );
