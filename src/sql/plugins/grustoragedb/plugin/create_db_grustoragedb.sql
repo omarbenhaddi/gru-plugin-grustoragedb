@@ -25,6 +25,8 @@ demand_reference varchar(50) NOT NULL default '',
 demand_state int(11) NOT NULL default '0',
 max_steps int(11) NOT NULL default '0',
 current_step int(11) NOT NULL default '0',
+status_customer varchar(255) NULL default '',
+status_gru varchar(255) NULL default '',
 PRIMARY KEY (id_demand)
 );
 

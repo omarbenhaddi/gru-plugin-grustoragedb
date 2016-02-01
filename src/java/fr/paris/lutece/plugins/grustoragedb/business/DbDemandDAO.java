@@ -47,14 +47,14 @@ public final class DbDemandDAO implements IDbDemandDAO
 {
     // Constants
     private static final String SQL_QUERY_NEW_PK = "SELECT max( id_demand ) FROM grustoragedb_demand";
-    private static final String SQL_QUERY_SELECT = "SELECT id_demand, customer_id, demand_id, demand_type_id, demand_reference, demand_state, max_steps, current_step FROM grustoragedb_demand WHERE id_demand = ?";
-    private static final String SQL_QUERY_INSERT = "INSERT INTO grustoragedb_demand ( id_demand, customer_id, demand_id, demand_type_id, demand_reference, demand_state, max_steps, current_step ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? ) ";
+    private static final String SQL_QUERY_SELECT = "SELECT id_demand, customer_id, demand_id, demand_type_id, demand_reference, demand_state, max_steps, current_step, status_customer, status_gru FROM grustoragedb_demand WHERE id_demand = ?";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO grustoragedb_demand ( id_demand, customer_id, demand_id, demand_type_id, demand_reference, demand_state, max_steps, current_step, status_customer, status_gru ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM grustoragedb_demand WHERE id_demand = ? ";
-    private static final String SQL_QUERY_UPDATE = "UPDATE grustoragedb_demand SET id_demand = ?, customer_id = ?, demand_id = ?, demand_type_id = ?, demand_reference = ?, demand_state = ?, max_steps = ?, current_step = ? WHERE id_demand = ?";
-    private static final String SQL_QUERY_SELECTALL = "SELECT id_demand, customer_id, demand_id, demand_type_id, demand_reference, demand_state, max_steps, current_step FROM grustoragedb_demand";
+    private static final String SQL_QUERY_UPDATE = "UPDATE grustoragedb_demand SET id_demand = ?, customer_id = ?, demand_id = ?, demand_type_id = ?, demand_reference = ?, demand_state = ?, max_steps = ?, current_step = ? , status_customer = ?, status_gru = ? WHERE id_demand = ?";
+    private static final String SQL_QUERY_SELECTALL = "SELECT id_demand, customer_id, demand_id, demand_type_id, demand_reference, demand_state, max_steps, current_step, status_customer, status_gru FROM grustoragedb_demand";
     private static final String SQL_QUERY_SELECTALL_ID = "SELECT id_demand FROM grustoragedb_demand";
-    private static final String SQL_QUERY_SELECT_BY_ID_AND_TYPE = "SELECT id_demand, customer_id, demand_id, demand_type_id, demand_reference, demand_state, max_steps, current_step FROM grustoragedb_demand WHERE demand_id = ? AND demand_type_id = ?";
-    private static final String SQL_QUERY_SELECT_BY_CUSTOMER = "SELECT id_demand, customer_id, demand_id, demand_type_id, demand_reference, demand_state, max_steps, current_step FROM grustoragedb_demand WHERE customer_id = ?";
+    private static final String SQL_QUERY_SELECT_BY_ID_AND_TYPE = "SELECT id_demand, customer_id, demand_id, demand_type_id, demand_reference, demand_state, max_steps, current_step FROM grustoragedb_demand, status_customer, status_gru WHERE demand_id = ? AND demand_type_id = ?";
+    private static final String SQL_QUERY_SELECT_BY_CUSTOMER = "SELECT id_demand, customer_id, demand_id, demand_type_id, demand_reference, demand_state, max_steps, current_step, status_customer, status_gru FROM grustoragedb_demand WHERE customer_id = ?";
 
     /**
      * Generates a new primary key
@@ -98,6 +98,8 @@ public final class DbDemandDAO implements IDbDemandDAO
         daoUtil.setInt( nIndex++, demand.getDemandState(  ) );
         daoUtil.setInt( nIndex++, demand.getMaxSteps(  ) );
         daoUtil.setInt( nIndex++, demand.getCurrentStep(  ) );
+        daoUtil.setString( nIndex++, demand.getStatusForCustomer(  ) );
+        daoUtil.setString( nIndex++, demand.getStatusForGRU(  ) );
 
         daoUtil.executeUpdate(  );
         daoUtil.free(  );
@@ -127,6 +129,8 @@ public final class DbDemandDAO implements IDbDemandDAO
             demand.setDemandState( daoUtil.getInt( nIndex++ ) );
             demand.setMaxSteps( daoUtil.getInt( nIndex++ ) );
             demand.setCurrentStep( daoUtil.getInt( nIndex++ ) );
+            demand.setStatusForCustomer( daoUtil.getString( nIndex++ ) );
+            demand.setStatusForGRU( daoUtil.getString( nIndex++ ) );
         }
 
         daoUtil.free(  );
@@ -163,6 +167,8 @@ public final class DbDemandDAO implements IDbDemandDAO
         daoUtil.setInt( nIndex++, demand.getDemandState(  ) );
         daoUtil.setInt( nIndex++, demand.getMaxSteps(  ) );
         daoUtil.setInt( nIndex++, demand.getCurrentStep(  ) );
+        daoUtil.setString( nIndex++, demand.getStatusForCustomer(  ) );
+        daoUtil.setString( nIndex++, demand.getStatusForGRU(  ) );
         daoUtil.setInt( nIndex, demand.getId(  ) );
 
         daoUtil.executeUpdate(  );
@@ -191,6 +197,8 @@ public final class DbDemandDAO implements IDbDemandDAO
             demand.setDemandState( daoUtil.getInt( nIndex++ ) );
             demand.setMaxSteps( daoUtil.getInt( nIndex++ ) );
             demand.setCurrentStep( daoUtil.getInt( nIndex++ ) );
+            demand.setStatusForCustomer( daoUtil.getString( nIndex++ ) );
+            demand.setStatusForGRU( daoUtil.getString( nIndex++ ) );
 
             demandList.add( demand );
         }
@@ -245,6 +253,8 @@ public final class DbDemandDAO implements IDbDemandDAO
             demand.setDemandState( daoUtil.getInt( nIndex++ ) );
             demand.setMaxSteps( daoUtil.getInt( nIndex++ ) );
             demand.setCurrentStep( daoUtil.getInt( nIndex++ ) );
+            demand.setStatusForCustomer( daoUtil.getString( nIndex++ ) );
+            demand.setStatusForGRU( daoUtil.getString( nIndex++ ) );
         }
 
         daoUtil.free(  );
@@ -272,6 +282,8 @@ public final class DbDemandDAO implements IDbDemandDAO
             demand.setDemandState( daoUtil.getInt( nIndex++ ) );
             demand.setMaxSteps( daoUtil.getInt( nIndex++ ) );
             demand.setCurrentStep( daoUtil.getInt( nIndex++ ) );
+            demand.setStatusForCustomer( daoUtil.getString( nIndex++ ) );
+            demand.setStatusForGRU( daoUtil.getString( nIndex++ ) );
 
             demandList.add( demand );
         }

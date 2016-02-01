@@ -39,39 +39,43 @@ import java.io.Serializable;
 
 import javax.validation.constraints.*;
 
-
 /**
  * This is the business class for the object DbDemand
  */
 public class DbDemand implements Serializable
 {
+
     private static final long serialVersionUID = 1L;
 
     // Variables declarations 
     private int _nId;
     private String _strCustomerId;
-    @NotEmpty( message = "#i18n{grustoragedb.validation.demand.DemandId.notEmpty}" )
-    @Size( max = 50, message = "#i18n{grustoragedb.validation.demand.DemandId.size}" )
+    @NotEmpty(message = "#i18n{grustoragedb.validation.demand.DemandId.notEmpty}")
+    @Size(max = 50, message = "#i18n{grustoragedb.validation.demand.DemandId.size}")
     private String _strDemandId;
-    @NotEmpty( message = "#i18n{grustoragedb.validation.demand.DemandTypeId.notEmpty}" )
-    @Size( max = 50, message = "#i18n{grustoragedb.validation.demand.DemandTypeId.size}" )
+    @NotEmpty(message = "#i18n{grustoragedb.validation.demand.DemandTypeId.notEmpty}")
+    @Size(max = 50, message = "#i18n{grustoragedb.validation.demand.DemandTypeId.size}")
     private String _strDemandTypeId;
     private String _strReference;
     private int _nDemandState;
     private int _nMaxSteps;
     private int _nCurrentStep;
+    private String _strStatusForCustomer;
+    private String _strStatusForGRU;
 
     /**
      * Returns the Id
+     *
      * @return The Id
      */
-    public int getId(  )
+    public int getId()
     {
         return _nId;
     }
 
     /**
      * Sets the Id
+     *
      * @param nId The Id
      */
     public void setId( int nId )
@@ -81,15 +85,17 @@ public class DbDemand implements Serializable
 
     /**
      * Returns the CustomerId
+     *
      * @return The CustomerId
      */
-    public String getCustomerId(  )
+    public String getCustomerId()
     {
         return _strCustomerId;
     }
 
     /**
      * Sets the CustomerId
+     *
      * @param strCustomerId The CustomerId
      */
     public void setCustomerId( String strCustomerId )
@@ -99,15 +105,17 @@ public class DbDemand implements Serializable
 
     /**
      * Returns the DemandId
+     *
      * @return The DemandId
      */
-    public String getDemandId(  )
+    public String getDemandId()
     {
         return _strDemandId;
     }
 
     /**
      * Sets the DemandId
+     *
      * @param strDemandId The DemandId
      */
     public void setDemandId( String strDemandId )
@@ -117,15 +125,17 @@ public class DbDemand implements Serializable
 
     /**
      * Returns the DemandTypeId
+     *
      * @return The DemandTypeId
      */
-    public String getDemandTypeId(  )
+    public String getDemandTypeId()
     {
         return _strDemandTypeId;
     }
 
     /**
      * Sets the DemandTypeId
+     *
      * @param strDemandTypeId The DemandTypeId
      */
     public void setDemandTypeId( String strDemandTypeId )
@@ -135,15 +145,17 @@ public class DbDemand implements Serializable
 
     /**
      * Returns the Reference
+     *
      * @return The Reference
      */
-    public String getReference(  )
+    public String getReference()
     {
         return _strReference;
     }
 
     /**
      * Sets the Reference
+     *
      * @param strReference The Reference
      */
     public void setReference( String strReference )
@@ -153,15 +165,17 @@ public class DbDemand implements Serializable
 
     /**
      * Returns the DemandState
+     *
      * @return The DemandState
      */
-    public int getDemandState(  )
+    public int getDemandState()
     {
         return _nDemandState;
     }
 
     /**
      * Sets the DemandState
+     *
      * @param nDemandState The DemandState
      */
     public void setDemandState( int nDemandState )
@@ -171,15 +185,17 @@ public class DbDemand implements Serializable
 
     /**
      * Returns the MaxSteps
+     *
      * @return The MaxSteps
      */
-    public int getMaxSteps(  )
+    public int getMaxSteps()
     {
         return _nMaxSteps;
     }
 
     /**
      * Sets the MaxSteps
+     *
      * @param nMaxSteps The MaxSteps
      */
     public void setMaxSteps( int nMaxSteps )
@@ -189,19 +205,61 @@ public class DbDemand implements Serializable
 
     /**
      * Returns the CurrentStep
+     *
      * @return The CurrentStep
      */
-    public int getCurrentStep(  )
+    public int getCurrentStep()
     {
         return _nCurrentStep;
     }
 
     /**
      * Sets the CurrentStep
+     *
      * @param nCurrentStep The CurrentStep
      */
     public void setCurrentStep( int nCurrentStep )
     {
         _nCurrentStep = nCurrentStep;
+    }
+
+    /**
+     * Returns the StatusForCustomer
+     *
+     * @return The StatusForCustomer
+     */
+    public String getStatusForCustomer()
+    {
+        return _strStatusForCustomer;
+    }
+
+    /**
+     * Sets the StatusForCustomer
+     *
+     * @param strStatusForCustomer The StatusForCustomer
+     */
+    public void setStatusForCustomer( String strStatusForCustomer )
+    {
+        _strStatusForCustomer = strStatusForCustomer;
+    }
+
+    /**
+     * Returns the StatusForGRU
+     *
+     * @return The StatusForGRU
+     */
+    public String getStatusForGRU()
+    {
+        return _strStatusForGRU;
+    }
+
+    /**
+     * Sets the StatusForGRU
+     *
+     * @param strStatusForGRU The StatusForGRU
+     */
+    public void setStatusForGRU( String strStatusForGRU )
+    {
+        _strStatusForGRU = strStatusForGRU;
     }
 }

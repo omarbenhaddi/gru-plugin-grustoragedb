@@ -33,13 +33,16 @@
  */
 package fr.paris.lutece.plugins.grustoragedb.service;
 
+import com.mysql.jdbc.StringUtils;
 import fr.paris.lutece.plugins.grustoragedb.business.DbCustomer;
 import fr.paris.lutece.plugins.grustoragedb.business.DbCustomerHome;
 import fr.paris.lutece.plugins.grustoragedb.business.DbDemand;
 import fr.paris.lutece.plugins.grustoragedb.business.DbDemandHome;
 import fr.paris.lutece.plugins.grustoragedb.business.DbNotification;
 import fr.paris.lutece.plugins.grustoragedb.business.DbNotificationHome;
+import fr.paris.lutece.plugins.grusupply.business.BackofficeNotification;
 import fr.paris.lutece.plugins.grusupply.business.Customer;
+import fr.paris.lutece.plugins.grusupply.business.DashboardNotification;
 import fr.paris.lutece.plugins.grusupply.business.Demand;
 import fr.paris.lutece.plugins.grusupply.business.Notification;
 import fr.paris.lutece.plugins.grusupply.service.INotificationStorageService;
@@ -129,5 +132,29 @@ public class DatabaseNotificationStorageService implements INotificationStorageS
         dbn.setIdDemand( dbd.getId(  ) );
         dbn.setJson( notification.getJson() );
         DbNotificationHome.create( dbn );
+        
+        // Update the demand Status if anew status is found in a dashboard or a backoffice notification
+        boolean bUpdateDemand = false; 
+        
+        DashboardNotification dashboardNotif = notification.getUserDashBoard();
+        if( ( dashboardNotif != null ) && ( ! StringUtils.isNullOrEmpty( dashboardNotif.getStatusText() ) ))
+        {
+            dbd.setStatusForGRU( dashboardNotif.getStatusText() );
+            bUpdateDemand = true;
+        }
+                
+        BackofficeNotification boNotif = notification.getUserBackOffice();
+        if( ( boNotif != null ) && ( ! StringUtils.isNullOrEmpty( boNotif.getStatusText() ) ))
+        {
+            dbd.setStatusForGRU( boNotif.getStatusText() );
+            bUpdateDemand = true;
+        }
+        
+        if ( bUpdateDemand )
+        {
+            DbDemandHome.update( dbd );
+        }
+        
+        
     }
 }
