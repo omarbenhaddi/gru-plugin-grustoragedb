@@ -34,6 +34,7 @@
 package fr.paris.lutece.plugins.grustoragedb.service;
 
 import com.mysql.jdbc.StringUtils;
+
 import fr.paris.lutece.plugins.grustoragedb.business.DbCustomer;
 import fr.paris.lutece.plugins.grustoragedb.business.DbCustomerHome;
 import fr.paris.lutece.plugins.grustoragedb.business.DbDemand;
@@ -71,7 +72,6 @@ public class DatabaseNotificationStorageService implements INotificationStorageS
 
         dbc.setCustomerId( String.valueOf( nCustomerId ) );
         dbc.setCustomerEmail( customer.getEmail(  ) );
-        
 
         if ( bCreate )
         {
@@ -101,10 +101,10 @@ public class DatabaseNotificationStorageService implements INotificationStorageS
             dbd = new DbDemand(  );
         }
 
-        dbd.setCustomerId( String.valueOf( demand.getCustomer( ).getCustomerId( ) ));
+        dbd.setCustomerId( String.valueOf( demand.getCustomer(  ).getCustomerId(  ) ) );
         dbd.setDemandId( strDemandId );
         dbd.setDemandTypeId( strDemandTypeId );
-        dbd.setReference(  demand.getReference());
+        dbd.setReference( demand.getReference(  ) );
         dbd.setDemandState( demand.getDemandState(  ) );
         dbd.setMaxSteps( demand.getDemandMaxStep(  ) );
         dbd.setCurrentStep( demand.getDemandUserCurrentStep(  ) );
@@ -126,35 +126,35 @@ public class DatabaseNotificationStorageService implements INotificationStorageS
     public void store( Notification notification )
     {
         DbNotification dbn = new DbNotification(  );
-        String strDemandId = String.valueOf( notification.getDemand().getDemandId(  ) );
-        String strDemandTypeId = String.valueOf( notification.getDemand().getDemandIdType(  ) );
+        String strDemandId = String.valueOf( notification.getDemand(  ).getDemandId(  ) );
+        String strDemandTypeId = String.valueOf( notification.getDemand(  ).getDemandIdType(  ) );
         DbDemand dbd = DbDemandHome.findByIdAndType( strDemandId, strDemandTypeId );
         dbn.setIdDemand( dbd.getId(  ) );
-        dbn.setJson( notification.getJson() );
+        dbn.setJson( notification.getJson(  ) );
         DbNotificationHome.create( dbn );
-        
+
         // Update the demand Status if anew status is found in a dashboard or a backoffice notification
-        boolean bUpdateDemand = false; 
-        
-        DashboardNotification dashboardNotif = notification.getUserDashBoard();
-        if( ( dashboardNotif != null ) && ( ! StringUtils.isNullOrEmpty( dashboardNotif.getStatusText() ) ))
+        boolean bUpdateDemand = false;
+
+        DashboardNotification dashboardNotif = notification.getUserDashBoard(  );
+
+        if ( ( dashboardNotif != null ) && ( !StringUtils.isNullOrEmpty( dashboardNotif.getStatusText(  ) ) ) )
         {
-            dbd.setStatusForGRU( dashboardNotif.getStatusText() );
+            dbd.setStatusForGRU( dashboardNotif.getStatusText(  ) );
             bUpdateDemand = true;
         }
-                
-        BackofficeNotification boNotif = notification.getUserBackOffice();
-        if( ( boNotif != null ) && ( ! StringUtils.isNullOrEmpty( boNotif.getStatusText() ) ))
+
+        BackofficeNotification boNotif = notification.getUserBackOffice(  );
+
+        if ( ( boNotif != null ) && ( !StringUtils.isNullOrEmpty( boNotif.getStatusText(  ) ) ) )
         {
-            dbd.setStatusForGRU( boNotif.getStatusText() );
+            dbd.setStatusForGRU( boNotif.getStatusText(  ) );
             bUpdateDemand = true;
         }
-        
+
         if ( bUpdateDemand )
         {
             DbDemandHome.update( dbd );
         }
-        
-        
     }
 }
