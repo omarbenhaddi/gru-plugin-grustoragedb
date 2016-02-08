@@ -49,6 +49,11 @@ import javax.ws.rs.core.MediaType;
 @Path( RestConstants.BASE_PATH + "grustoragedb" )
 public class AutoCompleteRestService
 {
+    /**
+     * Auto complete web service
+     * @param strQuery The query
+     * @return Data for auto complete as JSON
+     */
     @GET
     @Path( "autocomplete" )
     @Produces( MediaType.APPLICATION_JSON )
