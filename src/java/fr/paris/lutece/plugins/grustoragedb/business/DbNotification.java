@@ -33,11 +33,7 @@
  */
 package fr.paris.lutece.plugins.grustoragedb.business;
 
-import org.hibernate.validator.constraints.*;
-
 import java.io.Serializable;
-
-import javax.validation.constraints.*;
 
 
 /**

@@ -34,7 +34,6 @@
 package fr.paris.lutece.plugins.grustoragedb.web.rs;
 
 import fr.paris.lutece.plugins.grustoragedb.service.AutoCompleteService;
-import fr.paris.lutece.plugins.grustoragedb.service.lucene.SearchService;
 import fr.paris.lutece.plugins.rest.service.RestConstants;
 
 import javax.ws.rs.GET;
@@ -45,8 +44,7 @@ import javax.ws.rs.core.MediaType;
 
 
 /**
- *
- * @author pierre
+ * AutoCompleteRestService
  */
 @Path( RestConstants.BASE_PATH + "grustoragedb" )
 public class AutoCompleteRestService

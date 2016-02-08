@@ -72,7 +72,7 @@ import java.util.List;
 /**
  * SearchService
  */
-public class SearchService
+public final class SearchService
 {
     private static final String PATH_INDEX = "WEB-INF/plugins/grustoragedb/indexes";
     private static final String FIELD_CUSTOMER_INFOS = "customer";
@@ -81,6 +81,11 @@ public class SearchService
     private static final String FIELD_LASTNAME = "lastname";
     private static final String FIELD_EMAIL = "email";
     private static final String FIELD_PHONE = "phone";
+
+    /** Private constructor */
+    private SearchService()
+    {
+    }
 
     /**
      * Index a customer

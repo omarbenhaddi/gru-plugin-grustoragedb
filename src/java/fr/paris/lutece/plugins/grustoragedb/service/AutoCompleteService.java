@@ -45,10 +45,20 @@ import java.util.List;
 /**
  * AutoCompleteService
  */
-public class AutoCompleteService
+public final class AutoCompleteService
 {
     private static final int INDENT = 4;
 
+    /** Private constructor */
+    private AutoCompleteService()
+    {
+    }
+            
+    /**
+     * Returns a json string for autocomplete purpose 
+     * @param strQuery The query
+     * @return The JSON
+     */
     public static String getJson( String strQuery )
     {
         List<CustomerResult> listCustomers = SearchService.searchCustomer( strQuery );
