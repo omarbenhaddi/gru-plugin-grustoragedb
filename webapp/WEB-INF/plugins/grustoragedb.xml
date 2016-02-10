@@ -31,11 +31,15 @@
       </admin-feature>
     </admin-features>    
 
-    <!-- XPages parameters -->
-    <applications>
-    </applications>
+<!-- Daemons -->
+    <daemons>
+        <daemon>
+            <daemon-id>customerIndexerDaemon</daemon-id>
+            <daemon-name>grustoragedb.customerIndexerDaemon.name</daemon-name>
+            <daemon-description>grustoragedb.customerIndexerDaemon.description</daemon-description>
+            <daemon-class>fr.paris.lutece.plugins.grustoragedb.service.search.CustomerIndexerDaemon</daemon-class>
+        </daemon>
+    </daemons>
 
-    <!-- Portlet parameters -->
-    <portlets>
-   </portlets>
+
 </plug-in>

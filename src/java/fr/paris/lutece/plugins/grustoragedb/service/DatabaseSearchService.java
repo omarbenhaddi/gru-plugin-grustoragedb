@@ -35,7 +35,7 @@ package fr.paris.lutece.plugins.grustoragedb.service;
 
 import fr.paris.lutece.plugins.gru.service.search.CustomerResult;
 import fr.paris.lutece.plugins.gru.service.search.ISearchService;
-import fr.paris.lutece.plugins.grustoragedb.service.lucene.SearchService;
+import fr.paris.lutece.plugins.grustoragedb.service.search.SearchService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 
 import java.util.List;

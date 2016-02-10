@@ -31,53 +31,24 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.grustoragedb.service;
 
-import fr.paris.lutece.plugins.gru.service.search.CustomerResult;
-import fr.paris.lutece.plugins.grustoragedb.service.search.SearchService;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+package fr.paris.lutece.plugins.grustoragedb.service.search;
 
-import java.util.List;
-
+import fr.paris.lutece.portal.service.daemon.Daemon;
 
 /**
- * AutoCompleteService
+ * CustomerIndexerDaemon
  */
-public final class AutoCompleteService
+public class CustomerIndexerDaemon extends Daemon
 {
-    private static final int INDENT = 4;
-
-    /** Private constructor */
-    private AutoCompleteService()
-    {
-    }
-            
     /**
-     * Returns a json string for autocomplete purpose 
-     * @param strQuery The query
-     * @return The JSON
+     * {@inheritDoc }
      */
-    public static String getJson( String strQuery )
+    @Override
+    public void run()
     {
-        List<CustomerResult> listCustomers = SearchService.searchCustomer( strQuery + "*" );
-        JSONObject json = new JSONObject();
-        
-        JSONArray jsonAutocomplete = new JSONArray(  );
-
-        for ( CustomerResult customer : listCustomers )
-        {
-            JSONObject jsonItem = new JSONObject(  );
-            JSONObject jsonItemContent = new JSONObject(  );
-            
-            jsonItemContent.accumulate( "first_name", customer.getFirstname(  ) );
-            jsonItemContent.accumulate( "last_name", customer.getLastname(  ) );
-            jsonItem.accumulate( "item", jsonItemContent );
-            jsonAutocomplete.add( jsonItem );
-        }
-        json.accumulate( "autocomplete", jsonAutocomplete );
-        return json.toString( INDENT );
-        
+        setLastRunLogs( SearchService.indexAll() );
     }
+
 }

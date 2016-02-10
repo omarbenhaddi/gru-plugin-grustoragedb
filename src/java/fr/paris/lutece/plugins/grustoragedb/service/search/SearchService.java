@@ -31,10 +31,11 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.grustoragedb.service.lucene;
+package fr.paris.lutece.plugins.grustoragedb.service.search;
 
+import fr.paris.lutece.plugins.gru.business.customer.CustomerHome;
 import fr.paris.lutece.plugins.gru.service.search.CustomerResult;
-import fr.paris.lutece.plugins.grusupply.business.Customer;
+import fr.paris.lutece.plugins.gru.business.customer.Customer;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPathService;
 
@@ -87,6 +88,42 @@ public final class SearchService
     {
     }
 
+    public static String indexAll( )
+    {
+        StringBuilder sbLogs = new StringBuilder();
+        List<Customer> list = CustomerHome.getCustomersList();
+        try
+        {
+            Directory dir = FSDirectory.open( getIndexPath(  ) );
+            Analyzer analyzer = new StandardAnalyzer( Version.LUCENE_4_9 );
+            IndexWriterConfig iwc = new IndexWriterConfig( Version.LUCENE_4_9, analyzer );
+            boolean bCreate = true;
+
+            if ( bCreate )
+            {
+                iwc.setOpenMode( OpenMode.CREATE );
+            }
+            else
+            {
+                iwc.setOpenMode( OpenMode.CREATE_OR_APPEND );
+            }
+
+            IndexWriter writer = new IndexWriter( dir, iwc );
+            for( Customer customer  : list )
+            {
+                index( writer, customer );
+            }
+            sbLogs.append( "Indexed customers : " + list.size() );
+            writer.close(  );
+        }
+        catch ( IOException ex )
+        {
+            AppLogService.error( "Error indexing customer : " + ex.getMessage(  ), ex );
+        }
+        return sbLogs.toString();
+    }
+    
+    
     /**
      * Index a customer
      * @param customer The customer to index
@@ -176,15 +213,15 @@ public final class SearchService
     {
         Document doc = new Document(  );
         StringBuilder sbCustomerInfos = new StringBuilder(  );
-        sbCustomerInfos.append( customer.getFirstName(  ) ).append( " " ).append( customer.getName(  ) );
+        sbCustomerInfos.append( customer.getFirstname(  ) ).append( " " ).append( customer.getLastname(  ) );
 
-        Field fielIdname = new StringField( FIELD_ID, "" + customer.getCustomerId(  ), Field.Store.YES );
+        Field fielIdname = new StringField( FIELD_ID, "" + customer.getId(), Field.Store.YES );
         doc.add( fielIdname );
 
-        Field fielFirstname = new StringField( FIELD_FIRSTNAME, customer.getFirstName(  ), Field.Store.YES );
+        Field fielFirstname = new StringField( FIELD_FIRSTNAME, customer.getFirstname(  ), Field.Store.YES );
         doc.add( fielFirstname );
 
-        Field fielLastname = new StringField( FIELD_LASTNAME, customer.getName(  ), Field.Store.YES );
+        Field fielLastname = new StringField( FIELD_LASTNAME, customer.getLastname(  ), Field.Store.YES );
         doc.add( fielLastname );
 
         if ( customer.getEmail(  ) != null )
@@ -194,11 +231,11 @@ public final class SearchService
             sbCustomerInfos.append( " " ).append( customer.getEmail(  ) );
         }
 
-        if ( customer.getTelephoneNumber(  ) != null )
+        if ( customer.getMobilePhone() != null )
         {
-            Field fieldPhone = new StringField( FIELD_PHONE, customer.getTelephoneNumber(  ), Field.Store.YES );
+            Field fieldPhone = new StringField( FIELD_PHONE, customer.getMobilePhone(  ), Field.Store.YES );
             doc.add( fieldPhone );
-            sbCustomerInfos.append( " " ).append( customer.getTelephoneNumber(  ) );
+            sbCustomerInfos.append( " " ).append( customer.getMobilePhone(  ) );
         }
 
         Field fieldCustomer = new TextField( FIELD_CUSTOMER_INFOS, sbCustomerInfos.toString(  ), Field.Store.YES );
