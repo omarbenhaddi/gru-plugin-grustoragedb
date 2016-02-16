@@ -53,7 +53,7 @@ public final class DbDemandDAO implements IDbDemandDAO
     private static final String SQL_QUERY_UPDATE = "UPDATE grustoragedb_demand SET id_demand = ?, customer_id = ?, demand_id = ?, demand_type_id = ?, demand_reference = ?, demand_state = ?, max_steps = ?, current_step = ? , status_customer = ?, status_gru = ? WHERE id_demand = ?";
     private static final String SQL_QUERY_SELECTALL = "SELECT id_demand, customer_id, demand_id, demand_type_id, demand_reference, demand_state, max_steps, current_step, status_customer, status_gru FROM grustoragedb_demand";
     private static final String SQL_QUERY_SELECTALL_ID = "SELECT id_demand FROM grustoragedb_demand";
-    private static final String SQL_QUERY_SELECT_BY_ID_AND_TYPE = "SELECT id_demand, customer_id, demand_id, demand_type_id, demand_reference, demand_state, max_steps, current_step FROM grustoragedb_demand, status_customer, status_gru WHERE demand_id = ? AND demand_type_id = ?";
+    private static final String SQL_QUERY_SELECT_BY_ID_AND_TYPE = "SELECT id_demand, customer_id, demand_id, demand_type_id, demand_reference, demand_state, max_steps, current_step, status_customer, status_gru FROM grustoragedb_demand WHERE demand_id = ? AND demand_type_id = ?";
     private static final String SQL_QUERY_SELECT_BY_CUSTOMER = "SELECT id_demand, customer_id, demand_id, demand_type_id, demand_reference, demand_state, max_steps, current_step, status_customer, status_gru FROM grustoragedb_demand WHERE customer_id = ?";
 
     /**

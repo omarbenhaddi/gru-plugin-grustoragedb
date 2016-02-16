@@ -61,6 +61,8 @@ public class DatabaseDemandService implements IDemandService
     {
         DbDemand dbd = DbDemandHome.findByIdAndType( strDemandId, strDemandTypeId );
         Demand demand = new Demand(  );
+        demand.setId( strDemandId );
+        demand.setDemandTypeId( strDemandTypeId );
         demand.setStatus( dbd.getDemandState(  ) );
         demand.setReference( dbd.getReference(  ) );
 
