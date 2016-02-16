@@ -36,6 +36,7 @@ package fr.paris.lutece.plugins.grustoragedb.service;
 import fr.paris.lutece.plugins.gru.business.demand.BaseDemand;
 import fr.paris.lutece.plugins.gru.business.demand.Demand;
 import fr.paris.lutece.plugins.gru.business.demand.Notification;
+import fr.paris.lutece.plugins.gru.business.demand.UserDashboard;
 import fr.paris.lutece.plugins.gru.service.demand.IDemandService;
 import fr.paris.lutece.plugins.gru.service.demand.NotificationService;
 import fr.paris.lutece.plugins.grustoragedb.business.DbDemand;
@@ -46,6 +47,7 @@ import fr.paris.lutece.portal.business.user.AdminUser;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang.StringUtils;
 
 
 /**
@@ -65,6 +67,7 @@ public class DatabaseDemandService implements IDemandService
         demand.setDemandTypeId( strDemandTypeId );
         demand.setStatus( dbd.getDemandState(  ) );
         demand.setReference( dbd.getReference(  ) );
+        
 
         List<DbNotification> listDbNotifications = DbNotificationHome.findByDemand( dbd.getId(  ) );
 
@@ -72,7 +75,13 @@ public class DatabaseDemandService implements IDemandService
         {
             Notification notification = NotificationService.parseJSON( dbn.getJson(  ) );
             demand.addNotification( notification );
-        }
+            
+            UserDashboard ud = notification.getUserDashboard();
+            if( ( ud != null ) && StringUtils.isNotBlank( ud.getStatusText() ))
+            {
+                demand.setStatusForCustomer( ud.getStatusText() );
+            }
+         }
 
         return demand;
     }
