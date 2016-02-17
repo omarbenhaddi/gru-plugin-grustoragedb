@@ -36,6 +36,10 @@ package fr.paris.lutece.plugins.grustoragedb.service.search;
 import fr.paris.lutece.plugins.gru.business.customer.CustomerHome;
 import fr.paris.lutece.plugins.gru.service.search.CustomerResult;
 import fr.paris.lutece.plugins.gru.business.customer.Customer;
+import fr.paris.lutece.plugins.gru.business.demand.Demand;
+import fr.paris.lutece.plugins.gru.service.demand.DemandService;
+import fr.paris.lutece.plugins.grustoragedb.business.DbDemand;
+import fr.paris.lutece.plugins.grustoragedb.business.DbDemandHome;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPathService;
 
@@ -68,6 +72,7 @@ import java.nio.file.Paths;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang.StringUtils;
 
 
 /**
@@ -239,6 +244,17 @@ public final class SearchService
             sbCustomerInfos.append( " " ).append( customer.getMobilePhone(  ) );
         }
 
+        // Index demands references
+        List<DbDemand> listDemands = DbDemandHome.findByCustomer( "" + customer.getId() );
+        for( DbDemand demand : listDemands )
+        {
+            if( StringUtils.isNotBlank( demand.getReference() ))
+            {
+                sbCustomerInfos.append( " " ).append( demand.getReference(  ) );
+            }
+        }
+        
+        
         Field fieldCustomer = new TextField( FIELD_CUSTOMER_INFOS, sbCustomerInfos.toString(  ), Field.Store.YES );
         doc.add( fieldCustomer );
 
