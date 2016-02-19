@@ -33,6 +33,7 @@
  */
 package fr.paris.lutece.plugins.grustoragedb.service;
 
+import fr.paris.lutece.plugins.gru.business.demand.BackOfficeLogging;
 import fr.paris.lutece.plugins.gru.business.demand.BaseDemand;
 import fr.paris.lutece.plugins.gru.business.demand.Demand;
 import fr.paris.lutece.plugins.gru.business.demand.Notification;
@@ -46,6 +47,7 @@ import fr.paris.lutece.plugins.grustoragedb.business.DbNotificationHome;
 import fr.paris.lutece.portal.business.user.AdminUser;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import org.apache.commons.lang.StringUtils;
 
@@ -71,18 +73,44 @@ public class DatabaseDemandService implements IDemandService
 
         List<DbNotification> listDbNotifications = DbNotificationHome.findByDemand( dbd.getId(  ) );
 
+        long lFirstDate = 0;
+        long lLastDate = 0;
+        
         for ( DbNotification dbn : listDbNotifications )
         {
             Notification notification = NotificationService.parseJSON( dbn.getJson(  ) );
             demand.addNotification( notification );
-            
+            if( lFirstDate == 0 )
+            {
+                lFirstDate = notification.getTimestamp();
+            }
+            lLastDate = notification.getTimestamp();
+                    
             UserDashboard ud = notification.getUserDashboard();
             if( ( ud != null ) && StringUtils.isNotBlank( ud.getStatusText() ))
             {
                 demand.setStatusForCustomer( ud.getStatusText() );
             }
-         }
-
+            
+            BackOfficeLogging bol = notification.getBackOfficeLogging();
+            if( ( bol != null ) && StringUtils.isNotBlank( bol.getStatusText() ))
+            {
+                demand.setStatusForGRU( bol.getStatusText() );
+            }
+            
+        }
+        
+        
+        if( demand.getStatus() == Demand.STATUS_CLOSED )
+        {
+            demand.setTimeOpenedInMs( lLastDate - lFirstDate );
+        }
+        else
+        {
+            demand.setTimeOpenedInMs( (new Date()).getTime() - lFirstDate );
+        }
+            
+        
         return demand;
     }
 
