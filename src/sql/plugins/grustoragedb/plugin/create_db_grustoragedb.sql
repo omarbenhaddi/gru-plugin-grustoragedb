@@ -27,6 +27,8 @@ max_steps int(11) NOT NULL default '0',
 current_step int(11) NOT NULL default '0',
 status_customer varchar(255) NULL default '',
 status_gru varchar(255) NULL default '',
+first_notification_date bigint(20) NOT NULL default '0',
+last_notification_date bigint(20) NOT NULL default '0',
 PRIMARY KEY (id_demand)
 );
 

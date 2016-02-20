@@ -107,7 +107,7 @@ public class DatabaseDemandService implements IDemandService
         }
         else
         {
-            demand.setTimeOpenedInMs( (new Date()).getTime() - lFirstDate );
+            demand.setTimeOpenedInMs( now() - lFirstDate );
         }
             
         
@@ -130,9 +130,27 @@ public class DatabaseDemandService implements IDemandService
             demand.setDemandTypeId( dbd.getDemandTypeId(  ) );
             demand.setReference( dbd.getReference(  ) );
             demand.setStatus( dbd.getDemandState(  ) );
+            if( demand.getStatus() == Demand.STATUS_CLOSED )
+            {
+                demand.setTimeOpenedInMs( dbd.getLastNotificationDate() - dbd.getFirstNotificationDate() );
+            }
+            else
+            {
+                demand.setTimeOpenedInMs( now() - dbd.getFirstNotificationDate() );
+            }
+            
             listBaseDemands.add( demand );
         }
 
         return listBaseDemands;
+    }
+    
+    /**
+     * Return the current time in ms
+     * @return the current time
+     */
+    private long now()
+    {
+        return ( new Date() ).getTime();
     }
 }

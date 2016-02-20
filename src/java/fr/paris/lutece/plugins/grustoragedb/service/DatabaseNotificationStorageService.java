@@ -133,15 +133,11 @@ public class DatabaseNotificationStorageService implements INotificationStorageS
         dbn.setJson( notification.getJson(  ) );
         DbNotificationHome.create( dbn );
 
-        // Update the demand Status if anew status is found in a dashboard or a backoffice notification
-        boolean bUpdateDemand = false;
-
         DashboardNotification dashboardNotif = notification.getUserDashBoard(  );
 
         if ( ( dashboardNotif != null ) && ( !StringUtils.isNullOrEmpty( dashboardNotif.getStatusText(  ) ) ) )
         {
             dbd.setStatusForGRU( dashboardNotif.getStatusText(  ) );
-            bUpdateDemand = true;
         }
 
         BackofficeNotification boNotif = notification.getUserBackOffice(  );
@@ -149,12 +145,14 @@ public class DatabaseNotificationStorageService implements INotificationStorageS
         if ( ( boNotif != null ) && ( !StringUtils.isNullOrEmpty( boNotif.getStatusText(  ) ) ) )
         {
             dbd.setStatusForGRU( boNotif.getStatusText(  ) );
-            bUpdateDemand = true;
         }
 
-        if ( bUpdateDemand )
+        if( dbd.getFirstNotificationDate() == 0L )
         {
-            DbDemandHome.update( dbd );
+            dbd.setFirstNotificationDate( notification.getDateNotification() );
         }
+        dbd.setLastNotificationDate( notification.getDateNotification() );
+        
+        DbDemandHome.update( dbd );
     }
 }

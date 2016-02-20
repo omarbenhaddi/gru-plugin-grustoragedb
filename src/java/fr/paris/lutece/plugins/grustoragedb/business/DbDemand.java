@@ -62,6 +62,8 @@ public class DbDemand implements Serializable
     private int _nCurrentStep;
     private String _strStatusForCustomer;
     private String _strStatusForGRU;
+    private long _lFirstNotificationDate; 
+    private long _lLastNotificationDate; 
 
     /**
      * Returns the Id
@@ -262,4 +264,40 @@ public class DbDemand implements Serializable
     {
         _strStatusForGRU = strStatusForGRU;
     }
+    
+      /**
+        * Returns the FirstNotificationDate
+        * @return The FirstNotificationDate
+        */ 
+    public long getFirstNotificationDate()
+    {
+        return _lFirstNotificationDate;
+    }
+    
+       /**
+        * Sets the FirstNotificationDate
+        * @param lFirstNotificationDate The FirstNotificationDate
+        */ 
+    public void setFirstNotificationDate( long lFirstNotificationDate )
+    {
+        _lFirstNotificationDate = lFirstNotificationDate;
+    }
+    
+       /**
+        * Returns the LastNotificationDate
+        * @return The LastNotificationDate
+        */ 
+    public long getLastNotificationDate()
+    {
+        return _lLastNotificationDate;
+    }
+    
+       /**
+        * Sets the LastNotificationDate
+        * @param lLastNotificationDate The LastNotificationDate
+        */ 
+    public void setLastNotificationDate( long lLastNotificationDate )
+    {
+        _lLastNotificationDate = lLastNotificationDate;
+    }    
 }
