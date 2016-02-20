@@ -172,6 +172,7 @@ public final class SearchService
             Analyzer analyzer = new StandardAnalyzer( Version.LUCENE_4_9 );
 
             QueryParser parser = new QueryParser( Version.LUCENE_4_9, FIELD_CUSTOMER_INFOS, analyzer );
+            parser.setDefaultOperator( QueryParser.Operator.AND );
             Query query = parser.parse( strQuery );
             TopDocs results = searcher.search( query, 10 );
             ScoreDoc[] hits = results.scoreDocs;
