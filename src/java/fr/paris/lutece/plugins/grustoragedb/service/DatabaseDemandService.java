@@ -96,6 +96,7 @@ public class DatabaseDemandService implements IDemandService
             if( ( bol != null ) && StringUtils.isNotBlank( bol.getStatusText() ))
             {
                 demand.setStatusForGRU( bol.getStatusText() );
+                notification.setTitle( bol.getMessage() );
             }
             
         }
