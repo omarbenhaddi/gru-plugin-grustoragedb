@@ -91,7 +91,7 @@ public class DatabaseNotificationStorageService implements INotificationStorageS
     {
         boolean bCreate = false;
         String strDemandId = String.valueOf( demand.getDemandId(  ) );
-        String strDemandTypeId = String.valueOf( demand.getDemandIdType(  ) );
+        String strDemandTypeId = String.valueOf( demand.getDemandTypeId(  ) );
 
         DbDemand dbd = DbDemandHome.findByIdAndType( strDemandId, strDemandTypeId );
 
@@ -127,7 +127,7 @@ public class DatabaseNotificationStorageService implements INotificationStorageS
     {
         DbNotification dbn = new DbNotification(  );
         String strDemandId = String.valueOf( notification.getDemand(  ).getDemandId(  ) );
-        String strDemandTypeId = String.valueOf( notification.getDemand(  ).getDemandIdType(  ) );
+        String strDemandTypeId = String.valueOf( notification.getDemand(  ).getDemandTypeId(  ) );
         DbDemand dbd = DbDemandHome.findByIdAndType( strDemandId, strDemandTypeId );
         dbn.setIdDemand( dbd.getId(  ) );
         dbn.setJson( notification.getJson(  ) );
