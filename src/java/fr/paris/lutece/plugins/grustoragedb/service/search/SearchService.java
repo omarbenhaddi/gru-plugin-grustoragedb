@@ -36,15 +36,12 @@ package fr.paris.lutece.plugins.grustoragedb.service.search;
 import fr.paris.lutece.plugins.gru.business.customer.CustomerHome;
 import fr.paris.lutece.plugins.gru.service.search.CustomerResult;
 import fr.paris.lutece.plugins.gru.business.customer.Customer;
-import fr.paris.lutece.plugins.gru.business.demand.Demand;
-import fr.paris.lutece.plugins.gru.service.demand.DemandService;
 import fr.paris.lutece.plugins.grustoragedb.business.DbDemand;
 import fr.paris.lutece.plugins.grustoragedb.business.DbDemandHome;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPathService;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
@@ -73,6 +70,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang.StringUtils;
+import org.apache.lucene.analysis.fr.FrenchAnalyzer;
 
 
 /**
@@ -80,13 +78,15 @@ import org.apache.commons.lang.StringUtils;
  */
 public final class SearchService
 {
-    private static final String PATH_INDEX = "WEB-INF/plugins/grustoragedb/indexes";
+    private static final String PATH_INDEX = "/WEB-INF/plugins/grustoragedb/indexes";
     private static final String FIELD_CUSTOMER_INFOS = "customer";
     private static final String FIELD_ID = "id";
     private static final String FIELD_FIRSTNAME = "firstname";
     private static final String FIELD_LASTNAME = "lastname";
     private static final String FIELD_EMAIL = "email";
     private static final String FIELD_PHONE = "phone";
+    
+    private static Analyzer _analyzer = new FrenchAnalyzer( Version.LUCENE_4_9 );
 
     /** Private constructor */
     private SearchService()
@@ -100,8 +100,7 @@ public final class SearchService
         try
         {
             Directory dir = FSDirectory.open( getIndexPath(  ) );
-            Analyzer analyzer = new StandardAnalyzer( Version.LUCENE_4_9 );
-            IndexWriterConfig iwc = new IndexWriterConfig( Version.LUCENE_4_9, analyzer );
+            IndexWriterConfig iwc = new IndexWriterConfig( Version.LUCENE_4_9, _analyzer );
             boolean bCreate = true;
 
             if ( bCreate )
@@ -118,7 +117,7 @@ public final class SearchService
             {
                 index( writer, customer );
             }
-            sbLogs.append( "Indexed customers : " + list.size() );
+            sbLogs.append("Indexed customers : ").append(list.size());
             writer.close(  );
         }
         catch ( IOException ex )
@@ -138,8 +137,7 @@ public final class SearchService
         try
         {
             Directory dir = FSDirectory.open( getIndexPath(  ) );
-            Analyzer analyzer = new StandardAnalyzer( Version.LUCENE_4_9 );
-            IndexWriterConfig iwc = new IndexWriterConfig( Version.LUCENE_4_9, analyzer );
+            IndexWriterConfig iwc = new IndexWriterConfig( Version.LUCENE_4_9, _analyzer );
             boolean bCreate = true;
 
             if ( bCreate )
@@ -174,9 +172,8 @@ public final class SearchService
         {
             IndexReader reader = DirectoryReader.open( FSDirectory.open( getIndexPath(  ) ) );
             IndexSearcher searcher = new IndexSearcher( reader );
-            Analyzer analyzer = new StandardAnalyzer( Version.LUCENE_4_9 );
 
-            QueryParser parser = new QueryParser( Version.LUCENE_4_9, FIELD_CUSTOMER_INFOS, analyzer );
+            QueryParser parser = new QueryParser( Version.LUCENE_4_9, FIELD_CUSTOMER_INFOS, _analyzer );
             parser.setDefaultOperator( QueryParser.Operator.AND );
             Query query = parser.parse( strQuery );
             TopDocs results = searcher.search( query, 10 );
