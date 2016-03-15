@@ -190,7 +190,6 @@ public final class SearchService
                 customer.setId( Integer.parseInt( doc.get( FIELD_ID ) ) );
                 list.add( customer );
             }
-
             reader.close(  );
         }
         catch ( IOException ex )
@@ -240,9 +239,9 @@ public final class SearchService
             doc.add( fieldPhone );
             sbCustomerInfos.append( " " ).append( customer.getMobilePhone(  ) );
         }
-
+        
         // Index demands references
-        List<DbDemand> listDemands = DbDemandHome.findByCustomer( "" + customer.getId() );
+        List<DbDemand> listDemands = DbDemandHome.findByCustomer( String.valueOf( customer.getId() ));
         for( DbDemand demand : listDemands )
         {
             if( StringUtils.isNotBlank( demand.getReference() ))
@@ -251,8 +250,8 @@ public final class SearchService
             }
         }
         
-        
-        Field fieldCustomer = new TextField( FIELD_CUSTOMER_INFOS, sbCustomerInfos.toString(  ), Field.Store.YES );
+        Field fieldCustomer = new TextField( FIELD_CUSTOMER_INFOS, sbCustomerInfos.toString(  ), Field.Store.NO );
+
         doc.add( fieldCustomer );
 
         if ( writer.getConfig(  ).getOpenMode(  ) == OpenMode.CREATE )
