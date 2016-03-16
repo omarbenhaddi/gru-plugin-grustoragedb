@@ -95,7 +95,7 @@ public final class DbDemandDAO implements IDbDemandDAO
         daoUtil.setString( nIndex++, demand.getDemandId(  ) );
         daoUtil.setString( nIndex++, demand.getDemandTypeId(  ) );
         daoUtil.setString( nIndex++, demand.getReference(  ) );
-        daoUtil.setInt( nIndex++, demand.getDemandState(  ) );
+        daoUtil.setInt( nIndex++, demand.getDemandStatus(  ) );
         daoUtil.setInt( nIndex++, demand.getMaxSteps(  ) );
         daoUtil.setInt( nIndex++, demand.getCurrentStep(  ) );
         daoUtil.setString( nIndex++, demand.getStatusForCustomer(  ) );
@@ -128,7 +128,7 @@ public final class DbDemandDAO implements IDbDemandDAO
             demand.setDemandId( daoUtil.getString( nIndex++ ) );
             demand.setDemandTypeId( daoUtil.getString( nIndex++ ) );
             demand.setReference( daoUtil.getString( nIndex++ ) );
-            demand.setDemandState( daoUtil.getInt( nIndex++ ) );
+            demand.setDemandStatus( daoUtil.getInt( nIndex++ ) );
             demand.setMaxSteps( daoUtil.getInt( nIndex++ ) );
             demand.setCurrentStep( daoUtil.getInt( nIndex++ ) );
             demand.setStatusForCustomer( daoUtil.getString( nIndex++ ) );
@@ -168,7 +168,7 @@ public final class DbDemandDAO implements IDbDemandDAO
         daoUtil.setString( nIndex++, demand.getDemandId(  ) );
         daoUtil.setString( nIndex++, demand.getDemandTypeId(  ) );
         daoUtil.setString( nIndex++, demand.getReference(  ) );
-        daoUtil.setInt( nIndex++, demand.getDemandState(  ) );
+        daoUtil.setInt( nIndex++, demand.getDemandStatus(  ) );
         daoUtil.setInt( nIndex++, demand.getMaxSteps(  ) );
         daoUtil.setInt( nIndex++, demand.getCurrentStep(  ) );
         daoUtil.setString( nIndex++, demand.getStatusForCustomer(  ) );
@@ -200,7 +200,7 @@ public final class DbDemandDAO implements IDbDemandDAO
             demand.setDemandId( daoUtil.getString( nIndex++ ) );
             demand.setDemandTypeId( daoUtil.getString( nIndex++ ) );
             demand.setReference( daoUtil.getString( nIndex++ ) );
-            demand.setDemandState( daoUtil.getInt( nIndex++ ) );
+            demand.setDemandStatus( daoUtil.getInt( nIndex++ ) );
             demand.setMaxSteps( daoUtil.getInt( nIndex++ ) );
             demand.setCurrentStep( daoUtil.getInt( nIndex++ ) );
             demand.setStatusForCustomer( daoUtil.getString( nIndex++ ) );
@@ -258,7 +258,7 @@ public final class DbDemandDAO implements IDbDemandDAO
             demand.setDemandId( daoUtil.getString( nIndex++ ) );
             demand.setDemandTypeId( daoUtil.getString( nIndex++ ) );
             demand.setReference( daoUtil.getString( nIndex++ ) );
-            demand.setDemandState( daoUtil.getInt( nIndex++ ) );
+            demand.setDemandStatus( daoUtil.getInt( nIndex++ ) );
             demand.setMaxSteps( daoUtil.getInt( nIndex++ ) );
             demand.setCurrentStep( daoUtil.getInt( nIndex++ ) );
             demand.setStatusForCustomer( daoUtil.getString( nIndex++ ) );
@@ -289,7 +289,7 @@ public final class DbDemandDAO implements IDbDemandDAO
             demand.setDemandId( daoUtil.getString( nIndex++ ) );
             demand.setDemandTypeId( daoUtil.getString( nIndex++ ) );
             demand.setReference( daoUtil.getString( nIndex++ ) );
-            demand.setDemandState( daoUtil.getInt( nIndex++ ) );
+            demand.setDemandStatus( daoUtil.getInt( nIndex++ ) );
             demand.setMaxSteps( daoUtil.getInt( nIndex++ ) );
             demand.setCurrentStep( daoUtil.getInt( nIndex++ ) );
             demand.setStatusForCustomer( daoUtil.getString( nIndex++ ) );

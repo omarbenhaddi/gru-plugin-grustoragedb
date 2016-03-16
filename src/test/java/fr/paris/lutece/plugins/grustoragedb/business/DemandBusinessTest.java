@@ -58,7 +58,7 @@ public class DemandBusinessTest extends LuteceTestCase
         demand.setCustomerId( IDCUSTOMER1 );
         demand.setDemandId( DEMANDID1 );
         demand.setDemandTypeId( DEMANDTYPEID1 );
-        demand.setDemandState( DEMANDSTATE1 );
+        demand.setDemandStatus( DEMANDSTATE1 );
         demand.setMaxSteps( MAXSTEPS1 );
         demand.setCurrentStep( CURRENTSTEP1 );
 
@@ -69,7 +69,7 @@ public class DemandBusinessTest extends LuteceTestCase
         assertEquals( demandStored.getCustomerId(  ), demand.getCustomerId(  ) );
         assertEquals( demandStored.getDemandId(  ), demand.getDemandId(  ) );
         assertEquals( demandStored.getDemandTypeId(  ), demand.getDemandTypeId(  ) );
-        assertEquals( demandStored.getDemandState(  ), demand.getDemandState(  ) );
+        assertEquals( demandStored.getDemandStatus(  ), demand.getDemandStatus(  ) );
         assertEquals( demandStored.getMaxSteps(  ), demand.getMaxSteps(  ) );
         assertEquals( demandStored.getCurrentStep(  ), demand.getCurrentStep(  ) );
 
@@ -77,7 +77,7 @@ public class DemandBusinessTest extends LuteceTestCase
         demand.setCustomerId( IDCUSTOMER2 );
         demand.setDemandId( DEMANDID2 );
         demand.setDemandTypeId( DEMANDTYPEID2 );
-        demand.setDemandState( DEMANDSTATE2 );
+        demand.setDemandStatus( DEMANDSTATE2 );
         demand.setMaxSteps( MAXSTEPS2 );
         demand.setCurrentStep( CURRENTSTEP2 );
         DbDemandHome.update( demand );
@@ -85,7 +85,7 @@ public class DemandBusinessTest extends LuteceTestCase
         assertEquals( demandStored.getCustomerId(  ), demand.getCustomerId(  ) );
         assertEquals( demandStored.getDemandId(  ), demand.getDemandId(  ) );
         assertEquals( demandStored.getDemandTypeId(  ), demand.getDemandTypeId(  ) );
-        assertEquals( demandStored.getDemandState(  ), demand.getDemandState(  ) );
+        assertEquals( demandStored.getDemandStatus(  ), demand.getDemandStatus(  ) );
         assertEquals( demandStored.getMaxSteps(  ), demand.getMaxSteps(  ) );
         assertEquals( demandStored.getCurrentStep(  ), demand.getCurrentStep(  ) );
 

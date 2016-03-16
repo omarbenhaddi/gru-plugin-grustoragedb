@@ -67,7 +67,7 @@ public class DatabaseDemandService implements IDemandService
         Demand demand = new Demand(  );
         demand.setId( strDemandId );
         demand.setDemandTypeId( strDemandTypeId );
-        demand.setStatus( dbd.getDemandState(  ) );
+        demand.setStatus( dbd.getDemandStatus(  ) );
         demand.setReference( dbd.getReference(  ) );
         
 
@@ -130,7 +130,7 @@ public class DatabaseDemandService implements IDemandService
             demand.setId( dbd.getDemandId(  ) );
             demand.setDemandTypeId( dbd.getDemandTypeId(  ) );
             demand.setReference( dbd.getReference(  ) );
-            demand.setStatus( dbd.getDemandState(  ) );
+            demand.setStatus( dbd.getDemandStatus(  ) );
             if( demand.getStatus() == Demand.STATUS_CLOSED )
             {
                 demand.setTimeOpenedInMs( dbd.getLastNotificationDate() - dbd.getFirstNotificationDate() );
