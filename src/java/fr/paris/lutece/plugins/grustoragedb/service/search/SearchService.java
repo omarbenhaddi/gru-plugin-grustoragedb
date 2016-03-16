@@ -64,13 +64,22 @@ import org.apache.lucene.util.Version;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
 
 import java.nio.file.Paths;
 
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang.StringUtils;
-import org.apache.lucene.analysis.fr.FrenchAnalyzer;
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.Tokenizer;
+import org.apache.lucene.analysis.core.LowerCaseFilter;
+import org.apache.lucene.analysis.core.StopFilter;
+import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilter;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.standard.StandardFilter;
+import org.apache.lucene.analysis.standard.StandardTokenizer;
+import org.apache.lucene.analysis.util.StopwordAnalyzerBase;
 
 
 /**
@@ -86,7 +95,9 @@ public final class SearchService
     private static final String FIELD_EMAIL = "email";
     private static final String FIELD_PHONE = "phone";
     
-    private static Analyzer _analyzer = new FrenchAnalyzer( Version.LUCENE_4_9 );
+    private static final Version LUCENE_VERSION = Version.LUCENE_4_9;
+    
+    private static Analyzer _analyzer;
 
     /** Private constructor */
     private SearchService()
@@ -100,7 +111,7 @@ public final class SearchService
         try
         {
             Directory dir = FSDirectory.open( getIndexPath(  ) );
-            IndexWriterConfig iwc = new IndexWriterConfig( Version.LUCENE_4_9, _analyzer );
+            IndexWriterConfig iwc = new IndexWriterConfig( Version.LUCENE_4_9, getAnalyzer() );
             boolean bCreate = true;
 
             if ( bCreate )
@@ -137,7 +148,7 @@ public final class SearchService
         try
         {
             Directory dir = FSDirectory.open( getIndexPath(  ) );
-            IndexWriterConfig iwc = new IndexWriterConfig( Version.LUCENE_4_9, _analyzer );
+            IndexWriterConfig iwc = new IndexWriterConfig( Version.LUCENE_4_9, getAnalyzer() );
             boolean bCreate = true;
 
             if ( bCreate )
@@ -173,7 +184,7 @@ public final class SearchService
             IndexReader reader = DirectoryReader.open( FSDirectory.open( getIndexPath(  ) ) );
             IndexSearcher searcher = new IndexSearcher( reader );
 
-            QueryParser parser = new QueryParser( Version.LUCENE_4_9, FIELD_CUSTOMER_INFOS, _analyzer );
+            QueryParser parser = new QueryParser( Version.LUCENE_4_9, FIELD_CUSTOMER_INFOS, getAnalyzer() );
             parser.setDefaultOperator( QueryParser.Operator.AND );
             Query query = parser.parse( strQuery );
             TopDocs results = searcher.search( query, 10 );
@@ -274,4 +285,34 @@ public final class SearchService
 
         return Paths.get( strIndexPath ).toFile(  );
     }
+    
+    private static Analyzer getAnalyzer()
+    {
+        if( _analyzer == null )
+        {
+            _analyzer = new CustomAnalyzer( );
+        }
+        return _analyzer;
+    }
+        
+    private static class CustomAnalyzer extends StopwordAnalyzerBase 
+    {
+        public CustomAnalyzer()
+        {
+            super( LUCENE_VERSION , StandardAnalyzer.STOP_WORDS_SET );
+        }
+
+        @Override
+        protected TokenStreamComponents createComponents(String fieldName, Reader reader) 
+        {
+            final Tokenizer source = new StandardTokenizer( LUCENE_VERSION , reader);
+
+            TokenStream tokenStream = source;
+            tokenStream = new StandardFilter( LUCENE_VERSION, tokenStream);
+            tokenStream = new LowerCaseFilter( LUCENE_VERSION, tokenStream);
+            tokenStream = new StopFilter( LUCENE_VERSION, tokenStream, getStopwordSet());
+            tokenStream = new ASCIIFoldingFilter(tokenStream);
+            return new TokenStreamComponents(source, tokenStream);
+        }
+}
 }
