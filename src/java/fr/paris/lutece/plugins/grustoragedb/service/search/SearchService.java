@@ -52,8 +52,8 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.queryparser.analyzing.AnalyzingQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
-import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
@@ -184,8 +184,8 @@ public final class SearchService
             IndexReader reader = DirectoryReader.open( FSDirectory.open( getIndexPath(  ) ) );
             IndexSearcher searcher = new IndexSearcher( reader );
 
-            QueryParser parser = new QueryParser( Version.LUCENE_4_9, FIELD_CUSTOMER_INFOS, getAnalyzer() );
-            parser.setDefaultOperator( QueryParser.Operator.AND );
+            AnalyzingQueryParser parser = new AnalyzingQueryParser( Version.LUCENE_4_9, FIELD_CUSTOMER_INFOS, getAnalyzer() );
+            parser.setDefaultOperator( AnalyzingQueryParser.Operator.AND );
             Query query = parser.parse( strQuery );
             TopDocs results = searcher.search( query, 10 );
             ScoreDoc[] hits = results.scoreDocs;
