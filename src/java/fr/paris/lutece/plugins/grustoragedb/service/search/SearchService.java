@@ -169,7 +169,7 @@ public final class SearchService
     public static List<CustomerResult> searchCustomer( String strQuery )
     {
         List<CustomerResult> list = new ArrayList<CustomerResult>(  );
-
+        AppLogService.debug( "search customer from Data base" );
         try
         {
             IndexReader reader = DirectoryReader.open( FSDirectory.open( getIndexPath(  ) ) );
@@ -204,6 +204,7 @@ public final class SearchService
         {
             AppLogService.error( "Error searching customer : " + ex.getMessage(  ), ex );
         }
+        AppLogService.debug( "DB: list size :"+ list.size( ) );
 
         return list;
     }
