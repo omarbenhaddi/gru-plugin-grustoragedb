@@ -36,15 +36,12 @@ package fr.paris.lutece.plugins.grustoragedb.service.search;
 import fr.paris.lutece.plugins.gru.business.customer.CustomerHome;
 import fr.paris.lutece.plugins.gru.service.search.CustomerResult;
 import fr.paris.lutece.plugins.gru.business.customer.Customer;
-import fr.paris.lutece.plugins.gru.business.demand.Demand;
-import fr.paris.lutece.plugins.gru.service.demand.DemandService;
 import fr.paris.lutece.plugins.grustoragedb.business.DbDemand;
 import fr.paris.lutece.plugins.grustoragedb.business.DbDemandHome;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPathService;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
@@ -55,8 +52,8 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.queryparser.analyzing.AnalyzingQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
-import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
@@ -67,12 +64,22 @@ import org.apache.lucene.util.Version;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
 
 import java.nio.file.Paths;
 
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang.StringUtils;
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.Tokenizer;
+import org.apache.lucene.analysis.core.LowerCaseFilter;
+import org.apache.lucene.analysis.core.StopFilter;
+import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilter;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.standard.StandardFilter;
+import org.apache.lucene.analysis.standard.StandardTokenizer;
+import org.apache.lucene.analysis.util.StopwordAnalyzerBase;
 
 
 /**
@@ -80,13 +87,17 @@ import org.apache.commons.lang.StringUtils;
  */
 public final class SearchService
 {
-    private static final String PATH_INDEX = "WEB-INF/plugins/grustoragedb/indexes";
+    private static final String PATH_INDEX = "/WEB-INF/plugins/grustoragedb/indexes";
     private static final String FIELD_CUSTOMER_INFOS = "customer";
     private static final String FIELD_ID = "id";
     private static final String FIELD_FIRSTNAME = "firstname";
     private static final String FIELD_LASTNAME = "lastname";
     private static final String FIELD_EMAIL = "email";
     private static final String FIELD_PHONE = "phone";
+    
+    private static final Version LUCENE_VERSION = Version.LUCENE_4_9;
+    
+    private static Analyzer _analyzer;
 
     /** Private constructor */
     private SearchService()
@@ -100,8 +111,7 @@ public final class SearchService
         try
         {
             Directory dir = FSDirectory.open( getIndexPath(  ) );
-            Analyzer analyzer = new StandardAnalyzer( Version.LUCENE_4_9 );
-            IndexWriterConfig iwc = new IndexWriterConfig( Version.LUCENE_4_9, analyzer );
+            IndexWriterConfig iwc = new IndexWriterConfig( Version.LUCENE_4_9, getAnalyzer() );
             boolean bCreate = true;
 
             if ( bCreate )
@@ -118,7 +128,7 @@ public final class SearchService
             {
                 index( writer, customer );
             }
-            sbLogs.append( "Indexed customers : " + list.size() );
+            sbLogs.append("Indexed customers : ").append(list.size());
             writer.close(  );
         }
         catch ( IOException ex )
@@ -138,8 +148,7 @@ public final class SearchService
         try
         {
             Directory dir = FSDirectory.open( getIndexPath(  ) );
-            Analyzer analyzer = new StandardAnalyzer( Version.LUCENE_4_9 );
-            IndexWriterConfig iwc = new IndexWriterConfig( Version.LUCENE_4_9, analyzer );
+            IndexWriterConfig iwc = new IndexWriterConfig( Version.LUCENE_4_9, getAnalyzer() );
             boolean bCreate = true;
 
             if ( bCreate )
@@ -174,10 +183,9 @@ public final class SearchService
         {
             IndexReader reader = DirectoryReader.open( FSDirectory.open( getIndexPath(  ) ) );
             IndexSearcher searcher = new IndexSearcher( reader );
-            Analyzer analyzer = new StandardAnalyzer( Version.LUCENE_4_9 );
 
-            QueryParser parser = new QueryParser( Version.LUCENE_4_9, FIELD_CUSTOMER_INFOS, analyzer );
-            parser.setDefaultOperator( QueryParser.Operator.AND );
+            AnalyzingQueryParser parser = new AnalyzingQueryParser( Version.LUCENE_4_9, FIELD_CUSTOMER_INFOS, getAnalyzer() );
+            parser.setDefaultOperator( AnalyzingQueryParser.Operator.AND );
             Query query = parser.parse( strQuery );
             TopDocs results = searcher.search( query, 10 );
             ScoreDoc[] hits = results.scoreDocs;
@@ -193,7 +201,6 @@ public final class SearchService
                 customer.setId( Integer.parseInt( doc.get( FIELD_ID ) ) );
                 list.add( customer );
             }
-
             reader.close(  );
         }
         catch ( IOException ex )
@@ -244,9 +251,9 @@ public final class SearchService
             doc.add( fieldPhone );
             sbCustomerInfos.append( " " ).append( customer.getMobilePhone(  ) );
         }
-
+        
         // Index demands references
-        List<DbDemand> listDemands = DbDemandHome.findByCustomer( "" + customer.getId() );
+        List<DbDemand> listDemands = DbDemandHome.findByCustomer( String.valueOf( customer.getId() ));
         for( DbDemand demand : listDemands )
         {
             if( StringUtils.isNotBlank( demand.getReference() ))
@@ -255,8 +262,8 @@ public final class SearchService
             }
         }
         
-        
-        Field fieldCustomer = new TextField( FIELD_CUSTOMER_INFOS, sbCustomerInfos.toString(  ), Field.Store.YES );
+        Field fieldCustomer = new TextField( FIELD_CUSTOMER_INFOS, sbCustomerInfos.toString(  ), Field.Store.NO );
+
         doc.add( fieldCustomer );
 
         if ( writer.getConfig(  ).getOpenMode(  ) == OpenMode.CREATE )
@@ -279,4 +286,34 @@ public final class SearchService
 
         return Paths.get( strIndexPath ).toFile(  );
     }
+    
+    private static Analyzer getAnalyzer()
+    {
+        if( _analyzer == null )
+        {
+            _analyzer = new CustomAnalyzer( );
+        }
+        return _analyzer;
+    }
+        
+    private static class CustomAnalyzer extends StopwordAnalyzerBase 
+    {
+        public CustomAnalyzer()
+        {
+            super( LUCENE_VERSION , StandardAnalyzer.STOP_WORDS_SET );
+        }
+
+        @Override
+        protected TokenStreamComponents createComponents(String fieldName, Reader reader) 
+        {
+            final Tokenizer source = new StandardTokenizer( LUCENE_VERSION , reader);
+
+            TokenStream tokenStream = source;
+            tokenStream = new StandardFilter( LUCENE_VERSION, tokenStream);
+            tokenStream = new LowerCaseFilter( LUCENE_VERSION, tokenStream);
+            tokenStream = new StopFilter( LUCENE_VERSION, tokenStream, getStopwordSet());
+            tokenStream = new ASCIIFoldingFilter(tokenStream);
+            return new TokenStreamComponents(source, tokenStream);
+        }
+}
 }

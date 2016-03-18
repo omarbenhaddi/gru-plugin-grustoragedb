@@ -61,7 +61,18 @@ public final class AutoCompleteService
      */
     public static String getJson( String strQuery )
     {
-        List<CustomerResult> listCustomers = SearchService.searchCustomer( strQuery + "*" );
+        String[] terms =  strQuery.split( " " );
+        StringBuilder sbSearchQuery = new StringBuilder();
+        for( int i = 0 ; i < terms.length ; i ++ )
+        {
+            if( i > 0 )
+            {
+                sbSearchQuery.append( ' ' );
+            }
+            sbSearchQuery.append( terms[i] ).append( '*' );
+        }
+                
+        List<CustomerResult> listCustomers = SearchService.searchCustomer( sbSearchQuery.toString() );
         JSONObject json = new JSONObject();
         
         JSONArray jsonAutocomplete = new JSONArray(  );

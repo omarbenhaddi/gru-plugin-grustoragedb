@@ -57,7 +57,7 @@ public class DbDemand implements Serializable
     @Size( max = 50, message = "#i18n{grustoragedb.validation.demand.DemandTypeId.size}" )
     private String _strDemandTypeId;
     private String _strReference;
-    private int _nDemandState;
+    private int _nDemandStatus;
     private int _nMaxSteps;
     private int _nCurrentStep;
     private String _strStatusForCustomer;
@@ -170,19 +170,19 @@ public class DbDemand implements Serializable
      *
      * @return The DemandState
      */
-    public int getDemandState(  )
+    public int getDemandStatus(  )
     {
-        return _nDemandState;
+        return _nDemandStatus;
     }
 
     /**
      * Sets the DemandState
      *
-     * @param nDemandState The DemandState
+     * @param nDemandStatus The DemandState
      */
-    public void setDemandState( int nDemandState )
+    public void setDemandStatus( int nDemandStatus )
     {
-        _nDemandState = nDemandState;
+        _nDemandStatus = nDemandStatus;
     }
 
     /**

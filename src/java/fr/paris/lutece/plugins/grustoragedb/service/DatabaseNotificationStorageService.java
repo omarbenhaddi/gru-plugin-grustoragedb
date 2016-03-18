@@ -105,7 +105,7 @@ public class DatabaseNotificationStorageService implements INotificationStorageS
         dbd.setDemandId( strDemandId );
         dbd.setDemandTypeId( strDemandTypeId );
         dbd.setReference( demand.getReference(  ) );
-        dbd.setDemandState( demand.getDemandState(  ) );
+        dbd.setDemandStatus( demand.getDemandStatus(  ) );
         dbd.setMaxSteps( demand.getDemandMaxStep(  ) );
         dbd.setCurrentStep( demand.getDemandUserCurrentStep(  ) );
 
