@@ -89,13 +89,13 @@ public class DatabaseDemandService implements IDemandService
             UserDashboard ud = notification.getUserDashboard();
             if( ( ud != null ) && StringUtils.isNotBlank( ud.getStatusText() ))
             {
-                demand.setStatusForCustomer( ud.getStatusText() );
+                demand.setCustomerStatus( ud.getStatusText() );
             }
             
             BackOfficeLogging bol = notification.getBackOfficeLogging();
             if( ( bol != null ) && StringUtils.isNotBlank( bol.getStatusText() ))
             {
-                demand.setStatusForGRU( bol.getStatusText() );
+                demand.setAgentStatus( bol.getStatusText() );
                 notification.setTitle( bol.getMessage() );
             }
             
