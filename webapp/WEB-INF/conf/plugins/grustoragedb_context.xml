@@ -10,4 +10,5 @@
     <bean id="grustoragedb.notificationDAO"  class="fr.paris.lutece.plugins.grustoragedb.business.DbNotificationDAO" />  
     
     <bean id="grustoragedb.autoCompleteWebService" class="fr.paris.lutece.plugins.grustoragedb.web.rs.AutoCompleteRestService" />
+     <bean id="grustoragedb.luceneStorageService" class=" fr.paris.lutece.plugins.grustoragedb.service.LuceneStorageService" />
 </beans>

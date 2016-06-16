@@ -60,27 +60,9 @@ public class DatabaseNotificationStorageService implements INotificationStorageS
     @Override
     public void store( Customer customer )
     {
-        boolean bCreate = false;
-        int nCustomerId = customer.getCustomerId(  );
-        DbCustomer dbc = DbCustomerHome.findByPrimaryKey( nCustomerId );
-
-        if ( dbc == null )
-        {
-            bCreate = true;
-            dbc = new DbCustomer(  );
-        }
-
-        dbc.setCustomerId( String.valueOf( nCustomerId ) );
-        dbc.setCustomerEmail( customer.getEmail(  ) );
-
-        if ( bCreate )
-        {
-            DbCustomerHome.create( dbc );
-        }
-        else
-        {
-            DbCustomerHome.update( dbc );
-        }
+        //index toward Lucene for real-time searching
+        LuceneStorageService.instance().store( customer );
+ 
     }
 
     /**
@@ -117,6 +99,7 @@ public class DatabaseNotificationStorageService implements INotificationStorageS
         {
             DbDemandHome.update( dbd );
         }
+        
     }
 
     /**
@@ -125,7 +108,7 @@ public class DatabaseNotificationStorageService implements INotificationStorageS
     @Override
     public void store( Notification notification )
     {
-        DbNotification dbn = new DbNotification(  );
+      DbNotification dbn = new DbNotification(  );
         String strDemandId = String.valueOf( notification.getDemand(  ).getDemandId(  ) );
         String strDemandTypeId = String.valueOf( notification.getDemand(  ).getDemandTypeId(  ) );
         DbDemand dbd = DbDemandHome.findByIdAndType( strDemandId, strDemandTypeId );
@@ -154,5 +137,6 @@ public class DatabaseNotificationStorageService implements INotificationStorageS
         dbd.setLastNotificationDate( notification.getDateNotification() );
         
         DbDemandHome.update( dbd );
+        
     }
 }

@@ -33,6 +33,7 @@
  */
 package fr.paris.lutece.plugins.grustoragedb.service;
 
+import fr.paris.lutece.plugins.gru.business.customer.Customer;
 import fr.paris.lutece.plugins.gru.service.search.CustomerResult;
 import fr.paris.lutece.plugins.gru.service.search.ISearchService;
 import fr.paris.lutece.plugins.grustoragedb.service.search.SearchService;
@@ -74,4 +75,16 @@ public class DatabaseSearchService implements ISearchService
     {
         return AppPropertiesService.getProperty( PROPERTY_AUTOCOMPLETE_URL );
     }
+
+	@Override
+	public void deleteCustomer(int arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateCustomer(Customer arg0) {
+		// TODO Auto-generated method stub
+		
+	}
 }

@@ -65,11 +65,12 @@ import org.apache.lucene.util.Version;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
-
 import java.nio.file.Paths;
-
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
@@ -94,6 +95,7 @@ public final class SearchService
     private static final String FIELD_LASTNAME = "lastname";
     private static final String FIELD_EMAIL = "email";
     private static final String FIELD_PHONE = "phone";
+    private static final String FIELD_FIXED_PHONE_NUMBER = "fixed_pĥone_phone";
     
     private static final Version LUCENE_VERSION = Version.LUCENE_4_9;
     
@@ -106,6 +108,8 @@ public final class SearchService
 
     public static String indexAll( )
     {
+    	
+    	 AppLogService.info("\n\n\n\n\n DEMON CUSTOMER VERS LUCENE \n\n\n");
         StringBuilder sbLogs = new StringBuilder();
         List<Customer> list = CustomerHome.getCustomersList();
         try
@@ -125,10 +129,11 @@ public final class SearchService
 
             IndexWriter writer = new IndexWriter( dir, iwc );
             for( Customer customer  : list )
-            {
+            {            	
                 index( writer, customer );
             }
             sbLogs.append("Indexed customers : ").append(list.size());
+            AppLogService.info("\n\n\n\n\n TERMINER L'INDEXATION VERS LUCENE \n\n\n");
             writer.close(  );
         }
         catch ( IOException ex )
@@ -149,7 +154,9 @@ public final class SearchService
         {
             Directory dir = FSDirectory.open( getIndexPath(  ) );
             IndexWriterConfig iwc = new IndexWriterConfig( Version.LUCENE_4_9, getAnalyzer() );
-            boolean bCreate = true;
+            boolean bCreate = false;
+            
+          
 
             if ( bCreate )
             {
@@ -157,7 +164,7 @@ public final class SearchService
             }
             else
             {
-                iwc.setOpenMode( OpenMode.CREATE_OR_APPEND );
+                iwc.setOpenMode( OpenMode.APPEND );
             }
 
             IndexWriter writer = new IndexWriter( dir, iwc );
@@ -198,8 +205,14 @@ public final class SearchService
                 customer.setEmail( doc.get( FIELD_EMAIL ) );
                 customer.setMobilePhone( doc.get( FIELD_PHONE ) );
                 customer.setId( Integer.parseInt( doc.get( FIELD_ID ) ) );
-                list.add( customer );
-            }
+                
+                if(!list.contains(customer))
+                {
+                	 list.add( customer );	
+                }
+               
+            }            
+            
             reader.close(  );
         }
         catch ( IOException ex )
@@ -250,6 +263,13 @@ public final class SearchService
             sbCustomerInfos.append( " " ).append( customer.getMobilePhone(  ) );
         }
         
+        if ( customer.getFixedPhoneNumber( ) != null )
+        {
+            Field fieldPhone = new StringField( FIELD_FIXED_PHONE_NUMBER, customer.getFixedPhoneNumber(  ), Field.Store.YES );
+            doc.add( fieldPhone );
+            sbCustomerInfos.append( " " ).append( customer.getFixedPhoneNumber(  ) );
+        }
+        
         // Index demands references
         List<DbDemand> listDemands = DbDemandHome.findByCustomer( String.valueOf( customer.getId() ));
         for( DbDemand demand : listDemands )
@@ -270,7 +290,8 @@ public final class SearchService
         }
         else
         {
-            writer.updateDocument( new Term( FIELD_CUSTOMER_INFOS, sbCustomerInfos.toString(  ) ), doc );
+        	   writer.addDocument( doc );
+           // writer.updateDocument( new Term( FIELD_CUSTOMER_INFOS, sbCustomerInfos.toString(  ) ), doc );
         }
     }
 
