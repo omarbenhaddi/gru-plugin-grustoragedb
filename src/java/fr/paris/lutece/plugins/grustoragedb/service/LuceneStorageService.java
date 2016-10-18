@@ -3,8 +3,8 @@ package fr.paris.lutece.plugins.grustoragedb.service;
 
 
 import fr.paris.lutece.plugins.grustoragedb.service.search.SearchService;
-
 import fr.paris.lutece.plugins.grusupply.business.Customer;
+
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 
 
@@ -26,7 +26,7 @@ public class LuceneStorageService {
 
 	public void store(Customer user) {		
 		
-		fr.paris.lutece.plugins.gru.business.customer.Customer customer = new fr.paris.lutece.plugins.gru.business.customer.Customer();
+		fr.paris.lutece.plugins.grubusiness.business.customer.Customer customer = new fr.paris.lutece.plugins.grubusiness.business.customer.Customer();
 		customer.setFirstname(user.getFirstName());
 		customer.setLastname(user.getName());
 		customer.setId(user.getCustomerId());

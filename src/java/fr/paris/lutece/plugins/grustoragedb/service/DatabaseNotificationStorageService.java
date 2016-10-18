@@ -34,18 +34,16 @@
 package fr.paris.lutece.plugins.grustoragedb.service;
 
 import com.mysql.jdbc.StringUtils;
+import fr.paris.lutece.plugins.grubusiness.business.notification.BackofficeNotification;
+import fr.paris.lutece.plugins.grubusiness.business.notification.NotifyGruGlobalNotification;
+import fr.paris.lutece.plugins.grubusiness.business.notification.UserDashboardNotification;
 
-import fr.paris.lutece.plugins.grustoragedb.business.DbCustomer;
-import fr.paris.lutece.plugins.grustoragedb.business.DbCustomerHome;
 import fr.paris.lutece.plugins.grustoragedb.business.DbDemand;
 import fr.paris.lutece.plugins.grustoragedb.business.DbDemandHome;
 import fr.paris.lutece.plugins.grustoragedb.business.DbNotification;
 import fr.paris.lutece.plugins.grustoragedb.business.DbNotificationHome;
-import fr.paris.lutece.plugins.grusupply.business.BackofficeNotification;
 import fr.paris.lutece.plugins.grusupply.business.Customer;
-import fr.paris.lutece.plugins.grusupply.business.DashboardNotification;
 import fr.paris.lutece.plugins.grusupply.business.Demand;
-import fr.paris.lutece.plugins.grusupply.business.Notification;
 import fr.paris.lutece.plugins.grusupply.service.INotificationStorageService;
 
 
@@ -106,24 +104,24 @@ public class DatabaseNotificationStorageService implements INotificationStorageS
      * {@inheritDoc }
      */
     @Override
-    public void store( Notification notification )
+    public void store( NotifyGruGlobalNotification notification )
     {
       DbNotification dbn = new DbNotification(  );
-        String strDemandId = String.valueOf( notification.getDemand(  ).getDemandId(  ) );
-        String strDemandTypeId = String.valueOf( notification.getDemand(  ).getDemandTypeId(  ) );
+        String strDemandId = String.valueOf( notification.getDemandId() );
+        String strDemandTypeId = String.valueOf( notification.getDemandTypeId(  ) );
         DbDemand dbd = DbDemandHome.findByIdAndType( strDemandId, strDemandTypeId );
         dbn.setIdDemand( dbd.getId(  ) );
-        dbn.setJson( notification.getJson(  ) );
+        dbn.setJson( notification.toString() ); // FIXME GET JSON
         DbNotificationHome.create( dbn );
 
-        DashboardNotification dashboardNotif = notification.getUserDashBoard(  );
+        UserDashboardNotification dashboardNotif = notification.getUserDashboard();
 
         if ( ( dashboardNotif != null ) && ( !StringUtils.isNullOrEmpty( dashboardNotif.getStatusText(  ) ) ) )
         {
             dbd.setStatusForGRU( dashboardNotif.getStatusText(  ) );
         }
 
-        BackofficeNotification boNotif = notification.getUserBackOffice(  );
+        BackofficeNotification boNotif = notification.getBackofficeLogging();
 
         if ( ( boNotif != null ) && ( !StringUtils.isNullOrEmpty( boNotif.getStatusText(  ) ) ) )
         {
@@ -132,9 +130,9 @@ public class DatabaseNotificationStorageService implements INotificationStorageS
 
         if( dbd.getFirstNotificationDate() == 0L )
         {
-            dbd.setFirstNotificationDate( notification.getDateNotification() );
+            dbd.setFirstNotificationDate( notification.getNotificationDate() );
         }
-        dbd.setLastNotificationDate( notification.getDateNotification() );
+        dbd.setLastNotificationDate( notification.getNotificationDate() );
         
         DbDemandHome.update( dbd );
         

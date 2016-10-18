@@ -33,7 +33,7 @@
  */
 package fr.paris.lutece.plugins.grustoragedb.service;
 
-import fr.paris.lutece.plugins.gru.service.search.CustomerResult;
+import fr.paris.lutece.plugins.grubusiness.business.customer.Customer;
 import fr.paris.lutece.plugins.grustoragedb.service.search.SearchService;
 
 import net.sf.json.JSONArray;
@@ -72,12 +72,12 @@ public final class AutoCompleteService
             sbSearchQuery.append( terms[i] ).append( '*' );
         }
                 
-        List<CustomerResult> listCustomers = SearchService.searchCustomer( sbSearchQuery.toString() );
+        List<Customer> listCustomers = SearchService.searchCustomer( sbSearchQuery.toString() );
         JSONObject json = new JSONObject();
         
         JSONArray jsonAutocomplete = new JSONArray(  );
 
-        for ( CustomerResult customer : listCustomers )
+        for ( Customer customer : listCustomers )
         {
             JSONObject jsonItem = new JSONObject(  );
             JSONObject jsonItemContent = new JSONObject(  );

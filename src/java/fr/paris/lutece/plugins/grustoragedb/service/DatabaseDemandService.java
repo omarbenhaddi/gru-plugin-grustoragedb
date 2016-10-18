@@ -33,13 +33,13 @@
  */
 package fr.paris.lutece.plugins.grustoragedb.service;
 
-import fr.paris.lutece.plugins.gru.business.demand.BackOfficeLogging;
-import fr.paris.lutece.plugins.gru.business.demand.BaseDemand;
-import fr.paris.lutece.plugins.gru.business.demand.Demand;
-import fr.paris.lutece.plugins.gru.business.demand.Notification;
-import fr.paris.lutece.plugins.gru.business.demand.UserDashboard;
+import fr.paris.lutece.plugins.grubusiness.business.demand.BaseDemand;
 import fr.paris.lutece.plugins.gru.service.demand.IDemandService;
 import fr.paris.lutece.plugins.gru.service.demand.NotificationService;
+import fr.paris.lutece.plugins.grubusiness.business.demand.Demand;
+import fr.paris.lutece.plugins.grubusiness.business.notification.BackofficeNotification;
+import fr.paris.lutece.plugins.grubusiness.business.notification.NotifyGruGlobalNotification;
+import fr.paris.lutece.plugins.grubusiness.business.notification.UserDashboardNotification;
 import fr.paris.lutece.plugins.grustoragedb.business.DbDemand;
 import fr.paris.lutece.plugins.grustoragedb.business.DbDemandHome;
 import fr.paris.lutece.plugins.grustoragedb.business.DbNotification;
@@ -78,21 +78,21 @@ public class DatabaseDemandService implements IDemandService
         
         for ( DbNotification dbn : listDbNotifications )
         {
-            Notification notification = NotificationService.parseJSON( dbn.getJson(  ) );
+            NotifyGruGlobalNotification notification = NotificationService.parseJSON( dbn.getJson(  ) );
             demand.addNotification( notification );
             if( lFirstDate == 0 )
             {
-                lFirstDate = notification.getTimestamp();
+                lFirstDate = notification.getNotificationDate();
             }
-            lLastDate = notification.getTimestamp();
+            lLastDate = notification.getNotificationDate();
                     
-            UserDashboard ud = notification.getUserDashboard();
+            UserDashboardNotification ud = notification.getUserDashboard();
             if( ( ud != null ) && StringUtils.isNotBlank( ud.getStatusText() ))
             {
                 demand.setCustomerStatus( ud.getStatusText() );
             }
             
-            BackOfficeLogging bol = notification.getBackOfficeLogging();
+            BackofficeNotification bol = notification.getBackofficeLogging();
             if( ( bol != null ) && StringUtils.isNotBlank( bol.getStatusText() ))
             {
                 demand.setAgentStatus( bol.getStatusText() );
@@ -121,7 +121,7 @@ public class DatabaseDemandService implements IDemandService
     public List<BaseDemand> getDemands( String strCustomerId, AdminUser user )
     {
         List<DbDemand> listDemands = DbDemandHome.findByCustomer( strCustomerId );
-        List<BaseDemand> listBaseDemands = new ArrayList<BaseDemand>(  );
+        List<BaseDemand> listBaseDemands = new ArrayList<>(  );
 
         for ( DbDemand dbd : listDemands )
         {

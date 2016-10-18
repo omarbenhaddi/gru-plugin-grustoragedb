@@ -34,8 +34,7 @@
 package fr.paris.lutece.plugins.grustoragedb.service.search;
 
 import fr.paris.lutece.plugins.gru.business.customer.CustomerHome;
-import fr.paris.lutece.plugins.gru.service.search.CustomerResult;
-import fr.paris.lutece.plugins.gru.business.customer.Customer;
+import fr.paris.lutece.plugins.grubusiness.business.customer.Customer;
 import fr.paris.lutece.plugins.grustoragedb.business.DbDemand;
 import fr.paris.lutece.plugins.grustoragedb.business.DbDemandHome;
 import fr.paris.lutece.portal.service.util.AppLogService;
@@ -51,7 +50,6 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
-import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.analyzing.AnalyzingQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.IndexSearcher;
@@ -67,9 +65,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.analysis.TokenStream;
@@ -182,9 +178,9 @@ public final class SearchService
      * @param strQuery The search query
      * @return A list of results
      */
-    public static List<CustomerResult> searchCustomer( String strQuery )
+    public static List<Customer> searchCustomer( String strQuery )
     {
-        List<CustomerResult> list = new ArrayList<CustomerResult>(  );
+        List<Customer> list = new ArrayList<>(  );
         try
         {
             IndexReader reader = DirectoryReader.open( FSDirectory.open( getIndexPath(  ) ) );
@@ -199,7 +195,7 @@ public final class SearchService
             for ( ScoreDoc hit : hits )
             {
                 Document doc = searcher.doc( hit.doc );
-                CustomerResult customer = new CustomerResult(  );
+                Customer customer = new Customer(  );
                 customer.setFirstname( doc.get( FIELD_FIRSTNAME ) );
                 customer.setLastname( doc.get( FIELD_LASTNAME ) );
                 customer.setEmail( doc.get( FIELD_EMAIL ) );
@@ -225,6 +221,11 @@ public final class SearchService
         }
 
         return list;
+    }
+
+    public static Customer searchCustomerById(int nCustomerId) 
+    {
+        return searchCustomer( FIELD_ID + ":" + nCustomerId ).get( 0 );
     }
 
     /**

@@ -33,9 +33,8 @@
  */
 package fr.paris.lutece.plugins.grustoragedb.service;
 
-import fr.paris.lutece.plugins.gru.business.customer.Customer;
-import fr.paris.lutece.plugins.gru.service.search.CustomerResult;
 import fr.paris.lutece.plugins.gru.service.search.ISearchService;
+import fr.paris.lutece.plugins.grubusiness.business.customer.Customer;
 import fr.paris.lutece.plugins.grustoragedb.service.search.SearchService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 
@@ -53,7 +52,7 @@ public class DatabaseSearchService implements ISearchService
      * {@inheritDoc }
      */
     @Override
-    public List<CustomerResult> searchCustomer( String strQuery )
+    public List<Customer> searchCustomer( String strQuery )
     {
         return SearchService.searchCustomer( strQuery );
     }
@@ -76,15 +75,13 @@ public class DatabaseSearchService implements ISearchService
         return AppPropertiesService.getProperty( PROPERTY_AUTOCOMPLETE_URL );
     }
 
-	@Override
-	public void deleteCustomer(int arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public Customer searchCustomerById(int nCustomerId) 
+    {
+        return SearchService.searchCustomerById( nCustomerId );
+    }
 
-	@Override
-	public void updateCustomer(Customer arg0) {
-		// TODO Auto-generated method stub
-		
-	}
 }
