@@ -53,7 +53,6 @@ public final class DbCustomerDAO implements IDbCustomerDAO
     private static final String SQL_QUERY_UPDATE = "UPDATE grustoragedb_customer SET id_customer = ?, customer_id = ?, customer_email = ? WHERE id_customer = ?";
     private static final String SQL_QUERY_SELECTALL = "SELECT id_customer, customer_id, customer_email FROM grustoragedb_customer";
     private static final String SQL_QUERY_SELECTALL_ID = "SELECT id_customer FROM grustoragedb_customer";
- 
 
     /**
      * Generates a new primary key

@@ -50,45 +50,48 @@ public final class AutoCompleteService
     private static final int INDENT = 4;
 
     /** Private constructor */
-    private AutoCompleteService()
+    private AutoCompleteService(  )
     {
     }
-            
+
     /**
-     * Returns a json string for autocomplete purpose 
+     * Returns a json string for autocomplete purpose
      * @param strQuery The query
      * @return The JSON
      */
     public static String getJson( String strQuery )
     {
-        String[] terms =  strQuery.split( " " );
-        StringBuilder sbSearchQuery = new StringBuilder();
-        for( int i = 0 ; i < terms.length ; i ++ )
+        String[] terms = strQuery.split( " " );
+        StringBuilder sbSearchQuery = new StringBuilder(  );
+
+        for ( int i = 0; i < terms.length; i++ )
         {
-            if( i > 0 )
+            if ( i > 0 )
             {
                 sbSearchQuery.append( ' ' );
             }
+
             sbSearchQuery.append( terms[i] ).append( '*' );
         }
-                
-        List<Customer> listCustomers = SearchService.searchCustomer( sbSearchQuery.toString() );
-        JSONObject json = new JSONObject();
-        
+
+        List<Customer> listCustomers = SearchService.searchCustomer( sbSearchQuery.toString(  ) );
+        JSONObject json = new JSONObject(  );
+
         JSONArray jsonAutocomplete = new JSONArray(  );
 
         for ( Customer customer : listCustomers )
         {
             JSONObject jsonItem = new JSONObject(  );
             JSONObject jsonItemContent = new JSONObject(  );
-            
+
             jsonItemContent.accumulate( "first_name", customer.getFirstname(  ) );
             jsonItemContent.accumulate( "last_name", customer.getLastname(  ) );
             jsonItem.accumulate( "item", jsonItemContent );
             jsonAutocomplete.add( jsonItem );
         }
+
         json.accumulate( "autocomplete", jsonAutocomplete );
+
         return json.toString( INDENT );
-        
     }
 }
