@@ -34,8 +34,7 @@
 package fr.paris.lutece.plugins.grustoragedb.service.lucene;
 
 import fr.paris.lutece.plugins.grustoragedb.service.search.SearchService;
-import fr.paris.lutece.plugins.gru.service.search.CustomerResult;
-import fr.paris.lutece.plugins.gru.business.customer.Customer;
+import fr.paris.lutece.plugins.grubusiness.business.customer.Customer;
 import fr.paris.lutece.test.LuteceTestCase;
 
 import org.junit.Test;
@@ -71,9 +70,9 @@ public class SearchServiceTest extends LuteceTestCase
     {
         System.out.println( "searchCustomer" );
 
-        List<CustomerResult> list = SearchService.searchCustomer( "Dupont" );
+        List<Customer> list = SearchService.searchCustomer( "Dupont" );
 
-        for ( CustomerResult customer : list )
+        for ( Customer customer : list )
         {
             System.out.println( "Customer : " + customer.getFirstname(  ) + " " + customer.getLastname(  ) );
         }

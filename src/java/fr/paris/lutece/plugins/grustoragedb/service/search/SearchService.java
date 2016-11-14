@@ -200,7 +200,7 @@ public final class SearchService
                 customer.setLastname( doc.get( FIELD_LASTNAME ) );
                 customer.setEmail( doc.get( FIELD_EMAIL ) );
                 customer.setMobilePhone( doc.get( FIELD_PHONE ) );
-                customer.setId( Integer.parseInt( doc.get( FIELD_ID ) ) );
+                customer.setId( doc.get( FIELD_ID ) );
                 
                 if(!list.contains(customer))
                 {
@@ -223,9 +223,9 @@ public final class SearchService
         return list;
     }
 
-    public static Customer searchCustomerById(int nCustomerId) 
+    public static Customer searchCustomerById( String strCustomerId )
     {
-        return searchCustomer( FIELD_ID + ":" + nCustomerId ).get( 0 );
+        return searchCustomer( FIELD_ID + ":" + strCustomerId ).get( 0 );
     }
 
     /**

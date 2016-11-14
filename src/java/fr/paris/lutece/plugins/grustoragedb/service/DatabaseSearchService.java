@@ -79,9 +79,9 @@ public class DatabaseSearchService implements ISearchService
      * {@inheritDoc }
      */
     @Override
-    public Customer searchCustomerById(int nCustomerId) 
+    public Customer searchCustomerById( String strCustomerId )
     {
-        return SearchService.searchCustomerById( nCustomerId );
+        return SearchService.searchCustomerById( strCustomerId );
     }
 
 }
