@@ -241,7 +241,7 @@ public final class SearchService
         StringBuilder sbCustomerInfos = new StringBuilder(  );
         sbCustomerInfos.append( customer.getFirstname(  ) ).append( " " ).append( customer.getLastname(  ) );
 
-        Field fielIdname = new StringField( FIELD_ID, "" + customer.getId(), Field.Store.YES );
+        Field fielIdname = new StringField( FIELD_ID, customer.getId(  ), Field.Store.YES );
         doc.add( fielIdname );
 
         Field fielFirstname = new StringField( FIELD_FIRSTNAME, customer.getFirstname(  ), Field.Store.YES );
@@ -272,7 +272,7 @@ public final class SearchService
         }
         
         // Index demands references
-        List<DbDemand> listDemands = DbDemandHome.findByCustomer( String.valueOf( customer.getId() ));
+        List<DbDemand> listDemands = DbDemandHome.findByCustomer( customer.getId(  ) );
         for( DbDemand demand : listDemands )
         {
             if( StringUtils.isNotBlank( demand.getReference() ))
