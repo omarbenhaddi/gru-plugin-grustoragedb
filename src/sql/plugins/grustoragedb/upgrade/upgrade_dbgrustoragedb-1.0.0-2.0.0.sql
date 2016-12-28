@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS grustoragedb_customer;
+
 --
 -- Structure for table grustoragedb_demand
 --
@@ -32,8 +34,7 @@ DROP TABLE IF EXISTS grustoragedb_notification_backoffice;
 CREATE TABLE grustoragedb_notification_backoffice (
 notification_id int NOT NULL, 
 message text COLLATE utf8_unicode_ci NOT NULL, 
-status_text varchar(255) NOT NULL,
-PRIMARY KEY (notification_id)
+status_text varchar(255) NOT NULL
 );
 
 --
@@ -43,8 +44,7 @@ DROP TABLE IF EXISTS grustoragedb_notification_sms;
 CREATE TABLE grustoragedb_notification_sms (
 notification_id int NOT NULL, 
 message text COLLATE utf8_unicode_ci NOT NULL, 
-phone_number varchar(15) NOT NULL,
-PRIMARY KEY (notification_id)
+phone_number varchar(15) NOT NULL
 );
 
 --
@@ -59,8 +59,7 @@ subject varchar(255) NULL,
 message text COLLATE utf8_unicode_ci NOT NULL, 
 recipients varchar(255) NOT NULL, 
 copies varchar(255) NULL, 
-blind_copies varchar(255) NULL,
-PRIMARY KEY (notification_id)
+blind_copies varchar(255) NULL
 );
 
 --
@@ -74,8 +73,7 @@ status_text varchar(255) NOT NULL,
 message text COLLATE utf8_unicode_ci NOT NULL, 
 subject varchar(255) NULL, 
 data text COLLATE utf8_unicode_ci NULL, 
-sender_name varchar(255) NULL,
-PRIMARY KEY (notification_id)
+sender_name varchar(255) NULL
 );
 
 --
@@ -90,8 +88,7 @@ subject varchar(255) NULL,
 message text COLLATE utf8_unicode_ci NOT NULL, 
 recipients varchar(255) NOT NULL, 
 copies varchar(255) NULL, 
-blind_copies varchar(255) NULL,
-PRIMARY KEY (notification_id)
+blind_copies varchar(255) NULL
 );
 
 ALTER TABLE grustoragedb_notification ADD CONSTRAINT fk_grustoragedb_notification_demand_id FOREIGN KEY (demand_id, demand_type_id)

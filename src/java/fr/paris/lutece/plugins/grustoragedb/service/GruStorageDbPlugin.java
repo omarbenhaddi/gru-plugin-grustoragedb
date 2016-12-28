@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2015, Mairie de Paris
+ * Copyright (c) 2002-2016, Mairie de Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,25 +33,35 @@
  */
 package fr.paris.lutece.plugins.grustoragedb.service;
 
-import fr.paris.lutece.test.LuteceTestCase;
+import fr.paris.lutece.portal.service.plugin.Plugin;
+import fr.paris.lutece.portal.service.plugin.PluginService;
 
-import org.junit.Test;
 
 /**
- * AutoCompleteServiceTest
+ * GRU storage database plugin
  */
-public class AutoCompleteServiceTest extends LuteceTestCase
+public class GruStorageDbPlugin extends Plugin
 {
     /**
-     * Test of getJson method, of class AutoCompleteService.
+     * Name of the plugin
      */
-    @Test
-    public void testGetJson(  )
-    {
-        System.out.println( "getJson" );
+    public static final String PLUGIN_NAME = "grustoragedb";
 
-        String strQuery = "Dupont";
-        String strJSON = AutoCompleteService.getJson( strQuery );
-        System.out.println( strJSON );
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void init(  )
+    {
+    }
+
+    /**
+     * Gives the plugin
+     *
+     * @return The plugin
+     */
+    public static Plugin getPlugin(  )
+    {
+        return PluginService.getPlugin( PLUGIN_NAME );
     }
 }
