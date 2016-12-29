@@ -90,8 +90,7 @@ subject varchar(255) NULL,
 message text COLLATE utf8_unicode_ci NOT NULL, 
 recipients varchar(255) NOT NULL, 
 copies varchar(255) NULL, 
-blind_copies varchar(255) NULL,
-PRIMARY KEY (notification_id)
+blind_copies varchar(255) NULL
 );
 
 ALTER TABLE grustoragedb_notification ADD CONSTRAINT fk_grustoragedb_notification_demand_id FOREIGN KEY (demand_id, demand_type_id)
