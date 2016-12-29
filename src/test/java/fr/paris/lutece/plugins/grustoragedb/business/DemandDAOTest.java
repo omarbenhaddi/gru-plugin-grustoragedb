@@ -59,8 +59,10 @@ public class DemandDAOTest extends LuteceTestCase
     private static final String DEMAND_TYPE_ID_2 = "DemandTypeId2";
     private static final String DEMAND_REFERENCE_1 = "DemandReference1";
     private static final String DEMAND_REFERENCE_2 = "DemandReference2";
-    private static final int DEMAND_STATUS_ID_1 = 1;
-    private static final int DEMAND_STATUS_ID_2 = 2;
+    private static final long DEMAND_CREATION_DATE_1 = 1L;
+    private static final long DEMAND_CREATION_DATE_2 = 2L;
+    private static final long DEMAND_CLOSURE_DATE_1 = 1L;
+    private static final long DEMAND_CLOSURE_DATE_2 = 2L;
     private static final int DEMAND_MAX_STEPS_1 = 1;
     private static final int DEMAND_MAX_STEPS_2 = 2;
     private static final int DEMAND_CURRENT_STEP_1 = 1;
@@ -85,8 +87,10 @@ public class DemandDAOTest extends LuteceTestCase
         demand.setId( DEMAND_ID_1 );
         demand.setTypeId( DEMAND_TYPE_ID_1 );
         demand.setReference( DEMAND_REFERENCE_1 );
-        demand.setStatusId( DEMAND_STATUS_ID_1 );
+        demand.setStatusId( Demand.STATUS_INPROGRESS );
         demand.setCustomerId( CUSTOMER_ID_1 );
+        demand.setCreationDate( DEMAND_CREATION_DATE_1 );
+        demand.setClosureDate( DEMAND_CLOSURE_DATE_1 );
         demand.setMaxSteps( DEMAND_MAX_STEPS_1 );
         demand.setCurrentStep( DEMAND_CURRENT_STEP_1 );
 
@@ -98,6 +102,8 @@ public class DemandDAOTest extends LuteceTestCase
         assertThat( demandStored.getReference(  ), is( demand.getReference(  ) ) );
         assertThat( demandStored.getStatusId(  ), is( demand.getStatusId(  ) ) );
         assertThat( demandStored.getCustomerId(  ), is( demand.getCustomerId(  ) ) );
+        assertThat( demandStored.getCreationDate(  ), is( demand.getCreationDate(  ) ) );
+        assertThat( demandStored.getClosureDate(  ), is( demand.getClosureDate(  ) ) );
         assertThat( demandStored.getMaxSteps(  ), is( demand.getMaxSteps(  ) ) );
         assertThat( demandStored.getCurrentStep(  ), is( demand.getCurrentStep(  ) ) );
 
@@ -105,8 +111,10 @@ public class DemandDAOTest extends LuteceTestCase
         demand.setId( DEMAND_ID_2 );
         demand.setTypeId( DEMAND_TYPE_ID_2 );
         demand.setReference( DEMAND_REFERENCE_2 );
-        demand.setStatusId( DEMAND_STATUS_ID_2 );
+        demand.setStatusId( Demand.STATUS_CLOSED );
         demand.setCustomerId( CUSTOMER_ID_2 );
+        demand.setCreationDate( DEMAND_CREATION_DATE_2 );
+        demand.setClosureDate( DEMAND_CLOSURE_DATE_2 );
         demand.setMaxSteps( DEMAND_MAX_STEPS_2 );
         demand.setCurrentStep( DEMAND_CURRENT_STEP_2 );
 
@@ -125,6 +133,8 @@ public class DemandDAOTest extends LuteceTestCase
         assertThat( demandStored.getReference(  ), is( not( demand.getReference(  ) ) ) );
         assertThat( demandStored.getStatusId(  ), is( demand.getStatusId(  ) ) );
         assertThat( demandStored.getCustomerId(  ), is( demand.getCustomerId(  ) ) );
+        assertThat( demandStored.getCreationDate(  ), is( not( demand.getCreationDate(  ) ) ) );
+        assertThat( demandStored.getClosureDate(  ), is( demand.getClosureDate(  ) ) );
         assertThat( demandStored.getMaxSteps(  ), is( not( demand.getMaxSteps(  ) ) ) );
         assertThat( demandStored.getCurrentStep(  ), is( demand.getCurrentStep(  ) ) );
 

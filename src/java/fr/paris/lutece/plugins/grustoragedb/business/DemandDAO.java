@@ -53,16 +53,18 @@ public final class DemandDAO implements IDemandDAO
     private static final String COLUMN_REFERENCE = "reference";
     private static final String COLUMN_STATUS_ID = "status_id";
     private static final String COLUMN_CUSTOMER_ID = "customer_id";
+    private static final String COLUMN_CREATION_DATE = "creation_date";
+    private static final String COLUMN_CLOSURE_DATE = "closure_date";
     private static final String COLUMN_MAX_STEPS = "max_steps";
     private static final String COLUMN_CURRENT_STEP = "current_step";
 
     // SQL queries
-    private static final String SQL_QUERY_DEMAND_ALL_FIELDS = "id, type_id, reference, status_id, customer_id, max_steps, current_step";
+    private static final String SQL_QUERY_DEMAND_ALL_FIELDS = "id, type_id, reference, status_id, customer_id, creation_date, closure_date, max_steps, current_step";
     private static final String SQL_QUERY_DEMAND_SELECT = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS +
         " FROM grustoragedb_demand WHERE id = ? AND type_id = ?";
     private static final String SQL_QUERY_DEMAND_INSERT = "INSERT INTO grustoragedb_demand ( " +
-        SQL_QUERY_DEMAND_ALL_FIELDS + " ) VALUES ( ?, ?, ?, ?, ?, ?, ? ) ";
-    private static final String SQL_QUERY_DEMAND_UPDATE = "UPDATE grustoragedb_demand SET status_id = ?, customer_id = ?, current_step = ? WHERE id = ? AND type_id = ?";
+        SQL_QUERY_DEMAND_ALL_FIELDS + " ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ? ) ";
+    private static final String SQL_QUERY_DEMAND_UPDATE = "UPDATE grustoragedb_demand SET status_id = ?, customer_id = ?, closure_date = ?, current_step = ? WHERE id = ? AND type_id = ?";
     private static final String SQL_QUERY_DEMAND_DELETE = "DELETE FROM grustoragedb_demand WHERE id = ? AND type_id = ? ";
     private static final String SQL_QUERY_DEMAND_SELECT_BY_CUSTOMER_ID = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS +
         " FROM grustoragedb_demand WHERE customer_id = ?";
@@ -129,6 +131,8 @@ public final class DemandDAO implements IDemandDAO
         daoUtil.setString( nIndex++, demand.getReference(  ) );
         daoUtil.setInt( nIndex++, demand.getStatusId(  ) );
         daoUtil.setString( nIndex++, demand.getCustomerId(  ) );
+        daoUtil.setLong( nIndex++, demand.getCreationDate(  ) );
+        daoUtil.setLong( nIndex++, demand.getClosureDate(  ) );
         daoUtil.setInt( nIndex++, demand.getMaxSteps(  ) );
         daoUtil.setInt( nIndex++, demand.getCurrentStep(  ) );
 
@@ -150,6 +154,7 @@ public final class DemandDAO implements IDemandDAO
 
         daoUtil.setInt( nIndex++, demand.getStatusId(  ) );
         daoUtil.setString( nIndex++, demand.getCustomerId(  ) );
+        daoUtil.setLong( nIndex++, demand.getClosureDate(  ) );
         daoUtil.setInt( nIndex++, demand.getCurrentStep(  ) );
         daoUtil.setString( nIndex++, demand.getId(  ) );
         daoUtil.setString( nIndex++, demand.getTypeId(  ) );
@@ -189,6 +194,8 @@ public final class DemandDAO implements IDemandDAO
         demand.setStatusId( daoUtil.getInt( COLUMN_STATUS_ID ) );
         demand.setCustomerId( daoUtil.getString( COLUMN_CUSTOMER_ID ) );
         demand.setReference( daoUtil.getString( COLUMN_REFERENCE ) );
+        demand.setCreationDate( daoUtil.getLong( COLUMN_CREATION_DATE ) );
+        demand.setClosureDate( daoUtil.getLong( COLUMN_CLOSURE_DATE ) );
         demand.setMaxSteps( daoUtil.getInt( COLUMN_MAX_STEPS ) );
         demand.setCurrentStep( daoUtil.getInt( COLUMN_CURRENT_STEP ) );
 

@@ -10,6 +10,8 @@ type_id varchar(50) NOT NULL,
 reference varchar(50) NOT NULL,
 status_id int NOT NULL default 0,
 customer_id varchar(50) NULL,
+creation_date bigint NOT NULL,
+closure_date bigint NULL,
 max_steps int NULL,
 current_step int NULL,
 PRIMARY KEY (id, type_id)
