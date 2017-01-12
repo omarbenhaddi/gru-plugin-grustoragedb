@@ -33,6 +33,7 @@
  */
 package fr.paris.lutece.plugins.grustoragedb.business;
 
+import fr.paris.lutece.plugins.grubusiness.business.customer.Customer;
 import fr.paris.lutece.plugins.grubusiness.business.demand.Demand;
 import fr.paris.lutece.plugins.grubusiness.business.demand.IDemandDAO;
 import fr.paris.lutece.test.LuteceTestCase;
@@ -88,7 +89,10 @@ public class DemandDAOTest extends LuteceTestCase
         demand.setTypeId( DEMAND_TYPE_ID_1 );
         demand.setReference( DEMAND_REFERENCE_1 );
         demand.setStatusId( Demand.STATUS_INPROGRESS );
-        demand.setCustomerId( CUSTOMER_ID_1 );
+
+        Customer customer = new Customer(  );
+        customer.setId( CUSTOMER_ID_1 );
+        demand.setCustomer( customer );
         demand.setCreationDate( DEMAND_CREATION_DATE_1 );
         demand.setClosureDate( DEMAND_CLOSURE_DATE_1 );
         demand.setMaxSteps( DEMAND_MAX_STEPS_1 );
@@ -101,7 +105,7 @@ public class DemandDAOTest extends LuteceTestCase
         assertThat( demandStored.getTypeId(  ), is( demand.getTypeId(  ) ) );
         assertThat( demandStored.getReference(  ), is( demand.getReference(  ) ) );
         assertThat( demandStored.getStatusId(  ), is( demand.getStatusId(  ) ) );
-        assertThat( demandStored.getCustomerId(  ), is( demand.getCustomerId(  ) ) );
+        assertThat( demandStored.getCustomer(  ).getId(  ), is( demand.getCustomer(  ).getId(  ) ) );
         assertThat( demandStored.getCreationDate(  ), is( demand.getCreationDate(  ) ) );
         assertThat( demandStored.getClosureDate(  ), is( demand.getClosureDate(  ) ) );
         assertThat( demandStored.getMaxSteps(  ), is( demand.getMaxSteps(  ) ) );
@@ -112,7 +116,9 @@ public class DemandDAOTest extends LuteceTestCase
         demand.setTypeId( DEMAND_TYPE_ID_2 );
         demand.setReference( DEMAND_REFERENCE_2 );
         demand.setStatusId( Demand.STATUS_CLOSED );
-        demand.setCustomerId( CUSTOMER_ID_2 );
+        customer = new Customer(  );
+        customer.setId( CUSTOMER_ID_2 );
+        demand.setCustomer( customer );
         demand.setCreationDate( DEMAND_CREATION_DATE_2 );
         demand.setClosureDate( DEMAND_CLOSURE_DATE_2 );
         demand.setMaxSteps( DEMAND_MAX_STEPS_2 );
@@ -132,7 +138,7 @@ public class DemandDAOTest extends LuteceTestCase
         assertThat( demandStored.getTypeId(  ), is( demand.getTypeId(  ) ) );
         assertThat( demandStored.getReference(  ), is( not( demand.getReference(  ) ) ) );
         assertThat( demandStored.getStatusId(  ), is( demand.getStatusId(  ) ) );
-        assertThat( demandStored.getCustomerId(  ), is( demand.getCustomerId(  ) ) );
+        assertThat( demandStored.getCustomer(  ).getId(  ), is( demand.getCustomer(  ).getId(  ) ) );
         assertThat( demandStored.getCreationDate(  ), is( not( demand.getCreationDate(  ) ) ) );
         assertThat( demandStored.getClosureDate(  ), is( demand.getClosureDate(  ) ) );
         assertThat( demandStored.getMaxSteps(  ), is( not( demand.getMaxSteps(  ) ) ) );
