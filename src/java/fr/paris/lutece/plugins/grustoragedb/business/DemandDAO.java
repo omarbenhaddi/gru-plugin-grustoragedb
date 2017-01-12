@@ -33,6 +33,7 @@
  */
 package fr.paris.lutece.plugins.grustoragedb.business;
 
+import fr.paris.lutece.plugins.grubusiness.business.customer.Customer;
 import fr.paris.lutece.plugins.grubusiness.business.demand.Demand;
 import fr.paris.lutece.plugins.grubusiness.business.demand.IDemandDAO;
 import fr.paris.lutece.plugins.grustoragedb.service.GruStorageDbPlugin;
@@ -130,7 +131,7 @@ public final class DemandDAO implements IDemandDAO
         daoUtil.setString( nIndex++, demand.getTypeId(  ) );
         daoUtil.setString( nIndex++, demand.getReference(  ) );
         daoUtil.setInt( nIndex++, demand.getStatusId(  ) );
-        daoUtil.setString( nIndex++, demand.getCustomerId(  ) );
+        daoUtil.setString( nIndex++, demand.getCustomer(  ).getId(  ) );
         daoUtil.setLong( nIndex++, demand.getCreationDate(  ) );
         daoUtil.setLong( nIndex++, demand.getClosureDate(  ) );
         daoUtil.setInt( nIndex++, demand.getMaxSteps(  ) );
@@ -153,7 +154,7 @@ public final class DemandDAO implements IDemandDAO
         int nIndex = 1;
 
         daoUtil.setInt( nIndex++, demand.getStatusId(  ) );
-        daoUtil.setString( nIndex++, demand.getCustomerId(  ) );
+        daoUtil.setString( nIndex++, demand.getCustomer(  ).getId(  ) );
         daoUtil.setLong( nIndex++, demand.getClosureDate(  ) );
         daoUtil.setInt( nIndex++, demand.getCurrentStep(  ) );
         daoUtil.setString( nIndex++, demand.getId(  ) );
@@ -192,7 +193,11 @@ public final class DemandDAO implements IDemandDAO
         demand.setId( daoUtil.getString( COLUMN_ID ) );
         demand.setTypeId( daoUtil.getString( COLUMN_TYPE_ID ) );
         demand.setStatusId( daoUtil.getInt( COLUMN_STATUS_ID ) );
-        demand.setCustomerId( daoUtil.getString( COLUMN_CUSTOMER_ID ) );
+
+        Customer customer = new Customer(  );
+        customer.setId( daoUtil.getString( COLUMN_CUSTOMER_ID ) );
+        demand.setCustomer( customer );
+
         demand.setReference( daoUtil.getString( COLUMN_REFERENCE ) );
         demand.setCreationDate( daoUtil.getLong( COLUMN_CREATION_DATE ) );
         demand.setClosureDate( daoUtil.getLong( COLUMN_CLOSURE_DATE ) );

@@ -37,12 +37,12 @@ import fr.paris.lutece.plugins.grubusiness.business.demand.Demand;
 import fr.paris.lutece.plugins.grubusiness.business.demand.IDemandDAO;
 import fr.paris.lutece.plugins.grubusiness.business.notification.BackofficeNotification;
 import fr.paris.lutece.plugins.grubusiness.business.notification.BroadcastNotification;
+import fr.paris.lutece.plugins.grubusiness.business.notification.DashboardNotification;
 import fr.paris.lutece.plugins.grubusiness.business.notification.EmailAddress;
 import fr.paris.lutece.plugins.grubusiness.business.notification.EmailNotification;
 import fr.paris.lutece.plugins.grubusiness.business.notification.INotificationDAO;
-import fr.paris.lutece.plugins.grubusiness.business.notification.NotifyGruGlobalNotification;
+import fr.paris.lutece.plugins.grubusiness.business.notification.Notification;
 import fr.paris.lutece.plugins.grubusiness.business.notification.SMSNotification;
-import fr.paris.lutece.plugins.grubusiness.business.notification.UserDashboardNotification;
 import fr.paris.lutece.test.LuteceTestCase;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -125,25 +125,24 @@ public class NotificationDAOTest extends LuteceTestCase
         demand.setStatusId( DEMAND_STATUS_ID_1 );
         _demandDAO.insert( demand );
 
-        NotifyGruGlobalNotification notification = new NotifyGruGlobalNotification(  );
-        notification.setDemandId( Integer.parseInt( DEMAND_ID_1 ) );
-        notification.setDemandTypeId( Integer.parseInt( DEMAND_TYPE_ID_1 ) );
+        Notification notification = new Notification(  );
+        notification.setDemand( demand );
         notification.setNotificationDate( NOTIFICATION_DATE_1 );
 
         // Create test
         _notificationDAO.insert( notification );
 
-        String strDemandId = String.valueOf( notification.getDemandId(  ) );
-        String strDemandTypeId = String.valueOf( notification.getDemandTypeId(  ) );
-        Collection<NotifyGruGlobalNotification> collectionNotificationStored = _notificationDAO.loadByDemand( strDemandId,
+        String strDemandId = notification.getDemand(  ).getId(  );
+        String strDemandTypeId = notification.getDemand(  ).getTypeId(  );
+        Collection<Notification> collectionNotificationStored = _notificationDAO.loadByDemand( strDemandId,
                 strDemandTypeId );
         assertThat( collectionNotificationStored.size(  ), is( 1 ) );
 
-        Iterator<NotifyGruGlobalNotification> iterator = collectionNotificationStored.iterator(  );
-        NotifyGruGlobalNotification notificationStored = iterator.next(  );
+        Iterator<Notification> iterator = collectionNotificationStored.iterator(  );
+        Notification notificationStored = iterator.next(  );
 
-        assertThat( notificationStored.getDemandId(  ), is( notification.getDemandId(  ) ) );
-        assertThat( notificationStored.getDemandTypeId(  ), is( notification.getDemandTypeId(  ) ) );
+        assertThat( notificationStored.getDemand(  ).getId(  ), is( notification.getDemand(  ).getId(  ) ) );
+        assertThat( notificationStored.getDemand(  ).getTypeId(  ), is( notification.getDemand(  ).getTypeId(  ) ) );
 
         notification.setNotificationDate( NOTIFICATION_DATE_2 );
 
@@ -208,8 +207,8 @@ public class NotificationDAOTest extends LuteceTestCase
 
         notification.setNotificationDate( NOTIFICATION_DATE_5 );
 
-        UserDashboardNotification myDashboardNotification = new UserDashboardNotification(  );
-        notification.setCrmStatusId( MYDASHBOARD_NOTIFICATION_STATUS_ID_1 );
+        DashboardNotification myDashboardNotification = new DashboardNotification(  );
+        myDashboardNotification.setStatusId( MYDASHBOARD_NOTIFICATION_STATUS_ID_1 );
         myDashboardNotification.setStatusText( MYDASHBOARD_NOTIFICATION_STATUS_TEXT_1 );
         myDashboardNotification.setMessage( MYDASHBOARD_NOTIFICATION_MESSAGE_1 );
         myDashboardNotification.setSubject( MYDASHBOARD_NOTIFICATION_SUBJECT_1 );
@@ -223,8 +222,8 @@ public class NotificationDAOTest extends LuteceTestCase
         iterator = collectionNotificationStored.iterator(  );
         notificationStored = iterator.next(  );
 
-        UserDashboardNotification myDashboardNotificationStored = notificationStored.getUserDashboard(  );
-        assertThat( notificationStored.getCrmStatusId(  ), is( notification.getCrmStatusId(  ) ) );
+        DashboardNotification myDashboardNotificationStored = notificationStored.getUserDashboard(  );
+        assertThat( myDashboardNotificationStored.getStatusId(  ), is( myDashboardNotification.getStatusId(  ) ) );
         assertThat( myDashboardNotificationStored.getStatusText(  ), is( myDashboardNotification.getStatusText(  ) ) );
         assertThat( myDashboardNotificationStored.getMessage(  ), is( myDashboardNotification.getMessage(  ) ) );
         assertThat( myDashboardNotificationStored.getSubject(  ), is( myDashboardNotification.getSubject(  ) ) );
@@ -309,31 +308,28 @@ public class NotificationDAOTest extends LuteceTestCase
         demand.setStatusId( DEMAND_STATUS_ID_1 );
         _demandDAO.insert( demand );
 
-        demand = new Demand(  );
-        demand.setId( DEMAND_ID_2 );
-        demand.setTypeId( DEMAND_TYPE_ID_2 );
-        demand.setReference( DEMAND_REFERENCE_2 );
-        demand.setStatusId( DEMAND_STATUS_ID_2 );
-        _demandDAO.insert( demand );
+        Demand demand2 = new Demand(  );
+        demand2.setId( DEMAND_ID_2 );
+        demand2.setTypeId( DEMAND_TYPE_ID_2 );
+        demand2.setReference( DEMAND_REFERENCE_2 );
+        demand2.setStatusId( DEMAND_STATUS_ID_2 );
+        _demandDAO.insert( demand2 );
 
-        NotifyGruGlobalNotification notification = new NotifyGruGlobalNotification(  );
-        notification.setDemandId( Integer.parseInt( DEMAND_ID_1 ) );
-        notification.setDemandTypeId( Integer.parseInt( DEMAND_TYPE_ID_1 ) );
-        notification.setNotificationDate( NOTIFICATION_DATE_1 );
+        Notification notification = new Notification(  );
+        notification.setDemand( demand );
         _notificationDAO.insert( notification );
 
-        notification = new NotifyGruGlobalNotification(  );
-        notification.setDemandId( Integer.parseInt( DEMAND_ID_2 ) );
-        notification.setDemandTypeId( Integer.parseInt( DEMAND_TYPE_ID_2 ) );
+        notification = new Notification(  );
+        notification.setDemand( demand2 );
         notification.setNotificationDate( NOTIFICATION_DATE_2 );
         _notificationDAO.insert( notification );
 
-        Collection<NotifyGruGlobalNotification> collectionNotificationStored = _notificationDAO.loadByDemand( DEMAND_ID_1,
+        Collection<Notification> collectionNotificationStored = _notificationDAO.loadByDemand( DEMAND_ID_1,
                 DEMAND_TYPE_ID_1 );
         assertThat( collectionNotificationStored.size(  ), is( 1 ) );
 
-        Iterator<NotifyGruGlobalNotification> iterator = collectionNotificationStored.iterator(  );
-        NotifyGruGlobalNotification notificationStored = iterator.next(  );
+        Iterator<Notification> iterator = collectionNotificationStored.iterator(  );
+        Notification notificationStored = iterator.next(  );
         assertThat( notificationStored.getNotificationDate(  ), is( NOTIFICATION_DATE_1 ) );
 
         collectionNotificationStored = _notificationDAO.loadByDemand( DEMAND_ID_2, DEMAND_TYPE_ID_2 );

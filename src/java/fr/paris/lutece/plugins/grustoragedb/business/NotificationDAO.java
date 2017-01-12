@@ -33,14 +33,15 @@
  */
 package fr.paris.lutece.plugins.grustoragedb.business;
 
+import fr.paris.lutece.plugins.grubusiness.business.demand.Demand;
 import fr.paris.lutece.plugins.grubusiness.business.notification.BackofficeNotification;
 import fr.paris.lutece.plugins.grubusiness.business.notification.BroadcastNotification;
+import fr.paris.lutece.plugins.grubusiness.business.notification.DashboardNotification;
 import fr.paris.lutece.plugins.grubusiness.business.notification.EmailAddress;
 import fr.paris.lutece.plugins.grubusiness.business.notification.EmailNotification;
 import fr.paris.lutece.plugins.grubusiness.business.notification.INotificationDAO;
-import fr.paris.lutece.plugins.grubusiness.business.notification.NotifyGruGlobalNotification;
+import fr.paris.lutece.plugins.grubusiness.business.notification.Notification;
 import fr.paris.lutece.plugins.grubusiness.business.notification.SMSNotification;
-import fr.paris.lutece.plugins.grubusiness.business.notification.UserDashboardNotification;
 import fr.paris.lutece.plugins.grustoragedb.service.GruStorageDbPlugin;
 import fr.paris.lutece.util.sql.DAOUtil;
 
@@ -119,9 +120,9 @@ public final class NotificationDAO implements INotificationDAO
      * {@inheritDoc}
      */
     @Override
-    public List<NotifyGruGlobalNotification> loadByDemand( String strDemandId, String strDemandTypeId )
+    public List<Notification> loadByDemand( String strDemandId, String strDemandTypeId )
     {
-        List<NotifyGruGlobalNotification> collectionNotifications = new ArrayList<NotifyGruGlobalNotification>(  );
+        List<Notification> collectionNotifications = new ArrayList<Notification>(  );
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_DEMAND, GruStorageDbPlugin.getPlugin(  ) );
 
         int nIndex = 1;
@@ -133,11 +134,15 @@ public final class NotificationDAO implements INotificationDAO
 
         while ( daoUtil.next(  ) )
         {
-            NotifyGruGlobalNotification notification = new NotifyGruGlobalNotification(  );
+            Notification notification = new Notification(  );
 
             notification.setId( daoUtil.getInt( COLUMN_ID ) );
-            notification.setDemandId( Integer.parseInt( strDemandId ) );
-            notification.setDemandTypeId( Integer.parseInt( strDemandTypeId ) );
+
+            Demand demand = new Demand(  );
+            demand.setId( strDemandId );
+            demand.setTypeId( strDemandTypeId );
+            notification.setDemand( demand );
+
             notification.setNotificationDate( daoUtil.getLong( COLUMN_DATE ) );
 
             loadBackofficeNotification( daoUtil, notification );
@@ -150,7 +155,7 @@ public final class NotificationDAO implements INotificationDAO
 
         daoUtil.free(  );
 
-        for ( NotifyGruGlobalNotification notification : collectionNotifications )
+        for ( Notification notification : collectionNotifications )
         {
             loadBroadcastEmailNotification( notification );
         }
@@ -162,7 +167,7 @@ public final class NotificationDAO implements INotificationDAO
      * {@inheritDoc}
      */
     @Override
-    public synchronized NotifyGruGlobalNotification insert( NotifyGruGlobalNotification notification )
+    public synchronized Notification insert( Notification notification )
     {
         int nNotificationId = newPrimaryKey(  );
         notification.setId( nNotificationId );
@@ -172,8 +177,8 @@ public final class NotificationDAO implements INotificationDAO
         int nIndex = 1;
 
         daoUtil.setInt( nIndex++, notification.getId(  ) );
-        daoUtil.setString( nIndex++, String.valueOf( notification.getDemandId(  ) ) );
-        daoUtil.setString( nIndex++, String.valueOf( notification.getDemandTypeId(  ) ) );
+        daoUtil.setString( nIndex++, notification.getDemand(  ).getId(  ) );
+        daoUtil.setString( nIndex++, notification.getDemand(  ).getTypeId(  ) );
         daoUtil.setLong( nIndex++, notification.getNotificationDate(  ) );
 
         daoUtil.executeUpdate(  );
@@ -230,7 +235,7 @@ public final class NotificationDAO implements INotificationDAO
      * @param daoUtil the SQL query manager
      * @param notification the notification
      */
-    private void loadBackofficeNotification( DAOUtil daoUtil, NotifyGruGlobalNotification notification )
+    private void loadBackofficeNotification( DAOUtil daoUtil, Notification notification )
     {
         int nNotificationId = daoUtil.getInt( COLUMN_BACKOFFICE_NOTIFICATION_ID );
 
@@ -250,7 +255,7 @@ public final class NotificationDAO implements INotificationDAO
      * @param daoUtil the SQL query manager
      * @param notification the notification
      */
-    private void loadSmsNotification( DAOUtil daoUtil, NotifyGruGlobalNotification notification )
+    private void loadSmsNotification( DAOUtil daoUtil, Notification notification )
     {
         int nNotificationId = daoUtil.getInt( COLUMN_SMS_NOTIFICATION_ID );
 
@@ -270,7 +275,7 @@ public final class NotificationDAO implements INotificationDAO
      * @param daoUtil the SQL query manager
      * @param notification the notification
      */
-    private void loadCustomerEmailNotification( DAOUtil daoUtil, NotifyGruGlobalNotification notification )
+    private void loadCustomerEmailNotification( DAOUtil daoUtil, Notification notification )
     {
         int nNotificationId = daoUtil.getInt( COLUMN_CUSTOMER_EMAIL_NOTIFICATION_ID );
 
@@ -291,19 +296,19 @@ public final class NotificationDAO implements INotificationDAO
     }
 
     /**
-     * Finds the MyDashboard notification associated to the specified notification and sets it into the specified notification
+     * Finds the DashboardNotification notification associated to the specified notification and sets it into the specified notification
      * @param daoUtil the SQL query manager
      * @param notification the notification
      */
-    private void loadMyDashboardNotification( DAOUtil daoUtil, NotifyGruGlobalNotification notification )
+    private void loadMyDashboardNotification( DAOUtil daoUtil, Notification notification )
     {
         int nNotificationId = daoUtil.getInt( COLUMN_MYDASHBOARD_NOTIFICATION_ID );
 
         if ( nNotificationId != 0 )
         {
-            UserDashboardNotification myDashboardNotification = new UserDashboardNotification(  );
+            DashboardNotification myDashboardNotification = new DashboardNotification(  );
 
-            notification.setCrmStatusId( daoUtil.getInt( COLUMN_MYDASHBOARD_STATUS_ID ) );
+            myDashboardNotification.setStatusId( daoUtil.getInt( COLUMN_MYDASHBOARD_STATUS_ID ) );
             myDashboardNotification.setStatusText( daoUtil.getString( COLUMN_MYDASHBOARD_STATUS_TEXT ) );
             myDashboardNotification.setMessage( daoUtil.getString( COLUMN_MYDASHBOARD_MESSAGE ) );
             myDashboardNotification.setSubject( daoUtil.getString( COLUMN_MYDASHBOARD_SUBJECT ) );
@@ -318,7 +323,7 @@ public final class NotificationDAO implements INotificationDAO
      * Finds the broadcast email notification associated to the specified notification and sets it into the specified notification
      * @param notification the notification
      */
-    private void loadBroadcastEmailNotification( NotifyGruGlobalNotification notification )
+    private void loadBroadcastEmailNotification( Notification notification )
     {
         List<BroadcastNotification> listBroadcastEmailNotifications = new ArrayList<BroadcastNotification>(  );
 
@@ -358,7 +363,7 @@ public final class NotificationDAO implements INotificationDAO
      * Inserts the backoffice notification of the specified notification
      * @param notification the notification
      */
-    private void insertBackofficeNotification( NotifyGruGlobalNotification notification )
+    private void insertBackofficeNotification( Notification notification )
     {
         BackofficeNotification backofficeNotification = notification.getBackofficeLogging(  );
 
@@ -381,7 +386,7 @@ public final class NotificationDAO implements INotificationDAO
      * Inserts the SMS notification of the specified notification
      * @param notification the notification
      */
-    private void insertSmsNotification( NotifyGruGlobalNotification notification )
+    private void insertSmsNotification( Notification notification )
     {
         SMSNotification smsNotification = notification.getUserSMS(  );
 
@@ -404,7 +409,7 @@ public final class NotificationDAO implements INotificationDAO
      * Inserts the customer email notification of the specified notification
      * @param notification the notification
      */
-    private void insertCustomerEmailNotification( NotifyGruGlobalNotification notification )
+    private void insertCustomerEmailNotification( Notification notification )
     {
         EmailNotification customerEmailNotification = notification.getUserEmail(  );
 
@@ -432,9 +437,9 @@ public final class NotificationDAO implements INotificationDAO
      * Inserts the MyDasboard notification of the specified notification
      * @param notification the notification
      */
-    private void insertMyDashboardNotification( NotifyGruGlobalNotification notification )
+    private void insertMyDashboardNotification( Notification notification )
     {
-        UserDashboardNotification myDashboardNotification = notification.getUserDashboard(  );
+        DashboardNotification myDashboardNotification = notification.getUserDashboard(  );
 
         if ( myDashboardNotification != null )
         {
@@ -443,7 +448,7 @@ public final class NotificationDAO implements INotificationDAO
             int nIndex = 1;
 
             daoUtil.setInt( nIndex++, notification.getId(  ) );
-            daoUtil.setInt( nIndex++, notification.getCrmStatusId(  ) );
+            daoUtil.setInt( nIndex++, myDashboardNotification.getStatusId(  ) );
             daoUtil.setString( nIndex++, myDashboardNotification.getStatusText(  ) );
             daoUtil.setString( nIndex++, myDashboardNotification.getMessage(  ) );
             daoUtil.setString( nIndex++, myDashboardNotification.getSubject(  ) );
@@ -459,7 +464,7 @@ public final class NotificationDAO implements INotificationDAO
      * Inserts the broadcast email notifications of the specified notification
      * @param notification the notification
      */
-    private void insertBroadcastEmailNotification( NotifyGruGlobalNotification notification )
+    private void insertBroadcastEmailNotification( Notification notification )
     {
         List<BroadcastNotification> listBroadcastdEmailNotifications = notification.getBroadcastEmail(  );
 
