@@ -439,6 +439,7 @@ public final class NotificationDAO implements INotificationDAO
      */
     private void insertMyDashboardNotification( Notification notification )
     {
+
         MyDashboardNotification myDashboardNotification = notification.getUserDashboard(  );
 
         if ( myDashboardNotification != null )
