@@ -42,7 +42,6 @@ import fr.paris.lutece.util.sql.DAOUtil;
 import java.util.ArrayList;
 import java.util.Collection;
 
-
 /**
  * This class provides Data Access methods for Demand objects stored in SQL database
  */
@@ -61,14 +60,13 @@ public final class DemandDAO implements IDemandDAO
 
     // SQL queries
     private static final String SQL_QUERY_DEMAND_ALL_FIELDS = "id, type_id, reference, status_id, customer_id, creation_date, closure_date, max_steps, current_step";
-    private static final String SQL_QUERY_DEMAND_SELECT = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS +
-        " FROM grustoragedb_demand WHERE id = ? AND type_id = ?";
-    private static final String SQL_QUERY_DEMAND_INSERT = "INSERT INTO grustoragedb_demand ( " +
-        SQL_QUERY_DEMAND_ALL_FIELDS + " ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ? ) ";
+    private static final String SQL_QUERY_DEMAND_SELECT = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS + " FROM grustoragedb_demand WHERE id = ? AND type_id = ?";
+    private static final String SQL_QUERY_DEMAND_INSERT = "INSERT INTO grustoragedb_demand ( " + SQL_QUERY_DEMAND_ALL_FIELDS
+            + " ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DEMAND_UPDATE = "UPDATE grustoragedb_demand SET status_id = ?, customer_id = ?, closure_date = ?, current_step = ? WHERE id = ? AND type_id = ?";
     private static final String SQL_QUERY_DEMAND_DELETE = "DELETE FROM grustoragedb_demand WHERE id = ? AND type_id = ? ";
-    private static final String SQL_QUERY_DEMAND_SELECT_BY_CUSTOMER_ID = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS +
-        " FROM grustoragedb_demand WHERE customer_id = ?";
+    private static final String SQL_QUERY_DEMAND_SELECT_BY_CUSTOMER_ID = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS
+            + " FROM grustoragedb_demand WHERE customer_id = ?";
 
     /**
      * {@inheritDoc}
@@ -76,20 +74,20 @@ public final class DemandDAO implements IDemandDAO
     @Override
     public Demand load( String strDemandId, String strDemandTypeId )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_SELECT, GruStorageDbPlugin.getPlugin(  ) );
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_SELECT, GruStorageDbPlugin.getPlugin( ) );
 
         daoUtil.setString( 1, strDemandId );
         daoUtil.setString( 2, strDemandTypeId );
-        daoUtil.executeQuery(  );
+        daoUtil.executeQuery( );
 
         Demand demand = null;
 
-        if ( daoUtil.next(  ) )
+        if ( daoUtil.next( ) )
         {
             demand = dao2Demand( daoUtil );
         }
 
-        daoUtil.free(  );
+        daoUtil.free( );
 
         return demand;
     }
@@ -100,19 +98,19 @@ public final class DemandDAO implements IDemandDAO
     @Override
     public Collection<Demand> loadByCustomerId( String strCustomerId )
     {
-        Collection<Demand> collectionDemands = new ArrayList<Demand>(  );
+        Collection<Demand> collectionDemands = new ArrayList<Demand>( );
 
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_SELECT_BY_CUSTOMER_ID, GruStorageDbPlugin.getPlugin(  ) );
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_SELECT_BY_CUSTOMER_ID, GruStorageDbPlugin.getPlugin( ) );
 
         daoUtil.setString( 1, strCustomerId );
-        daoUtil.executeQuery(  );
+        daoUtil.executeQuery( );
 
-        while ( daoUtil.next(  ) )
+        while ( daoUtil.next( ) )
         {
             collectionDemands.add( dao2Demand( daoUtil ) );
         }
 
-        daoUtil.free(  );
+        daoUtil.free( );
 
         return collectionDemands;
     }
@@ -123,22 +121,22 @@ public final class DemandDAO implements IDemandDAO
     @Override
     public Demand insert( Demand demand )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_INSERT, GruStorageDbPlugin.getPlugin(  ) );
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_INSERT, GruStorageDbPlugin.getPlugin( ) );
 
         int nIndex = 1;
 
-        daoUtil.setString( nIndex++, demand.getId(  ) );
-        daoUtil.setString( nIndex++, demand.getTypeId(  ) );
-        daoUtil.setString( nIndex++, demand.getReference(  ) );
-        daoUtil.setInt( nIndex++, demand.getStatusId(  ) );
-        daoUtil.setString( nIndex++, demand.getCustomer(  ).getId(  ) );
-        daoUtil.setLong( nIndex++, demand.getCreationDate(  ) );
-        daoUtil.setLong( nIndex++, demand.getClosureDate(  ) );
-        daoUtil.setInt( nIndex++, demand.getMaxSteps(  ) );
-        daoUtil.setInt( nIndex++, demand.getCurrentStep(  ) );
+        daoUtil.setString( nIndex++, demand.getId( ) );
+        daoUtil.setString( nIndex++, demand.getTypeId( ) );
+        daoUtil.setString( nIndex++, demand.getReference( ) );
+        daoUtil.setInt( nIndex++, demand.getStatusId( ) );
+        daoUtil.setString( nIndex++, demand.getCustomer( ).getId( ) );
+        daoUtil.setLong( nIndex++, demand.getCreationDate( ) );
+        daoUtil.setLong( nIndex++, demand.getClosureDate( ) );
+        daoUtil.setInt( nIndex++, demand.getMaxSteps( ) );
+        daoUtil.setInt( nIndex++, demand.getCurrentStep( ) );
 
-        daoUtil.executeUpdate(  );
-        daoUtil.free(  );
+        daoUtil.executeUpdate( );
+        daoUtil.free( );
 
         return demand;
     }
@@ -149,19 +147,19 @@ public final class DemandDAO implements IDemandDAO
     @Override
     public Demand store( Demand demand )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_UPDATE, GruStorageDbPlugin.getPlugin(  ) );
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_UPDATE, GruStorageDbPlugin.getPlugin( ) );
 
         int nIndex = 1;
 
-        daoUtil.setInt( nIndex++, demand.getStatusId(  ) );
-        daoUtil.setString( nIndex++, demand.getCustomer(  ).getId(  ) );
-        daoUtil.setLong( nIndex++, demand.getClosureDate(  ) );
-        daoUtil.setInt( nIndex++, demand.getCurrentStep(  ) );
-        daoUtil.setString( nIndex++, demand.getId(  ) );
-        daoUtil.setString( nIndex++, demand.getTypeId(  ) );
+        daoUtil.setInt( nIndex++, demand.getStatusId( ) );
+        daoUtil.setString( nIndex++, demand.getCustomer( ).getId( ) );
+        daoUtil.setLong( nIndex++, demand.getClosureDate( ) );
+        daoUtil.setInt( nIndex++, demand.getCurrentStep( ) );
+        daoUtil.setString( nIndex++, demand.getId( ) );
+        daoUtil.setString( nIndex++, demand.getTypeId( ) );
 
-        daoUtil.executeUpdate(  );
-        daoUtil.free(  );
+        daoUtil.executeUpdate( );
+        daoUtil.free( );
 
         return demand;
     }
@@ -172,29 +170,31 @@ public final class DemandDAO implements IDemandDAO
     @Override
     public void delete( String strDemandId, String strDemandTypeId )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_DELETE, GruStorageDbPlugin.getPlugin(  ) );
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_DELETE, GruStorageDbPlugin.getPlugin( ) );
 
         daoUtil.setString( 1, strDemandId );
         daoUtil.setString( 2, strDemandTypeId );
 
-        daoUtil.executeUpdate(  );
-        daoUtil.free(  );
+        daoUtil.executeUpdate( );
+        daoUtil.free( );
     }
 
     /**
      * Converts data from DAO to a Demand object
-     * @param daoUtil the DAO containing the data to convert
+     * 
+     * @param daoUtil
+     *            the DAO containing the data to convert
      * @return a Demand object
      */
     private Demand dao2Demand( DAOUtil daoUtil )
     {
-        Demand demand = new Demand(  );
+        Demand demand = new Demand( );
 
         demand.setId( daoUtil.getString( COLUMN_ID ) );
         demand.setTypeId( daoUtil.getString( COLUMN_TYPE_ID ) );
         demand.setStatusId( daoUtil.getInt( COLUMN_STATUS_ID ) );
 
-        Customer customer = new Customer(  );
+        Customer customer = new Customer( );
         customer.setId( daoUtil.getString( COLUMN_CUSTOMER_ID ) );
         demand.setCustomer( customer );
 

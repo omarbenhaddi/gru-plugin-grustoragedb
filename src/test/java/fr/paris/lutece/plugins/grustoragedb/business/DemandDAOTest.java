@@ -45,7 +45,6 @@ import static org.junit.Assert.assertThat;
 import java.util.Collection;
 import java.util.Iterator;
 
-
 /**
  * Test class for the DemandDAO
  *
@@ -73,24 +72,24 @@ public class DemandDAOTest extends LuteceTestCase
     /**
      * Constructor
      */
-    public DemandDAOTest(  )
+    public DemandDAOTest( )
     {
-        _demandDao = new DemandDAO(  );
+        _demandDao = new DemandDAO( );
     }
 
     /**
      * Test case
      */
-    public void testBusiness(  )
+    public void testBusiness( )
     {
         // Create test
-        Demand demand = new Demand(  );
+        Demand demand = new Demand( );
         demand.setId( DEMAND_ID_1 );
         demand.setTypeId( DEMAND_TYPE_ID_1 );
         demand.setReference( DEMAND_REFERENCE_1 );
         demand.setStatusId( Demand.STATUS_INPROGRESS );
 
-        Customer customer = new Customer(  );
+        Customer customer = new Customer( );
         customer.setId( CUSTOMER_ID_1 );
         demand.setCustomer( customer );
         demand.setCreationDate( DEMAND_CREATION_DATE_1 );
@@ -100,23 +99,23 @@ public class DemandDAOTest extends LuteceTestCase
 
         _demandDao.insert( demand );
 
-        Demand demandStored = _demandDao.load( demand.getId(  ), demand.getTypeId(  ) );
-        assertThat( demandStored.getId(  ), is( demand.getId(  ) ) );
-        assertThat( demandStored.getTypeId(  ), is( demand.getTypeId(  ) ) );
-        assertThat( demandStored.getReference(  ), is( demand.getReference(  ) ) );
-        assertThat( demandStored.getStatusId(  ), is( demand.getStatusId(  ) ) );
-        assertThat( demandStored.getCustomer(  ).getId(  ), is( demand.getCustomer(  ).getId(  ) ) );
-        assertThat( demandStored.getCreationDate(  ), is( demand.getCreationDate(  ) ) );
-        assertThat( demandStored.getClosureDate(  ), is( demand.getClosureDate(  ) ) );
-        assertThat( demandStored.getMaxSteps(  ), is( demand.getMaxSteps(  ) ) );
-        assertThat( demandStored.getCurrentStep(  ), is( demand.getCurrentStep(  ) ) );
+        Demand demandStored = _demandDao.load( demand.getId( ), demand.getTypeId( ) );
+        assertThat( demandStored.getId( ), is( demand.getId( ) ) );
+        assertThat( demandStored.getTypeId( ), is( demand.getTypeId( ) ) );
+        assertThat( demandStored.getReference( ), is( demand.getReference( ) ) );
+        assertThat( demandStored.getStatusId( ), is( demand.getStatusId( ) ) );
+        assertThat( demandStored.getCustomer( ).getId( ), is( demand.getCustomer( ).getId( ) ) );
+        assertThat( demandStored.getCreationDate( ), is( demand.getCreationDate( ) ) );
+        assertThat( demandStored.getClosureDate( ), is( demand.getClosureDate( ) ) );
+        assertThat( demandStored.getMaxSteps( ), is( demand.getMaxSteps( ) ) );
+        assertThat( demandStored.getCurrentStep( ), is( demand.getCurrentStep( ) ) );
 
         // Update test
         demand.setId( DEMAND_ID_2 );
         demand.setTypeId( DEMAND_TYPE_ID_2 );
         demand.setReference( DEMAND_REFERENCE_2 );
         demand.setStatusId( Demand.STATUS_CLOSED );
-        customer = new Customer(  );
+        customer = new Customer( );
         customer.setId( CUSTOMER_ID_2 );
         demand.setCustomer( customer );
         demand.setCreationDate( DEMAND_CREATION_DATE_2 );
@@ -126,36 +125,36 @@ public class DemandDAOTest extends LuteceTestCase
 
         _demandDao.store( demand );
 
-        demandStored = _demandDao.load( demand.getId(  ), demand.getTypeId(  ) );
-        assertThat( demandStored, is( nullValue(  ) ) );
+        demandStored = _demandDao.load( demand.getId( ), demand.getTypeId( ) );
+        assertThat( demandStored, is( nullValue( ) ) );
 
         demand.setId( DEMAND_ID_1 );
         demand.setTypeId( DEMAND_TYPE_ID_1 );
         _demandDao.store( demand );
 
-        demandStored = _demandDao.load( demand.getId(  ), demand.getTypeId(  ) );
-        assertThat( demandStored.getId(  ), is( demand.getId(  ) ) );
-        assertThat( demandStored.getTypeId(  ), is( demand.getTypeId(  ) ) );
-        assertThat( demandStored.getReference(  ), is( not( demand.getReference(  ) ) ) );
-        assertThat( demandStored.getStatusId(  ), is( demand.getStatusId(  ) ) );
-        assertThat( demandStored.getCustomer(  ).getId(  ), is( demand.getCustomer(  ).getId(  ) ) );
-        assertThat( demandStored.getCreationDate(  ), is( not( demand.getCreationDate(  ) ) ) );
-        assertThat( demandStored.getClosureDate(  ), is( demand.getClosureDate(  ) ) );
-        assertThat( demandStored.getMaxSteps(  ), is( not( demand.getMaxSteps(  ) ) ) );
-        assertThat( demandStored.getCurrentStep(  ), is( demand.getCurrentStep(  ) ) );
+        demandStored = _demandDao.load( demand.getId( ), demand.getTypeId( ) );
+        assertThat( demandStored.getId( ), is( demand.getId( ) ) );
+        assertThat( demandStored.getTypeId( ), is( demand.getTypeId( ) ) );
+        assertThat( demandStored.getReference( ), is( not( demand.getReference( ) ) ) );
+        assertThat( demandStored.getStatusId( ), is( demand.getStatusId( ) ) );
+        assertThat( demandStored.getCustomer( ).getId( ), is( demand.getCustomer( ).getId( ) ) );
+        assertThat( demandStored.getCreationDate( ), is( not( demand.getCreationDate( ) ) ) );
+        assertThat( demandStored.getClosureDate( ), is( demand.getClosureDate( ) ) );
+        assertThat( demandStored.getMaxSteps( ), is( not( demand.getMaxSteps( ) ) ) );
+        assertThat( demandStored.getCurrentStep( ), is( demand.getCurrentStep( ) ) );
 
         // List test
         Collection<Demand> collectionDemands = _demandDao.loadByCustomerId( CUSTOMER_ID_1 );
-        assertThat( collectionDemands.size(  ), is( 1 ) );
+        assertThat( collectionDemands.size( ), is( 1 ) );
 
-        Iterator<Demand> iteratorDemand = collectionDemands.iterator(  );
-        demandStored = iteratorDemand.next(  );
-        assertThat( demandStored.getId(  ), is( DEMAND_ID_1 ) );
-        assertThat( demandStored.getTypeId(  ), is( DEMAND_TYPE_ID_1 ) );
+        Iterator<Demand> iteratorDemand = collectionDemands.iterator( );
+        demandStored = iteratorDemand.next( );
+        assertThat( demandStored.getId( ), is( DEMAND_ID_1 ) );
+        assertThat( demandStored.getTypeId( ), is( DEMAND_TYPE_ID_1 ) );
 
         // Delete test
         _demandDao.delete( DEMAND_ID_1, DEMAND_TYPE_ID_1 );
         demandStored = _demandDao.load( DEMAND_ID_1, DEMAND_TYPE_ID_1 );
-        assertThat( demandStored, is( nullValue(  ) ) );
+        assertThat( demandStored, is( nullValue( ) ) );
     }
 }

@@ -36,7 +36,6 @@ package fr.paris.lutece.plugins.grustoragedb.service;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 
-
 /**
  * GRU storage database plugin
  */
@@ -51,7 +50,7 @@ public class GruStorageDbPlugin extends Plugin
      * {@inheritDoc}
      */
     @Override
-    public void init(  )
+    public void init( )
     {
     }
 
@@ -60,7 +59,7 @@ public class GruStorageDbPlugin extends Plugin
      *
      * @return The plugin
      */
-    public static Plugin getPlugin(  )
+    public static Plugin getPlugin( )
     {
         return PluginService.getPlugin( PLUGIN_NAME );
     }
