@@ -61,6 +61,7 @@ public final class DemandDAO implements IDemandDAO
     // SQL queries
     private static final String SQL_QUERY_DEMAND_ALL_FIELDS = "id, type_id, reference, status_id, customer_id, creation_date, closure_date, max_steps, current_step";
     private static final String SQL_QUERY_DEMAND_SELECT = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS + " FROM grustoragedb_demand WHERE id = ? AND type_id = ?";
+    private static final String SQL_QUERY_DEMAND_SELECT_ALL = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS + " FROM grustoragedb_demand";
     private static final String SQL_QUERY_DEMAND_INSERT = "INSERT INTO grustoragedb_demand ( " + SQL_QUERY_DEMAND_ALL_FIELDS
             + " ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DEMAND_UPDATE = "UPDATE grustoragedb_demand SET status_id = ?, customer_id = ?, closure_date = ?, current_step = ? WHERE id = ? AND type_id = ?";
@@ -103,6 +104,27 @@ public final class DemandDAO implements IDemandDAO
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_SELECT_BY_CUSTOMER_ID, GruStorageDbPlugin.getPlugin( ) );
 
         daoUtil.setString( 1, strCustomerId );
+        daoUtil.executeQuery( );
+
+        while ( daoUtil.next( ) )
+        {
+            collectionDemands.add( dao2Demand( daoUtil ) );
+        }
+
+        daoUtil.free( );
+
+        return collectionDemands;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Collection<Demand> loadAllDemands( )
+    {
+        Collection<Demand> collectionDemands = new ArrayList<Demand>( );
+
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_SELECT_ALL, GruStorageDbPlugin.getPlugin( ) );
         daoUtil.executeQuery( );
 
         while ( daoUtil.next( ) )
@@ -206,4 +228,5 @@ public final class DemandDAO implements IDemandDAO
 
         return demand;
     }
+
 }
