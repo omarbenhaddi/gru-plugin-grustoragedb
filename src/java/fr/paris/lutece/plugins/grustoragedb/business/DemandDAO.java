@@ -115,7 +115,7 @@ public final class DemandDAO implements IDemandDAO
 
         return collectionDemands;
     }
-    
+
     /**
      * {@inheritDoc}
      */
