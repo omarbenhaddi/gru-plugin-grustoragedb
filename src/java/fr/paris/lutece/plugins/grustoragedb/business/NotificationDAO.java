@@ -141,7 +141,7 @@ public final class NotificationDAO implements INotificationDAO
             demand.setTypeId( strDemandTypeId );
             notification.setDemand( demand );
 
-            notification.setNotificationDate( daoUtil.getLong( COLUMN_DATE ) );
+            notification.setDate( daoUtil.getLong( COLUMN_DATE ) );
 
             loadBackofficeNotification( daoUtil, notification );
             loadSmsNotification( daoUtil, notification );
@@ -177,7 +177,7 @@ public final class NotificationDAO implements INotificationDAO
         daoUtil.setInt( nIndex++, notification.getId( ) );
         daoUtil.setString( nIndex++, notification.getDemand( ).getId( ) );
         daoUtil.setString( nIndex++, notification.getDemand( ).getTypeId( ) );
-        daoUtil.setLong( nIndex++, notification.getNotificationDate( ) );
+        daoUtil.setLong( nIndex++, notification.getDate( ) );
 
         daoUtil.executeUpdate( );
         daoUtil.free( );
@@ -247,7 +247,7 @@ public final class NotificationDAO implements INotificationDAO
             backofficeNotification.setMessage( daoUtil.getString( COLUMN_BACKOFFICE_MESSAGE ) );
             backofficeNotification.setStatusText( daoUtil.getString( COLUMN_BACKOFFICE_STATUS_TEXT ) );
 
-            notification.setBackofficeLogging( backofficeNotification );
+            notification.setBackofficeNotification( backofficeNotification );
         }
     }
 
@@ -270,7 +270,7 @@ public final class NotificationDAO implements INotificationDAO
             smsNotification.setMessage( daoUtil.getString( COLUMN_SMS_MESSAGE ) );
             smsNotification.setPhoneNumber( daoUtil.getString( COLUMN_SMS_PHONE_NUMBER ) );
 
-            notification.setUserSMS( smsNotification );
+            notification.setSmsNotification( smsNotification );
         }
     }
 
@@ -298,7 +298,7 @@ public final class NotificationDAO implements INotificationDAO
             customerEmailNotification.setCc( daoUtil.getString( COLUMN_CUSTOMER_EMAIL_COPIES ) );
             customerEmailNotification.setBcc( daoUtil.getString( COLUMN_CUSTOMER_EMAIL_BLIND_COPIES ) );
 
-            notification.setUserEmail( customerEmailNotification );
+            notification.setEmailNotification( customerEmailNotification );
         }
     }
 
@@ -325,7 +325,7 @@ public final class NotificationDAO implements INotificationDAO
             myDashboardNotification.setData( daoUtil.getString( COLUMN_MYDASHBOARD_DATA ) );
             myDashboardNotification.setSenderName( daoUtil.getString( COLUMN_MYDASHBOARD_SENDER_NAME ) );
 
-            notification.setUserDashboard( myDashboardNotification );
+            notification.setMyDashboardNotification( myDashboardNotification );
         }
     }
 
@@ -378,7 +378,7 @@ public final class NotificationDAO implements INotificationDAO
      */
     private void insertBackofficeNotification( Notification notification )
     {
-        BackofficeNotification backofficeNotification = notification.getBackofficeLogging( );
+        BackofficeNotification backofficeNotification = notification.getBackofficeNotification( );
 
         if ( backofficeNotification != null )
         {
@@ -403,7 +403,7 @@ public final class NotificationDAO implements INotificationDAO
      */
     private void insertSmsNotification( Notification notification )
     {
-        SMSNotification smsNotification = notification.getUserSMS( );
+        SMSNotification smsNotification = notification.getSmsNotification( );
 
         if ( smsNotification != null )
         {
@@ -428,7 +428,7 @@ public final class NotificationDAO implements INotificationDAO
      */
     private void insertCustomerEmailNotification( Notification notification )
     {
-        EmailNotification customerEmailNotification = notification.getUserEmail( );
+        EmailNotification customerEmailNotification = notification.getEmailNotification( );
 
         if ( customerEmailNotification != null )
         {
@@ -459,7 +459,7 @@ public final class NotificationDAO implements INotificationDAO
     private void insertMyDashboardNotification( Notification notification )
     {
 
-        MyDashboardNotification myDashboardNotification = notification.getUserDashboard( );
+        MyDashboardNotification myDashboardNotification = notification.getMyDashboardNotification( );
 
         if ( myDashboardNotification != null )
         {

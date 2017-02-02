@@ -126,7 +126,7 @@ public class NotificationDAOTest extends LuteceTestCase
 
         Notification notification = new Notification( );
         notification.setDemand( demand );
-        notification.setNotificationDate( NOTIFICATION_DATE_1 );
+        notification.setDate( NOTIFICATION_DATE_1 );
 
         // Create test
         _notificationDAO.insert( notification );
@@ -142,12 +142,12 @@ public class NotificationDAOTest extends LuteceTestCase
         assertThat( notificationStored.getDemand( ).getId( ), is( notification.getDemand( ).getId( ) ) );
         assertThat( notificationStored.getDemand( ).getTypeId( ), is( notification.getDemand( ).getTypeId( ) ) );
 
-        notification.setNotificationDate( NOTIFICATION_DATE_2 );
+        notification.setDate( NOTIFICATION_DATE_2 );
 
         BackofficeNotification backofficeNotification = new BackofficeNotification( );
         backofficeNotification.setMessage( BACKOFFICE_NOTIFICATION_MESSAGE_1 );
         backofficeNotification.setStatusText( BACKOFFICE_NOTIFICATION_STATUS_TEXT_1 );
-        notification.setBackofficeLogging( backofficeNotification );
+        notification.setBackofficeNotification( backofficeNotification );
         _notificationDAO.insert( notification );
 
         collectionNotificationStored = _notificationDAO.loadByDemand( strDemandId, strDemandTypeId );
@@ -155,16 +155,16 @@ public class NotificationDAOTest extends LuteceTestCase
         iterator = collectionNotificationStored.iterator( );
         notificationStored = iterator.next( );
 
-        BackofficeNotification backofficeNotificationStored = notificationStored.getBackofficeLogging( );
+        BackofficeNotification backofficeNotificationStored = notificationStored.getBackofficeNotification( );
         assertThat( backofficeNotificationStored.getMessage( ), is( backofficeNotification.getMessage( ) ) );
         assertThat( backofficeNotificationStored.getStatusText( ), is( backofficeNotification.getStatusText( ) ) );
 
-        notification.setNotificationDate( NOTIFICATION_DATE_3 );
+        notification.setDate( NOTIFICATION_DATE_3 );
 
         SMSNotification smsNotification = new SMSNotification( );
         smsNotification.setMessage( SMS_NOTIFICATION_MESSAGE_1 );
         smsNotification.setPhoneNumber( SMS_NOTIFICATION_PHONE_NUMBER_1 );
-        notification.setUserSMS( smsNotification );
+        notification.setSmsNotification( smsNotification );
         _notificationDAO.insert( notification );
 
         collectionNotificationStored = _notificationDAO.loadByDemand( strDemandId, strDemandTypeId );
@@ -172,11 +172,11 @@ public class NotificationDAOTest extends LuteceTestCase
         iterator = collectionNotificationStored.iterator( );
         notificationStored = iterator.next( );
 
-        SMSNotification smsNotificationStored = notificationStored.getUserSMS( );
+        SMSNotification smsNotificationStored = notificationStored.getSmsNotification( );
         assertThat( smsNotificationStored.getMessage( ), is( smsNotification.getMessage( ) ) );
         assertThat( smsNotificationStored.getPhoneNumber( ), is( smsNotification.getPhoneNumber( ) ) );
 
-        notification.setNotificationDate( NOTIFICATION_DATE_4 );
+        notification.setDate( NOTIFICATION_DATE_4 );
 
         EmailNotification emailNotification = new EmailNotification( );
         emailNotification.setSenderEmail( CUSTOMER_EMAIL_NOTIFICATION_SENDER_EMAIL_1 );
@@ -186,7 +186,7 @@ public class NotificationDAOTest extends LuteceTestCase
         emailNotification.setRecipient( CUSTOMER_EMAIL_NOTIFICATION_RECIPIENT_1 );
         emailNotification.setCc( CUSTOMER_EMAIL_NOTIFICATION_COPIES_1 );
         emailNotification.setBcc( CUSTOMER_EMAIL_NOTIFICATION_BLIND_COPIES_1 );
-        notification.setUserEmail( emailNotification );
+        notification.setEmailNotification( emailNotification );
         _notificationDAO.insert( notification );
 
         collectionNotificationStored = _notificationDAO.loadByDemand( strDemandId, strDemandTypeId );
@@ -194,7 +194,7 @@ public class NotificationDAOTest extends LuteceTestCase
         iterator = collectionNotificationStored.iterator( );
         notificationStored = iterator.next( );
 
-        EmailNotification emailNotificationStored = notificationStored.getUserEmail( );
+        EmailNotification emailNotificationStored = notificationStored.getEmailNotification( );
         assertThat( emailNotificationStored.getSenderEmail( ), is( emailNotification.getSenderEmail( ) ) );
         assertThat( emailNotificationStored.getSenderName( ), is( emailNotification.getSenderName( ) ) );
         assertThat( emailNotificationStored.getSubject( ), is( emailNotification.getSubject( ) ) );
@@ -203,7 +203,7 @@ public class NotificationDAOTest extends LuteceTestCase
         assertThat( emailNotificationStored.getCc( ), is( emailNotification.getCc( ) ) );
         assertThat( emailNotificationStored.getCci( ), is( emailNotification.getCci( ) ) );
 
-        notification.setNotificationDate( NOTIFICATION_DATE_5 );
+        notification.setDate( NOTIFICATION_DATE_5 );
 
         MyDashboardNotification myDashboardNotification = new MyDashboardNotification( );
         myDashboardNotification.setStatusId( MYDASHBOARD_NOTIFICATION_STATUS_ID_1 );
@@ -212,7 +212,7 @@ public class NotificationDAOTest extends LuteceTestCase
         myDashboardNotification.setSubject( MYDASHBOARD_NOTIFICATION_SUBJECT_1 );
         myDashboardNotification.setData( MYDASHBOARD_NOTIFICATION_DATA_1 );
         myDashboardNotification.setSenderName( MYDASHBOARD_NOTIFICATION_SENDER_NAME_1 );
-        notification.setUserDashboard( myDashboardNotification );
+        notification.setMyDashboardNotification( myDashboardNotification );
         _notificationDAO.insert( notification );
 
         collectionNotificationStored = _notificationDAO.loadByDemand( strDemandId, strDemandTypeId );
@@ -220,7 +220,7 @@ public class NotificationDAOTest extends LuteceTestCase
         iterator = collectionNotificationStored.iterator( );
         notificationStored = iterator.next( );
 
-        MyDashboardNotification myDashboardNotificationStored = notificationStored.getUserDashboard( );
+        MyDashboardNotification myDashboardNotificationStored = notificationStored.getMyDashboardNotification( );
         assertThat( myDashboardNotificationStored.getStatusId( ), is( myDashboardNotification.getStatusId( ) ) );
         assertThat( myDashboardNotificationStored.getStatusText( ), is( myDashboardNotification.getStatusText( ) ) );
         assertThat( myDashboardNotificationStored.getMessage( ), is( myDashboardNotification.getMessage( ) ) );
@@ -228,7 +228,7 @@ public class NotificationDAOTest extends LuteceTestCase
         assertThat( myDashboardNotificationStored.getData( ), is( myDashboardNotification.getData( ) ) );
         assertThat( myDashboardNotificationStored.getSenderName( ), is( myDashboardNotification.getSenderName( ) ) );
 
-        notification.setNotificationDate( NOTIFICATION_DATE_6 );
+        notification.setDate( NOTIFICATION_DATE_6 );
 
         List<BroadcastNotification> listBroadcastNotifications = new ArrayList<BroadcastNotification>( );
         BroadcastNotification broadcastNotification = new BroadcastNotification( );
@@ -319,7 +319,7 @@ public class NotificationDAOTest extends LuteceTestCase
 
         notification = new Notification( );
         notification.setDemand( demand2 );
-        notification.setNotificationDate( NOTIFICATION_DATE_2 );
+        notification.setDate( NOTIFICATION_DATE_2 );
         _notificationDAO.insert( notification );
 
         Collection<Notification> collectionNotificationStored = _notificationDAO.loadByDemand( DEMAND_ID_1, DEMAND_TYPE_ID_1 );
@@ -327,13 +327,13 @@ public class NotificationDAOTest extends LuteceTestCase
 
         Iterator<Notification> iterator = collectionNotificationStored.iterator( );
         Notification notificationStored = iterator.next( );
-        assertThat( notificationStored.getNotificationDate( ), is( NOTIFICATION_DATE_1 ) );
+        assertThat( notificationStored.getDate( ), is( NOTIFICATION_DATE_1 ) );
 
         collectionNotificationStored = _notificationDAO.loadByDemand( DEMAND_ID_2, DEMAND_TYPE_ID_2 );
         assertThat( collectionNotificationStored.size( ), is( 1 ) );
         iterator = collectionNotificationStored.iterator( );
         notificationStored = iterator.next( );
-        assertThat( notificationStored.getNotificationDate( ), is( NOTIFICATION_DATE_2 ) );
+        assertThat( notificationStored.getDate( ), is( NOTIFICATION_DATE_2 ) );
 
         _notificationDAO.deleteByDemand( DEMAND_ID_1, DEMAND_TYPE_ID_1 );
         collectionNotificationStored = _notificationDAO.loadByDemand( DEMAND_ID_1, DEMAND_TYPE_ID_1 );
