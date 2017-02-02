@@ -68,6 +68,8 @@ public final class DemandDAO implements IDemandDAO
     private static final String SQL_QUERY_DEMAND_DELETE = "DELETE FROM grustoragedb_demand WHERE id = ? AND type_id = ? ";
     private static final String SQL_QUERY_DEMAND_SELECT_BY_CUSTOMER_ID = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS
             + " FROM grustoragedb_demand WHERE customer_id = ?";
+    private static final String SQL_QUERY_DEMAND_SELECT_BY_REFERENCE = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS
+            + " FROM grustoragedb_demand WHERE reference = ?";
 
     /**
      * {@inheritDoc}
@@ -104,6 +106,29 @@ public final class DemandDAO implements IDemandDAO
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_SELECT_BY_CUSTOMER_ID, GruStorageDbPlugin.getPlugin( ) );
 
         daoUtil.setString( 1, strCustomerId );
+        daoUtil.executeQuery( );
+
+        while ( daoUtil.next( ) )
+        {
+            collectionDemands.add( dao2Demand( daoUtil ) );
+        }
+
+        daoUtil.free( );
+
+        return collectionDemands;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Collection<Demand> loadByReference( String strReference )
+    {
+        Collection<Demand> collectionDemands = new ArrayList<Demand>( );
+
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_SELECT_BY_REFERENCE, GruStorageDbPlugin.getPlugin( ) );
+
+        daoUtil.setString( 1, strReference );
         daoUtil.executeQuery( );
 
         while ( daoUtil.next( ) )

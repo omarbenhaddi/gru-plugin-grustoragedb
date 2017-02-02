@@ -33,6 +33,7 @@
  */
 package fr.paris.lutece.plugins.grustoragedb.business;
 
+import fr.paris.lutece.plugins.grubusiness.business.customer.Customer;
 import fr.paris.lutece.plugins.grubusiness.business.demand.Demand;
 import fr.paris.lutece.plugins.grubusiness.business.demand.IDemandDAO;
 import fr.paris.lutece.plugins.grubusiness.business.notification.BackofficeNotification;
@@ -76,6 +77,8 @@ public class NotificationDAOTest extends LuteceTestCase
     private static final String BACKOFFICE_NOTIFICATION_STATUS_TEXT_1 = "BackofficeStatusText1";
     private static final String SMS_NOTIFICATION_MESSAGE_1 = "SmsMessage1";
     private static final String SMS_NOTIFICATION_PHONE_NUMBER_1 = "SmsPhoneNumber1";
+    private static final String CUSTOMER_ID_1 = "CustomerId1";
+    private static final String CUSTOMER_ID_2 = "CustomerId2";
     private static final String CUSTOMER_EMAIL_NOTIFICATION_SENDER_EMAIL_1 = "CustomerEmailSenderEmail1";
     private static final String CUSTOMER_EMAIL_NOTIFICATION_SENDER_NAME_1 = "CustomerEmailSenderName1";
     private static final String CUSTOMER_EMAIL_NOTIFICATION_SUBJECT_1 = "CustomerEmailSubject1";
@@ -122,6 +125,11 @@ public class NotificationDAOTest extends LuteceTestCase
         demand.setTypeId( DEMAND_TYPE_ID_1 );
         demand.setReference( DEMAND_REFERENCE_1 );
         demand.setStatusId( DEMAND_STATUS_ID_1 );
+
+        Customer customer = new Customer( );
+        customer.setId( CUSTOMER_ID_1 );
+        demand.setCustomer( customer );
+
         _demandDAO.insert( demand );
 
         Notification notification = new Notification( );
@@ -304,6 +312,11 @@ public class NotificationDAOTest extends LuteceTestCase
         demand.setTypeId( DEMAND_TYPE_ID_1 );
         demand.setReference( DEMAND_REFERENCE_1 );
         demand.setStatusId( DEMAND_STATUS_ID_1 );
+
+        Customer customer = new Customer( );
+        customer.setId( CUSTOMER_ID_1 );
+        demand.setCustomer( customer );
+
         _demandDAO.insert( demand );
 
         Demand demand2 = new Demand( );
@@ -311,10 +324,16 @@ public class NotificationDAOTest extends LuteceTestCase
         demand2.setTypeId( DEMAND_TYPE_ID_2 );
         demand2.setReference( DEMAND_REFERENCE_2 );
         demand2.setStatusId( DEMAND_STATUS_ID_2 );
+
+        Customer customer2 = new Customer( );
+        customer2.setId( CUSTOMER_ID_2 );
+        demand2.setCustomer( customer2 );
+
         _demandDAO.insert( demand2 );
 
         Notification notification = new Notification( );
         notification.setDemand( demand );
+        notification.setNotificationDate( NOTIFICATION_DATE_1 );
         _notificationDAO.insert( notification );
 
         notification = new Notification( );
