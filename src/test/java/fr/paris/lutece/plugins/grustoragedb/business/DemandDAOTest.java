@@ -152,6 +152,15 @@ public class DemandDAOTest extends LuteceTestCase
         assertThat( demandStored.getId( ), is( DEMAND_ID_1 ) );
         assertThat( demandStored.getTypeId( ), is( DEMAND_TYPE_ID_1 ) );
 
+        // List test by reference
+        Collection<Demand> collectionDemands2 = _demandDao.loadByReference( DEMAND_REFERENCE_1 );
+        assertThat( collectionDemands2.size( ), is( 1 ) );
+
+        Iterator<Demand> iteratorDemand2 = collectionDemands2.iterator( );
+        demandStored = iteratorDemand2.next( );
+        assertThat( demandStored.getId( ), is( DEMAND_ID_1 ) );
+        assertThat( demandStored.getTypeId( ), is( DEMAND_TYPE_ID_1 ) );
+
         // Delete test
         _demandDao.delete( DEMAND_ID_1, DEMAND_TYPE_ID_1 );
         demandStored = _demandDao.load( DEMAND_ID_1, DEMAND_TYPE_ID_1 );
