@@ -333,7 +333,7 @@ public class NotificationDAOTest extends LuteceTestCase
 
         Notification notification = new Notification( );
         notification.setDemand( demand );
-        notification.setNotificationDate( NOTIFICATION_DATE_1 );
+        notification.setDate( NOTIFICATION_DATE_1 );
         _notificationDAO.insert( notification );
 
         notification = new Notification( );
