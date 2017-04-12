@@ -48,6 +48,7 @@ import fr.paris.lutece.util.sql.DAOUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * This class provides Data Access methods for Notification objects stored in SQL database
@@ -529,16 +530,20 @@ public final class NotificationDAO implements INotificationDAO
      */
     private List<EmailAddress> string2Emails( String strEmails )
     {
-        List<String> listEmails = Arrays.asList( strEmails.split( EMAIL_SEPARATOR ) );
         List<EmailAddress> listEmailAddresses = new ArrayList<EmailAddress>( );
-
-        for ( String strEmail : listEmails )
+        
+        if( StringUtils.isNotEmpty( strEmails ) )
         {
-            EmailAddress emailAddress = new EmailAddress( );
-
-            emailAddress.setAddress( strEmail );
-
-            listEmailAddresses.add( emailAddress );
+	        List<String> listEmails = Arrays.asList( strEmails.split( EMAIL_SEPARATOR ) );
+	
+	        for ( String strEmail : listEmails )
+	        {
+	            EmailAddress emailAddress = new EmailAddress( );
+	
+	            emailAddress.setAddress( strEmail );
+	
+	            listEmailAddresses.add( emailAddress );
+	        }
         }
 
         return listEmailAddresses;
@@ -554,15 +559,18 @@ public final class NotificationDAO implements INotificationDAO
     private String emails2String( List<EmailAddress> listEmails )
     {
         StringBuilder sbEmails = new StringBuilder( );
-
-        for ( EmailAddress emailAddress : listEmails )
-        {
-            sbEmails.append( emailAddress.getAddress( ) ).append( EMAIL_SEPARATOR );
-        }
-
-        if ( sbEmails.length( ) != 0 )
-        {
-            sbEmails.deleteCharAt( sbEmails.length( ) - 1 );
+        
+        if( listEmails!=null && !listEmails.isEmpty( ) )
+        {	
+	        for ( EmailAddress emailAddress : listEmails )
+	        {
+	            sbEmails.append( emailAddress.getAddress( ) ).append( EMAIL_SEPARATOR );
+	        }
+	
+	        if ( sbEmails.length( ) != 0 )
+	        {
+	            sbEmails.deleteCharAt( sbEmails.length( ) - 1 );
+	        }
         }
 
         return sbEmails.toString( );
