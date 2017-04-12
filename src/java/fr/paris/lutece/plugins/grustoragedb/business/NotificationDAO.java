@@ -531,19 +531,19 @@ public final class NotificationDAO implements INotificationDAO
     private List<EmailAddress> string2Emails( String strEmails )
     {
         List<EmailAddress> listEmailAddresses = new ArrayList<EmailAddress>( );
-        
-        if( StringUtils.isNotEmpty( strEmails ) )
+
+        if ( StringUtils.isNotEmpty( strEmails ) )
         {
-	        List<String> listEmails = Arrays.asList( strEmails.split( EMAIL_SEPARATOR ) );
-	
-	        for ( String strEmail : listEmails )
-	        {
-	            EmailAddress emailAddress = new EmailAddress( );
-	
-	            emailAddress.setAddress( strEmail );
-	
-	            listEmailAddresses.add( emailAddress );
-	        }
+            List<String> listEmails = Arrays.asList( strEmails.split( EMAIL_SEPARATOR ) );
+
+            for ( String strEmail : listEmails )
+            {
+                EmailAddress emailAddress = new EmailAddress( );
+
+                emailAddress.setAddress( strEmail );
+
+                listEmailAddresses.add( emailAddress );
+            }
         }
 
         return listEmailAddresses;
@@ -559,18 +559,18 @@ public final class NotificationDAO implements INotificationDAO
     private String emails2String( List<EmailAddress> listEmails )
     {
         StringBuilder sbEmails = new StringBuilder( );
-        
-        if( listEmails!=null && !listEmails.isEmpty( ) )
-        {	
-	        for ( EmailAddress emailAddress : listEmails )
-	        {
-	            sbEmails.append( emailAddress.getAddress( ) ).append( EMAIL_SEPARATOR );
-	        }
-	
-	        if ( sbEmails.length( ) != 0 )
-	        {
-	            sbEmails.deleteCharAt( sbEmails.length( ) - 1 );
-	        }
+
+        if ( listEmails != null && !listEmails.isEmpty( ) )
+        {
+            for ( EmailAddress emailAddress : listEmails )
+            {
+                sbEmails.append( emailAddress.getAddress( ) ).append( EMAIL_SEPARATOR );
+            }
+
+            if ( sbEmails.length( ) != 0 )
+            {
+                sbEmails.deleteCharAt( sbEmails.length( ) - 1 );
+            }
         }
 
         return sbEmails.toString( );
