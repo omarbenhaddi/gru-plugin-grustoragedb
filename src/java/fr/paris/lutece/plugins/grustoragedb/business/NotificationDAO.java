@@ -33,22 +33,23 @@
  */
 package fr.paris.lutece.plugins.grustoragedb.business;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+
 import fr.paris.lutece.plugins.grubusiness.business.demand.Demand;
 import fr.paris.lutece.plugins.grubusiness.business.notification.BackofficeNotification;
 import fr.paris.lutece.plugins.grubusiness.business.notification.BroadcastNotification;
-import fr.paris.lutece.plugins.grubusiness.business.notification.MyDashboardNotification;
 import fr.paris.lutece.plugins.grubusiness.business.notification.EmailAddress;
 import fr.paris.lutece.plugins.grubusiness.business.notification.EmailNotification;
 import fr.paris.lutece.plugins.grubusiness.business.notification.INotificationDAO;
+import fr.paris.lutece.plugins.grubusiness.business.notification.MyDashboardNotification;
 import fr.paris.lutece.plugins.grubusiness.business.notification.Notification;
 import fr.paris.lutece.plugins.grubusiness.business.notification.SMSNotification;
 import fr.paris.lutece.plugins.grustoragedb.service.GruStorageDbPlugin;
 import fr.paris.lutece.util.sql.DAOUtil;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import org.apache.commons.lang.StringUtils;
 
 /**
  * This class provides Data Access methods for Notification objects stored in SQL database
@@ -95,6 +96,15 @@ public final class NotificationDAO implements INotificationDAO
             + "LEFT JOIN grustoragedb_notification_customer_email d ON a.id = d.notification_id "
             + "LEFT JOIN grustoragedb_notification_mydashboard e ON a.id = e.notification_id "
             + "WHERE a.demand_id = ? AND a.demand_type_id = ? ORDER BY a.date DESC";
+    private static final String SQL_QUERY_SELECT_ALL_NO_DETAILS = "SELECT a.id, a.date, a.demand_id, a.demand_type_id, "
+            + "b.notification_id, c.notification_id, d.notification_id, e.notification_id , f.nb "
+            + "FROM grustoragedb_notification a "
+            + "LEFT JOIN grustoragedb_notification_backoffice b ON a.id = b.notification_id "
+            + "LEFT JOIN grustoragedb_notification_sms c ON a.id = c.notification_id "
+            + "LEFT JOIN grustoragedb_notification_customer_email d ON a.id = d.notification_id "
+            + "LEFT JOIN grustoragedb_notification_mydashboard e ON a.id = e.notification_id "
+            + "LEFT JOIN ( SELECT count(*) as nb, notification_id from grustoragedb_notification_broadcast_email GROUP BY notification_id ) f ON a.id = f.notification_id "
+            + "ORDER BY a.date DESC";
     private static final String SQL_QUERY_INSERT = "INSERT INTO grustoragedb_notification ( id, demand_id, demand_type_id, date ) VALUES ( ?, ?, ?, ? );";
     private static final String SQL_QUERY_INSERT_BACKOFFICE = "INSERT INTO grustoragedb_notification_backoffice ( notification_id, message, status_text ) VALUES ( ?, ?, ? )";
     private static final String SQL_QUERY_INSERT_SMS = "INSERT INTO grustoragedb_notification_sms ( notification_id, message, phone_number ) VALUES ( ?, ?, ? )";
@@ -163,6 +173,63 @@ public final class NotificationDAO implements INotificationDAO
     }
 
     /**
+	 * {@inheritDoc}
+	 */
+    @Override
+    public List<Notification> loadAllNotifications( )
+    {
+    	List<Notification> collectionNotifications = new ArrayList<Notification>( );
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_ALL_NO_DETAILS, GruStorageDbPlugin.getPlugin( ) );
+        daoUtil.executeQuery( );
+
+        while ( daoUtil.next( ) )
+        {
+            Notification notification = new Notification( );
+            int nIndex = 1;
+            notification.setId( daoUtil.getInt( nIndex++ ) );
+            notification.setDate( daoUtil.getLong( nIndex++ ) );
+
+            Demand demand = new Demand( );
+            demand.setId( daoUtil.getString( nIndex++ ) );
+            demand.setTypeId( daoUtil.getString( nIndex++ ) );
+            notification.setDemand( demand );
+
+            if( daoUtil.getInt( nIndex++ ) > 0 )
+            {
+            	notification.setBackofficeNotification( new BackofficeNotification( ) );
+            }
+            if( daoUtil.getInt( nIndex++ ) > 0 )
+            {
+            	notification.setSmsNotification( new SMSNotification( ) );
+            }
+            if( daoUtil.getInt( nIndex++ ) > 0 )
+            {
+            	notification.setEmailNotification( new EmailNotification( ) );
+            }
+            if( daoUtil.getInt( nIndex++ ) > 0 )
+            {
+            	notification.setMyDashboardNotification( new MyDashboardNotification( ) );
+            }
+            int nCountBroadcast = daoUtil.getInt( nIndex++ );
+            if( nCountBroadcast > 0 )
+            {
+            	for ( int nCount=0; nCount<nCountBroadcast; nCount++ )
+                {
+        			notification.addBroadcastEmail( new BroadcastNotification( ) );
+                }
+            }
+
+            collectionNotifications.add( notification );
+        }
+
+        daoUtil.free( );
+        
+        return collectionNotifications;
+    }
+
+
+
+	/**
      * {@inheritDoc}
      */
     @Override
