@@ -43,41 +43,41 @@ import fr.paris.lutece.portal.service.util.AppLogService;
 public class LogNotificationListener implements INotificationListener
 {
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void onCreateNotification( Notification notification )
-	{
-		String strDemandId = "null";
-		if( notification.getDemand( )!=null )
-		{
-			strDemandId = notification.getDemand( ).getId( );
-		}
-		AppLogService.info( "Notification [" + notification.getId( ) + "] for demand [" + strDemandId + "] has been created" );
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onCreateNotification( Notification notification )
+    {
+        String strDemandId = "null";
+        if ( notification.getDemand( ) != null )
+        {
+            strDemandId = notification.getDemand( ).getId( );
+        }
+        AppLogService.info( "Notification [" + notification.getId( ) + "] for demand [" + strDemandId + "] has been created" );
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void onUpdateNotification( Notification notification )
-	{
-		String strDemandId = "null";
-		if( notification.getDemand( )!=null )
-		{
-			strDemandId = notification.getDemand( ).getId( );
-		}
-		AppLogService.info( "Notification [" + notification.getId( ) + "] for demand [" + strDemandId + "] has been updated" );
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onUpdateNotification( Notification notification )
+    {
+        String strDemandId = "null";
+        if ( notification.getDemand( ) != null )
+        {
+            strDemandId = notification.getDemand( ).getId( );
+        }
+        AppLogService.info( "Notification [" + notification.getId( ) + "] for demand [" + strDemandId + "] has been updated" );
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void onDeleteDemand( String strDemandId, String strDemandTypeId )
-	{
-		AppLogService.info( "Notifications for demand [" + strDemandId + "] of type [" + strDemandTypeId + "] has been deleted" );
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onDeleteDemand( String strDemandId, String strDemandTypeId )
+    {
+        AppLogService.info( "Notifications for demand [" + strDemandId + "] of type [" + strDemandTypeId + "] has been deleted" );
+    }
 
 }

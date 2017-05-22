@@ -43,31 +43,31 @@ import fr.paris.lutece.portal.service.util.AppLogService;
 public class LogDemandListener implements IDemandListener
 {
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void onCreateDemand( Demand demand )
-	{
-		AppLogService.info( "Demand [" + demand.getId( ) + "] of type [" + demand.getTypeId( ) + "] has been created" );
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onCreateDemand( Demand demand )
+    {
+        AppLogService.info( "Demand [" + demand.getId( ) + "] of type [" + demand.getTypeId( ) + "] has been created" );
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void onUpdateDemand( Demand demand )
-	{
-		AppLogService.info( "Demand [" + demand.getId( ) + "] of type [" + demand.getTypeId( ) + "] has been updated" );
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onUpdateDemand( Demand demand )
+    {
+        AppLogService.info( "Demand [" + demand.getId( ) + "] of type [" + demand.getTypeId( ) + "] has been updated" );
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void onDeleteDemand( String strDemandId, String strDemandTypeId )
-	{
-		AppLogService.info( "Demand [" + strDemandId + "] of type [" + strDemandTypeId + "] has been deleted" );
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onDeleteDemand( String strDemandId, String strDemandTypeId )
+    {
+        AppLogService.info( "Demand [" + strDemandId + "] of type [" + strDemandTypeId + "] has been deleted" );
+    }
 
 }

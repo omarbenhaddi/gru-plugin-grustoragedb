@@ -173,12 +173,12 @@ public final class NotificationDAO implements INotificationDAO
     }
 
     /**
-	 * {@inheritDoc}
-	 */
+     * {@inheritDoc}
+     */
     @Override
     public List<Notification> loadAllNotifications( )
     {
-    	List<Notification> collectionNotifications = new ArrayList<Notification>( );
+        List<Notification> collectionNotifications = new ArrayList<Notification>( );
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_ALL_NO_DETAILS, GruStorageDbPlugin.getPlugin( ) );
         daoUtil.executeQuery( );
 
@@ -194,28 +194,28 @@ public final class NotificationDAO implements INotificationDAO
             demand.setTypeId( daoUtil.getString( nIndex++ ) );
             notification.setDemand( demand );
 
-            if( daoUtil.getInt( nIndex++ ) > 0 )
+            if ( daoUtil.getInt( nIndex++ ) > 0 )
             {
-            	notification.setBackofficeNotification( new BackofficeNotification( ) );
+                notification.setBackofficeNotification( new BackofficeNotification( ) );
             }
-            if( daoUtil.getInt( nIndex++ ) > 0 )
+            if ( daoUtil.getInt( nIndex++ ) > 0 )
             {
-            	notification.setSmsNotification( new SMSNotification( ) );
+                notification.setSmsNotification( new SMSNotification( ) );
             }
-            if( daoUtil.getInt( nIndex++ ) > 0 )
+            if ( daoUtil.getInt( nIndex++ ) > 0 )
             {
-            	notification.setEmailNotification( new EmailNotification( ) );
+                notification.setEmailNotification( new EmailNotification( ) );
             }
-            if( daoUtil.getInt( nIndex++ ) > 0 )
+            if ( daoUtil.getInt( nIndex++ ) > 0 )
             {
-            	notification.setMyDashboardNotification( new MyDashboardNotification( ) );
+                notification.setMyDashboardNotification( new MyDashboardNotification( ) );
             }
             int nCountBroadcast = daoUtil.getInt( nIndex++ );
-            if( nCountBroadcast > 0 )
+            if ( nCountBroadcast > 0 )
             {
-            	for ( int nCount=0; nCount<nCountBroadcast; nCount++ )
+                for ( int nCount = 0; nCount < nCountBroadcast; nCount++ )
                 {
-        			notification.addBroadcastEmail( new BroadcastNotification( ) );
+                    notification.addBroadcastEmail( new BroadcastNotification( ) );
                 }
             }
 
@@ -223,13 +223,11 @@ public final class NotificationDAO implements INotificationDAO
         }
 
         daoUtil.free( );
-        
+
         return collectionNotifications;
     }
 
-
-
-	/**
+    /**
      * {@inheritDoc}
      */
     @Override
