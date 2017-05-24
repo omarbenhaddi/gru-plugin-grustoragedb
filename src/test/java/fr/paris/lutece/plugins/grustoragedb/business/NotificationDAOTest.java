@@ -43,6 +43,7 @@ import fr.paris.lutece.plugins.grubusiness.business.notification.EmailAddress;
 import fr.paris.lutece.plugins.grubusiness.business.notification.EmailNotification;
 import fr.paris.lutece.plugins.grubusiness.business.notification.INotificationDAO;
 import fr.paris.lutece.plugins.grubusiness.business.notification.Notification;
+import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationFilter;
 import fr.paris.lutece.plugins.grubusiness.business.notification.SMSNotification;
 import fr.paris.lutece.test.LuteceTestCase;
 import static org.hamcrest.CoreMatchers.is;
@@ -104,6 +105,11 @@ public class NotificationDAOTest extends LuteceTestCase
     private static final String EMAIL_ADDRESS_BLIND_COPY_2 = "EmailAddressRecipient2";
     private final IDemandDAO _demandDAO;
     private final INotificationDAO _notificationDAO;
+    private final NotificationFilter _filterSMS;
+    private final NotificationFilter _filterCustomerEmail;
+    private final NotificationFilter _filterBackoffice;
+    private final NotificationFilter _filterMyDashboard;
+    private final NotificationFilter _filterBroadcast;
 
     /**
      * Constructor
@@ -112,6 +118,16 @@ public class NotificationDAOTest extends LuteceTestCase
     {
         _notificationDAO = new NotificationDAO( );
         _demandDAO = new DemandDAO( );
+        _filterSMS = new NotificationFilter( );
+        _filterSMS.setHasSmsNotification( true );
+        _filterCustomerEmail = new NotificationFilter( );
+        _filterCustomerEmail.setHasCustomerEmailNotification( true );
+        _filterBackoffice = new NotificationFilter( );
+        _filterBackoffice.setHasBackofficeNotification( true );
+        _filterMyDashboard = new NotificationFilter( );
+        _filterMyDashboard.setHasMyDashboardNotification( true );
+        _filterBroadcast = new NotificationFilter( );
+        _filterBroadcast.setHasBroadcastEmailNotification( true );
     }
 
     /**
@@ -141,6 +157,9 @@ public class NotificationDAOTest extends LuteceTestCase
 
         String strDemandId = notification.getDemand( ).getId( );
         String strDemandTypeId = notification.getDemand( ).getTypeId( );
+        NotificationFilter filterDemand = new NotificationFilter( );
+        filterDemand.setDemandId( strDemandId );
+        filterDemand.setDemandTypeId( strDemandTypeId );
         Collection<Notification> collectionNotificationStored = _notificationDAO.loadByDemand( strDemandId, strDemandTypeId );
         assertThat( collectionNotificationStored.size( ), is( 1 ) );
 
@@ -149,6 +168,19 @@ public class NotificationDAOTest extends LuteceTestCase
 
         assertThat( notificationStored.getDemand( ).getId( ), is( notification.getDemand( ).getId( ) ) );
         assertThat( notificationStored.getDemand( ).getTypeId( ), is( notification.getDemand( ).getTypeId( ) ) );
+
+        collectionNotificationStored = _notificationDAO.loadByFilter( filterDemand );
+        assertThat( collectionNotificationStored.size( ), is( 1 ) );
+        collectionNotificationStored = _notificationDAO.loadByFilter( _filterSMS );
+        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        collectionNotificationStored = _notificationDAO.loadByFilter( _filterCustomerEmail );
+        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        collectionNotificationStored = _notificationDAO.loadByFilter( _filterBackoffice );
+        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        collectionNotificationStored = _notificationDAO.loadByFilter( _filterMyDashboard );
+        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        collectionNotificationStored = _notificationDAO.loadByFilter( _filterBroadcast );
+        assertThat( collectionNotificationStored.size( ), is( 0 ) );
 
         notification.setDate( NOTIFICATION_DATE_2 );
 
@@ -167,6 +199,19 @@ public class NotificationDAOTest extends LuteceTestCase
         assertThat( backofficeNotificationStored.getMessage( ), is( backofficeNotification.getMessage( ) ) );
         assertThat( backofficeNotificationStored.getStatusText( ), is( backofficeNotification.getStatusText( ) ) );
 
+        collectionNotificationStored = _notificationDAO.loadByFilter( filterDemand );
+        assertThat( collectionNotificationStored.size( ), is( 2 ) );
+        collectionNotificationStored = _notificationDAO.loadByFilter( _filterBackoffice );
+        assertThat( collectionNotificationStored.size( ), is( 1 ) );
+        collectionNotificationStored = _notificationDAO.loadByFilter( _filterSMS );
+        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        collectionNotificationStored = _notificationDAO.loadByFilter( _filterCustomerEmail );
+        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        collectionNotificationStored = _notificationDAO.loadByFilter( _filterMyDashboard );
+        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        collectionNotificationStored = _notificationDAO.loadByFilter( _filterBroadcast );
+        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+
         notification.setDate( NOTIFICATION_DATE_3 );
 
         SMSNotification smsNotification = new SMSNotification( );
@@ -183,6 +228,19 @@ public class NotificationDAOTest extends LuteceTestCase
         SMSNotification smsNotificationStored = notificationStored.getSmsNotification( );
         assertThat( smsNotificationStored.getMessage( ), is( smsNotification.getMessage( ) ) );
         assertThat( smsNotificationStored.getPhoneNumber( ), is( smsNotification.getPhoneNumber( ) ) );
+
+        collectionNotificationStored = _notificationDAO.loadByFilter( filterDemand );
+        assertThat( collectionNotificationStored.size( ), is( 3 ) );
+        collectionNotificationStored = _notificationDAO.loadByFilter( _filterBackoffice );
+        assertThat( collectionNotificationStored.size( ), is( 2 ) );
+        collectionNotificationStored = _notificationDAO.loadByFilter( _filterSMS );
+        assertThat( collectionNotificationStored.size( ), is( 1 ) );
+        collectionNotificationStored = _notificationDAO.loadByFilter( _filterCustomerEmail );
+        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        collectionNotificationStored = _notificationDAO.loadByFilter( _filterMyDashboard );
+        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        collectionNotificationStored = _notificationDAO.loadByFilter( _filterBroadcast );
+        assertThat( collectionNotificationStored.size( ), is( 0 ) );
 
         notification.setDate( NOTIFICATION_DATE_4 );
 
@@ -211,6 +269,19 @@ public class NotificationDAOTest extends LuteceTestCase
         assertThat( emailNotificationStored.getCc( ), is( emailNotification.getCc( ) ) );
         assertThat( emailNotificationStored.getCci( ), is( emailNotification.getCci( ) ) );
 
+        collectionNotificationStored = _notificationDAO.loadByFilter( filterDemand );
+        assertThat( collectionNotificationStored.size( ), is( 4 ) );
+        collectionNotificationStored = _notificationDAO.loadByFilter( _filterBackoffice );
+        assertThat( collectionNotificationStored.size( ), is( 3 ) );
+        collectionNotificationStored = _notificationDAO.loadByFilter( _filterSMS );
+        assertThat( collectionNotificationStored.size( ), is( 2 ) );
+        collectionNotificationStored = _notificationDAO.loadByFilter( _filterCustomerEmail );
+        assertThat( collectionNotificationStored.size( ), is( 1 ) );
+        collectionNotificationStored = _notificationDAO.loadByFilter( _filterMyDashboard );
+        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        collectionNotificationStored = _notificationDAO.loadByFilter( _filterBroadcast );
+        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+
         notification.setDate( NOTIFICATION_DATE_5 );
 
         MyDashboardNotification myDashboardNotification = new MyDashboardNotification( );
@@ -235,6 +306,19 @@ public class NotificationDAOTest extends LuteceTestCase
         assertThat( myDashboardNotificationStored.getSubject( ), is( myDashboardNotification.getSubject( ) ) );
         assertThat( myDashboardNotificationStored.getData( ), is( myDashboardNotification.getData( ) ) );
         assertThat( myDashboardNotificationStored.getSenderName( ), is( myDashboardNotification.getSenderName( ) ) );
+
+        collectionNotificationStored = _notificationDAO.loadByFilter( filterDemand );
+        assertThat( collectionNotificationStored.size( ), is( 5 ) );
+        collectionNotificationStored = _notificationDAO.loadByFilter( _filterBackoffice );
+        assertThat( collectionNotificationStored.size( ), is( 4 ) );
+        collectionNotificationStored = _notificationDAO.loadByFilter( _filterSMS );
+        assertThat( collectionNotificationStored.size( ), is( 3 ) );
+        collectionNotificationStored = _notificationDAO.loadByFilter( _filterCustomerEmail );
+        assertThat( collectionNotificationStored.size( ), is( 2 ) );
+        collectionNotificationStored = _notificationDAO.loadByFilter( _filterMyDashboard );
+        assertThat( collectionNotificationStored.size( ), is( 1 ) );
+        collectionNotificationStored = _notificationDAO.loadByFilter( _filterBroadcast );
+        assertThat( collectionNotificationStored.size( ), is( 0 ) );
 
         notification.setDate( NOTIFICATION_DATE_6 );
 
@@ -270,6 +354,17 @@ public class NotificationDAOTest extends LuteceTestCase
         listEmailAddresses.add( emailAddress );
         broadcastNotification.setBcc( listEmailAddresses );
         listBroadcastNotifications.add( broadcastNotification );
+
+        BroadcastNotification broadcastNotification2 = new BroadcastNotification( );
+        broadcastNotification2.setSenderEmail( BROADCAST_EMAIL_NOTIFICATION_SENDER_EMAIL_1 );
+        broadcastNotification2.setSenderName( BROADCAST_EMAIL_NOTIFICATION_SENDER_NAME_1 );
+        broadcastNotification2.setSubject( BROADCAST_EMAIL_NOTIFICATION_SUBJECT_1 );
+        broadcastNotification2.setMessage( BROADCAST_EMAIL_NOTIFICATION_MESSAGE_1 );
+        broadcastNotification2.setRecipient( listEmailAddresses );
+        broadcastNotification2.setCc( listEmailAddresses );
+        broadcastNotification2.setBcc( listEmailAddresses );
+        listBroadcastNotifications.add( broadcastNotification2 );
+
         notification.setBroadcastEmail( listBroadcastNotifications );
         _notificationDAO.insert( notification );
 
@@ -279,7 +374,7 @@ public class NotificationDAOTest extends LuteceTestCase
         notificationStored = iterator.next( );
 
         List<BroadcastNotification> listBroadcastNotificationsStored = notificationStored.getBroadcastEmail( );
-        assertThat( listBroadcastNotificationsStored.size( ), is( 1 ) );
+        assertThat( listBroadcastNotificationsStored.size( ), is( 2 ) );
 
         BroadcastNotification broadcastNotificationStored = listBroadcastNotificationsStored.get( 0 );
         assertThat( broadcastNotificationStored.getSenderEmail( ), is( broadcastNotification.getSenderEmail( ) ) );
@@ -294,8 +389,34 @@ public class NotificationDAOTest extends LuteceTestCase
         listEmailAddressesStored = broadcastNotificationStored.getBcc( );
         assertThat( listEmailAddressesStored.size( ), is( 2 ) );
 
+        collectionNotificationStored = _notificationDAO.loadByFilter( filterDemand );
+        assertThat( collectionNotificationStored.size( ), is( 6 ) );
+        collectionNotificationStored = _notificationDAO.loadByFilter( _filterBackoffice );
+        assertThat( collectionNotificationStored.size( ), is( 5 ) );
+        collectionNotificationStored = _notificationDAO.loadByFilter( _filterSMS );
+        assertThat( collectionNotificationStored.size( ), is( 4 ) );
+        collectionNotificationStored = _notificationDAO.loadByFilter( _filterCustomerEmail );
+        assertThat( collectionNotificationStored.size( ), is( 3 ) );
+        collectionNotificationStored = _notificationDAO.loadByFilter( _filterMyDashboard );
+        assertThat( collectionNotificationStored.size( ), is( 2 ) );
+        collectionNotificationStored = _notificationDAO.loadByFilter( _filterBroadcast );
+        assertThat( collectionNotificationStored.size( ), is( 1 ) );
+
         _notificationDAO.deleteByDemand( strDemandId, strDemandTypeId );
         collectionNotificationStored = _notificationDAO.loadByDemand( strDemandId, strDemandTypeId );
+        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+
+        collectionNotificationStored = _notificationDAO.loadByFilter( filterDemand );
+        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        collectionNotificationStored = _notificationDAO.loadByFilter( _filterBackoffice );
+        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        collectionNotificationStored = _notificationDAO.loadByFilter( _filterSMS );
+        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        collectionNotificationStored = _notificationDAO.loadByFilter( _filterCustomerEmail );
+        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        collectionNotificationStored = _notificationDAO.loadByFilter( _filterMyDashboard );
+        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        collectionNotificationStored = _notificationDAO.loadByFilter( _filterBroadcast );
         assertThat( collectionNotificationStored.size( ), is( 0 ) );
 
         _demandDAO.delete( strDemandId, strDemandTypeId );

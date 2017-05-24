@@ -47,6 +47,7 @@ import fr.paris.lutece.plugins.grubusiness.business.notification.EmailNotificati
 import fr.paris.lutece.plugins.grubusiness.business.notification.INotificationDAO;
 import fr.paris.lutece.plugins.grubusiness.business.notification.MyDashboardNotification;
 import fr.paris.lutece.plugins.grubusiness.business.notification.Notification;
+import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationFilter;
 import fr.paris.lutece.plugins.grubusiness.business.notification.SMSNotification;
 import fr.paris.lutece.plugins.grustoragedb.service.GruStorageDbPlugin;
 import fr.paris.lutece.util.sql.DAOUtil;
@@ -58,6 +59,8 @@ public final class NotificationDAO implements INotificationDAO
 {
     private static final String COLUMN_ID = "a.id";
     private static final String COLUMN_DATE = "a.date";
+    private static final String COLUMN_DEMAND_ID = "a.demand_id";
+    private static final String COLUMN_DEMAND_TYPEID = "a.demand_type_id";
     private static final String COLUMN_BACKOFFICE_NOTIFICATION_ID = "b.notification_id";
     private static final String COLUMN_BACKOFFICE_MESSAGE = "b.message";
     private static final String COLUMN_BACKOFFICE_STATUS_TEXT = "b.status_text";
@@ -79,42 +82,54 @@ public final class NotificationDAO implements INotificationDAO
     private static final String COLUMN_MYDASHBOARD_SUBJECT = "e.subject";
     private static final String COLUMN_MYDASHBOARD_DATA = "e.data";
     private static final String COLUMN_MYDASHBOARD_SENDER_NAME = "e.sender_name";
-    private static final String COLUMN_BROADCAST_EMAIL_SENDER_EMAIL = "sender_email";
-    private static final String COLUMN_BROADCAST_EMAIL_SENDER_NAME = "sender_name";
-    private static final String COLUMN_BROADCAST_EMAIL_SUBJECT = "subject";
-    private static final String COLUMN_BROADCAST_EMAIL_MESSAGE = "message";
-    private static final String COLUMN_BROADCAST_EMAIL_RECIPIENTS = "recipients";
-    private static final String COLUMN_BROADCAST_EMAIL_COPIES = "copies";
-    private static final String COLUMN_BROADCAST_EMAIL_BLIND_COPIES = "blind_copies";
+    private static final String COLUMN_BROADCAST_EMAIL_NOTIFICATION_ID = "f.notification_id";
+    private static final String COLUMN_BROADCAST_EMAIL_SENDER_EMAIL = "f.sender_email";
+    private static final String COLUMN_BROADCAST_EMAIL_SENDER_NAME = "f.sender_name";
+    private static final String COLUMN_BROADCAST_EMAIL_SUBJECT = "f.subject";
+    private static final String COLUMN_BROADCAST_EMAIL_MESSAGE = "f.message";
+    private static final String COLUMN_BROADCAST_EMAIL_RECIPIENTS = "f.recipients";
+    private static final String COLUMN_BROADCAST_EMAIL_COPIES = "f.copies";
+    private static final String COLUMN_BROADCAST_EMAIL_BLIND_COPIES = "f.blind_copies";
     private static final String SQL_QUERY_NEW_PK = "SELECT max( id ) FROM grustoragedb_notification";
     private static final String SQL_QUERY_SELECT_BY_DEMAND = "SELECT a.id, a.date, b.notification_id, b.message, b.status_text, c.notification_id, c.message, c.phone_number, "
             + "d.notification_id, d.sender_email, d.sender_name, d.subject, d.message, d.recipients, d.copies, d.blind_copies, "
-            + "e.notification_id, e.status_id, e.status_text, e.message, e.subject, e.data, e.sender_name "
+            + "e.notification_id, e.status_id, e.status_text, e.message, e.subject, e.data, e.sender_name, "
+            + "f.notification_id, f.sender_email, f.sender_name, f.subject, f.message, f.recipients, f.copies, f.blind_copies "
             + "FROM grustoragedb_notification a "
             + "LEFT JOIN grustoragedb_notification_backoffice b ON a.id = b.notification_id "
             + "LEFT JOIN grustoragedb_notification_sms c ON a.id = c.notification_id "
             + "LEFT JOIN grustoragedb_notification_customer_email d ON a.id = d.notification_id "
             + "LEFT JOIN grustoragedb_notification_mydashboard e ON a.id = e.notification_id "
-            + "WHERE a.demand_id = ? AND a.demand_type_id = ? ORDER BY a.date DESC";
-    private static final String SQL_QUERY_SELECT_ALL_NO_DETAILS = "SELECT a.id, a.date, a.demand_id, a.demand_type_id, "
-            + "b.notification_id, c.notification_id, d.notification_id, e.notification_id , f.nb "
-            + "FROM grustoragedb_notification a "
-            + "LEFT JOIN grustoragedb_notification_backoffice b ON a.id = b.notification_id "
-            + "LEFT JOIN grustoragedb_notification_sms c ON a.id = c.notification_id "
-            + "LEFT JOIN grustoragedb_notification_customer_email d ON a.id = d.notification_id "
-            + "LEFT JOIN grustoragedb_notification_mydashboard e ON a.id = e.notification_id "
-            + "LEFT JOIN ( SELECT count(*) as nb, notification_id from grustoragedb_notification_broadcast_email GROUP BY notification_id ) f ON a.id = f.notification_id "
-            + "ORDER BY a.date DESC";
+            + "LEFT JOIN grustoragedb_notification_broadcast_email f ON a.id = f.notification_id "
+            + "WHERE a.demand_id = ? AND a.demand_type_id = ? ORDER BY a.date DESC, a.id ASC";
+
+    private static final String SQL_QUERY_FILTER_SELECT_BASE = "SELECT a.id, a.demand_id, a.demand_type_id, a.date";
+    private static final String SQL_QUERY_FILTER_SELECT_BACKOFFICE = ", b.notification_id, b.message, b.status_text";
+    private static final String SQL_QUERY_FILTER_SELECT_SMS = ", c.notification_id, c.message, c.phone_number";
+    private static final String SQL_QUERY_FILTER_SELECT_EMAIL = ", d.notification_id, d.sender_email, d.sender_name, d.subject, d.message, d.recipients, d.copies, d.blind_copies";
+    private static final String SQL_QUERY_FILTER_SELECT_MYDASHBAORD = ", e.notification_id, e.status_id, e.status_text, e.message, e.subject, e.data, e.sender_name";
+    private static final String SQL_QUERY_FILTER_SELECT_BROADCAST = ", f.notification_id, f.sender_email, f.sender_name, f.subject, f.message, f.recipients, f.copies, f.blind_copies";
+    private static final String SQL_QUERY_FILTER_FROM_BASE = " FROM grustoragedb_notification a ";
+    private static final String SQL_QUERY_FILTER_JOIN_BACKOFFICE = " LEFT JOIN grustoragedb_notification_backoffice b ON a.id = b.notification_id ";
+    private static final String SQL_QUERY_FILTER_JOIN_SMS = " LEFT JOIN grustoragedb_notification_sms c ON a.id = c.notification_id ";
+    private static final String SQL_QUERY_FILTER_JOIN_EMAIL = " LEFT JOIN grustoragedb_notification_customer_email d ON a.id = d.notification_id ";
+    private static final String SQL_QUERY_FILTER_JOIN_MYDASHBAORD = " LEFT JOIN grustoragedb_notification_mydashboard e ON a.id = e.notification_id ";
+    private static final String SQL_QUERY_FILTER_JOIN_BROADCAST = " LEFT JOIN grustoragedb_notification_broadcast_email f ON a.id = f.notification_id ";
+    private static final String SQL_QUERY_FILTER_WHERE_BASE = " WHERE ";
+    private static final String SQL_QUERY_FILTER_WHERE_DEMANDID = " a.demand_id = ? ";
+    private static final String SQL_QUERY_FILTER_WHERE_DEMANDTYPEID = " a.demand_type_id = ? ";
+    private static final String SQL_QUERY_FILTER_ORDER = " ORDER BY a.date DESC, a.id ASC";
+    private static final String SQL_QUERY_AND = " AND ";
+    private static final String SQL_QUERY_IS_NULL = " IS NULL ";
+    private static final String SQL_QUERY_IS_NOT_NULL = " IS NOT NULL ";
+
     private static final String SQL_QUERY_INSERT = "INSERT INTO grustoragedb_notification ( id, demand_id, demand_type_id, date ) VALUES ( ?, ?, ?, ? );";
     private static final String SQL_QUERY_INSERT_BACKOFFICE = "INSERT INTO grustoragedb_notification_backoffice ( notification_id, message, status_text ) VALUES ( ?, ?, ? )";
     private static final String SQL_QUERY_INSERT_SMS = "INSERT INTO grustoragedb_notification_sms ( notification_id, message, phone_number ) VALUES ( ?, ?, ? )";
     private static final String SQL_QUERY_INSERT_CUSTOMER_EMAIL = "INSERT INTO grustoragedb_notification_customer_email ( notification_id, sender_email, sender_name, subject, message, recipients, copies, blind_copies ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )";
     private static final String SQL_QUERY_INSERT_MYDASHBOARD = "INSERT INTO grustoragedb_notification_mydashboard ( notification_id, status_id, status_text, message, subject, data, sender_name ) VALUES ( ?, ?, ?, ?, ?, ?, ? )";
-    private static final String SQL_QUERY_BROADCAST_EMAIL_ALL_FIELDS = "notification_id, sender_email, sender_name, subject, message, recipients, copies, blind_copies";
-    private static final String SQL_QUERY_SELECT_BROADCAST_EMAIL = "SELECT " + SQL_QUERY_BROADCAST_EMAIL_ALL_FIELDS
-            + " FROM grustoragedb_notification_broadcast_email WHERE notification_id = ?";
-    private static final String SQL_QUERY_INSERT_BROADCAST_EMAIL = "INSERT INTO grustoragedb_notification_broadcast_email ( "
-            + SQL_QUERY_BROADCAST_EMAIL_ALL_FIELDS + " ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? );";
+    private static final String SQL_QUERY_INSERT_BROADCAST_EMAIL = "INSERT INTO grustoragedb_notification_broadcast_email ( notification_id, sender_email, sender_name, subject, message, recipients, copies, blind_copies ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )";
+    private static final String SQL_QUERY_INSERT_BROADCAST_EMAIL_MORE_VALUES = ", ( ?, ?, ?, ?, ?, ?, ?, ? )";
     private static final String SQL_QUERY_DELETE = "DELETE a, b, c, d, e, f FROM grustoragedb_notification a "
             + "LEFT JOIN grustoragedb_notification_backoffice b ON a.id = b.notification_id "
             + "LEFT JOIN grustoragedb_notification_sms c ON a.id = c.notification_id "
@@ -141,33 +156,48 @@ public final class NotificationDAO implements INotificationDAO
 
         daoUtil.executeQuery( );
 
+        // WARNING It is a full request which mean we have ONE line for each grustoragedb_notification_broadcast_email
+        // this mean the ORDER is important to avoid duplicate and we must not create a 'new' notification each time
+        // BUT the add in collection is done only if notification id are different
+        Notification notification = null;
         while ( daoUtil.next( ) )
         {
-            Notification notification = new Notification( );
+            int nIdNotifBase = daoUtil.getInt( COLUMN_ID );
 
-            notification.setId( daoUtil.getInt( COLUMN_ID ) );
+            if ( notification == null || notification.getId( ) != nIdNotifBase )
+            {
+                // new notification
+                if ( notification != null )
+                {
+                    collectionNotifications.add( notification );
+                }
+                notification = new Notification( );
+                notification.setId( nIdNotifBase );
+                notification.setDate( daoUtil.getLong( COLUMN_DATE ) );
 
-            Demand demand = new Demand( );
-            demand.setId( strDemandId );
-            demand.setTypeId( strDemandTypeId );
-            notification.setDemand( demand );
+                Demand demand = new Demand( );
+                demand.setId( strDemandId );
+                demand.setTypeId( strDemandTypeId );
+                notification.setDemand( demand );
 
-            notification.setDate( daoUtil.getLong( COLUMN_DATE ) );
-
-            loadBackofficeNotification( daoUtil, notification );
-            loadSmsNotification( daoUtil, notification );
-            loadCustomerEmailNotification( daoUtil, notification );
-            loadMyDashboardNotification( daoUtil, notification );
-
+                loadBackofficeNotification( daoUtil, notification );
+                loadSmsNotification( daoUtil, notification );
+                loadCustomerEmailNotification( daoUtil, notification );
+                loadMyDashboardNotification( daoUtil, notification );
+                loadBroadcastEmailNotification( daoUtil, notification );
+            }
+            else
+            {
+                // same notification, just add the grustoragedb_notification_broadcast_email
+                loadBroadcastEmailNotification( daoUtil, notification );
+            }
+        }
+        if ( notification != null )
+        {
             collectionNotifications.add( notification );
         }
 
         daoUtil.free( );
-
-        for ( Notification notification : collectionNotifications )
-        {
-            loadBroadcastEmailNotification( notification );
-        }
 
         return collectionNotifications;
     }
@@ -176,55 +206,264 @@ public final class NotificationDAO implements INotificationDAO
      * {@inheritDoc}
      */
     @Override
-    public List<Notification> loadAllNotifications( )
+    public List<Notification> loadByFilter( NotificationFilter notificationFilter )
     {
+        String strSQL = getFilterCriteriaClauses( notificationFilter );
         List<Notification> collectionNotifications = new ArrayList<Notification>( );
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_ALL_NO_DETAILS, GruStorageDbPlugin.getPlugin( ) );
+        DAOUtil daoUtil = new DAOUtil( strSQL.toString( ), GruStorageDbPlugin.getPlugin( ) );
+        addFilterCriteriaValues( daoUtil, notificationFilter );
+
         daoUtil.executeQuery( );
 
+        // WARNING It is a full request which mean we have ONE line for each grustoragedb_notification_broadcast_email
+        // this mean the ORDER is important to avoid duplicate and we must not create a 'new' notification each time
+        // BUT the add in collection is done only if notification id are different
+        Notification notification = null;
         while ( daoUtil.next( ) )
         {
-            Notification notification = new Notification( );
-            int nIndex = 1;
-            notification.setId( daoUtil.getInt( nIndex++ ) );
-            notification.setDate( daoUtil.getLong( nIndex++ ) );
+            int nIdNotifBase = daoUtil.getInt( COLUMN_ID );
 
-            Demand demand = new Demand( );
-            demand.setId( daoUtil.getString( nIndex++ ) );
-            demand.setTypeId( daoUtil.getString( nIndex++ ) );
-            notification.setDemand( demand );
-
-            if ( daoUtil.getInt( nIndex++ ) > 0 )
+            if ( notification == null || notification.getId( ) != nIdNotifBase )
             {
-                notification.setBackofficeNotification( new BackofficeNotification( ) );
-            }
-            if ( daoUtil.getInt( nIndex++ ) > 0 )
-            {
-                notification.setSmsNotification( new SMSNotification( ) );
-            }
-            if ( daoUtil.getInt( nIndex++ ) > 0 )
-            {
-                notification.setEmailNotification( new EmailNotification( ) );
-            }
-            if ( daoUtil.getInt( nIndex++ ) > 0 )
-            {
-                notification.setMyDashboardNotification( new MyDashboardNotification( ) );
-            }
-            int nCountBroadcast = daoUtil.getInt( nIndex++ );
-            if ( nCountBroadcast > 0 )
-            {
-                for ( int nCount = 0; nCount < nCountBroadcast; nCount++ )
+                // new notification
+                if ( notification != null )
                 {
-                    notification.addBroadcastEmail( new BroadcastNotification( ) );
+                    collectionNotifications.add( notification );
+                }
+                notification = new Notification( );
+                notification.setId( nIdNotifBase );
+                notification.setDate( daoUtil.getLong( COLUMN_DATE ) );
+
+                Demand demand = new Demand( );
+                demand.setId( daoUtil.getString( COLUMN_DEMAND_ID ) );
+                demand.setTypeId( daoUtil.getString( COLUMN_DEMAND_TYPEID ) );
+                notification.setDemand( demand );
+
+                if ( notificationFilter.containsHasBackofficeNotification( ) )
+                {
+                    loadBackofficeNotification( daoUtil, notification );
+                }
+                if ( notificationFilter.containsHasSmsNotification( ) )
+                {
+                    loadSmsNotification( daoUtil, notification );
+                }
+                if ( notificationFilter.containsHasCustomerEmailNotification( ) )
+                {
+                    loadCustomerEmailNotification( daoUtil, notification );
+                }
+                if ( notificationFilter.containsHasMyDashboardNotification( ) )
+                {
+                    loadMyDashboardNotification( daoUtil, notification );
+                }
+                if ( notificationFilter.containsHasBroadcastEmailNotification( ) )
+                {
+                    loadBroadcastEmailNotification( daoUtil, notification );
                 }
             }
-
+            else
+                if ( notificationFilter.containsHasBroadcastEmailNotification( ) )
+                {
+                    // same notification, just add the grustoragedb_notification_broadcast_email
+                    loadBroadcastEmailNotification( daoUtil, notification );
+                }
+        }
+        if ( notification != null )
+        {
             collectionNotifications.add( notification );
         }
 
         daoUtil.free( );
 
         return collectionNotifications;
+    }
+
+    /**
+     * @param notificationFilter
+     * @return the query string
+     */
+    private String getFilterCriteriaClauses( NotificationFilter notificationFilter )
+    {
+        StringBuilder sbQuery = new StringBuilder( SQL_QUERY_FILTER_SELECT_BASE );
+        boolean hasOneFilter = notificationFilter.containsDemandId( ) || notificationFilter.containsDemandTypeId( );
+        boolean hasOneWhere = false;
+        // SELECT
+        if ( notificationFilter.containsHasBackofficeNotification( ) )
+        {
+            hasOneFilter = true;
+            sbQuery.append( SQL_QUERY_FILTER_SELECT_BACKOFFICE );
+        }
+        if ( notificationFilter.containsHasSmsNotification( ) )
+        {
+            hasOneFilter = true;
+            sbQuery.append( SQL_QUERY_FILTER_SELECT_SMS );
+        }
+        if ( notificationFilter.containsHasCustomerEmailNotification( ) )
+        {
+            hasOneFilter = true;
+            sbQuery.append( SQL_QUERY_FILTER_SELECT_EMAIL );
+        }
+        if ( notificationFilter.containsHasMyDashboardNotification( ) )
+        {
+            hasOneFilter = true;
+            sbQuery.append( SQL_QUERY_FILTER_SELECT_MYDASHBAORD );
+        }
+        if ( notificationFilter.containsHasBroadcastEmailNotification( ) )
+        {
+            hasOneFilter = true;
+            sbQuery.append( SQL_QUERY_FILTER_SELECT_BROADCAST );
+        }
+
+        // FROM
+        sbQuery.append( SQL_QUERY_FILTER_FROM_BASE );
+        if ( notificationFilter.containsHasBackofficeNotification( ) )
+        {
+            sbQuery.append( SQL_QUERY_FILTER_JOIN_BACKOFFICE );
+        }
+        if ( notificationFilter.containsHasSmsNotification( ) )
+        {
+            sbQuery.append( SQL_QUERY_FILTER_JOIN_SMS );
+        }
+        if ( notificationFilter.containsHasCustomerEmailNotification( ) )
+        {
+            sbQuery.append( SQL_QUERY_FILTER_JOIN_EMAIL );
+        }
+        if ( notificationFilter.containsHasMyDashboardNotification( ) )
+        {
+            sbQuery.append( SQL_QUERY_FILTER_JOIN_MYDASHBAORD );
+        }
+        if ( notificationFilter.containsHasBroadcastEmailNotification( ) )
+        {
+            sbQuery.append( SQL_QUERY_FILTER_JOIN_BROADCAST );
+        }
+
+        // WHERE
+        if ( hasOneFilter )
+        {
+            sbQuery.append( SQL_QUERY_FILTER_WHERE_BASE );
+        }
+
+        if ( notificationFilter.containsDemandId( ) )
+        {
+            sbQuery.append( SQL_QUERY_FILTER_WHERE_DEMANDID );
+            hasOneWhere = true;
+        }
+        if ( notificationFilter.containsDemandTypeId( ) )
+        {
+            if ( hasOneWhere )
+            {
+                sbQuery.append( SQL_QUERY_AND );
+            }
+            sbQuery.append( SQL_QUERY_FILTER_WHERE_DEMANDTYPEID );
+            hasOneWhere = true;
+        }
+        if ( notificationFilter.containsHasBackofficeNotification( ) )
+        {
+            if ( hasOneWhere )
+            {
+                sbQuery.append( SQL_QUERY_AND );
+            }
+            sbQuery.append( COLUMN_BACKOFFICE_NOTIFICATION_ID );
+            if ( notificationFilter.getHasBackofficeNotification( ) )
+            {
+                sbQuery.append( SQL_QUERY_IS_NOT_NULL );
+            }
+            else
+            {
+                sbQuery.append( SQL_QUERY_IS_NULL );
+            }
+            hasOneWhere = true;
+        }
+        if ( notificationFilter.containsHasSmsNotification( ) )
+        {
+            if ( hasOneWhere )
+            {
+                sbQuery.append( SQL_QUERY_AND );
+            }
+            sbQuery.append( COLUMN_SMS_NOTIFICATION_ID );
+            if ( notificationFilter.getHasSmsNotification( ) )
+            {
+                sbQuery.append( SQL_QUERY_IS_NOT_NULL );
+            }
+            else
+            {
+                sbQuery.append( SQL_QUERY_IS_NULL );
+            }
+            hasOneWhere = true;
+        }
+        if ( notificationFilter.containsHasCustomerEmailNotification( ) )
+        {
+            if ( hasOneWhere )
+            {
+                sbQuery.append( SQL_QUERY_AND );
+            }
+            sbQuery.append( COLUMN_CUSTOMER_EMAIL_NOTIFICATION_ID );
+            if ( notificationFilter.getHasCustomerEmailNotification( ) )
+            {
+                sbQuery.append( SQL_QUERY_IS_NOT_NULL );
+            }
+            else
+            {
+                sbQuery.append( SQL_QUERY_IS_NULL );
+            }
+            hasOneWhere = true;
+        }
+        if ( notificationFilter.containsHasMyDashboardNotification( ) )
+        {
+            if ( hasOneWhere )
+            {
+                sbQuery.append( SQL_QUERY_AND );
+            }
+            sbQuery.append( COLUMN_MYDASHBOARD_NOTIFICATION_ID );
+            if ( notificationFilter.getHasMyDashboardNotification( ) )
+            {
+                sbQuery.append( SQL_QUERY_IS_NOT_NULL );
+            }
+            else
+            {
+                sbQuery.append( SQL_QUERY_IS_NULL );
+            }
+            hasOneWhere = true;
+        }
+        if ( notificationFilter.containsHasBroadcastEmailNotification( ) )
+        {
+            if ( hasOneWhere )
+            {
+                sbQuery.append( SQL_QUERY_AND );
+            }
+            sbQuery.append( COLUMN_BROADCAST_EMAIL_NOTIFICATION_ID );
+            if ( notificationFilter.getHasBroadcastEmailNotification( ) )
+            {
+                sbQuery.append( SQL_QUERY_IS_NOT_NULL );
+            }
+            else
+            {
+                sbQuery.append( SQL_QUERY_IS_NULL );
+            }
+            hasOneWhere = true;
+        }
+
+        // ORDER
+        sbQuery.append( SQL_QUERY_FILTER_ORDER );
+
+        return sbQuery.toString( );
+    }
+
+    /**
+     * @param daoUtil
+     * @param notificationFilter
+     */
+    private void addFilterCriteriaValues( DAOUtil daoUtil, NotificationFilter notificationFilter )
+    {
+        int nIndex = 1;
+
+        if ( notificationFilter.containsDemandId( ) )
+        {
+            daoUtil.setString( nIndex++, notificationFilter.getDemandId( ) );
+        }
+        if ( notificationFilter.containsDemandTypeId( ) )
+        {
+            daoUtil.setString( nIndex++, notificationFilter.getDemandTypeId( ) );
+        }
     }
 
     /**
@@ -396,22 +635,18 @@ public final class NotificationDAO implements INotificationDAO
     }
 
     /**
-     * Finds the broadcast email notification associated to the specified notification and sets it into the specified notification
+     * Finds one BroadcastEmailNotification notification associated to the specified notification and add it into the specified notification
      * 
+     * @param daoUtil
+     *            the SQL query manager
      * @param notification
      *            the notification
      */
-    private void loadBroadcastEmailNotification( Notification notification )
+    private void loadBroadcastEmailNotification( DAOUtil daoUtil, Notification notification )
     {
-        List<BroadcastNotification> listBroadcastEmailNotifications = new ArrayList<BroadcastNotification>( );
+        int nNotificationId = daoUtil.getInt( COLUMN_BROADCAST_EMAIL_NOTIFICATION_ID );
 
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BROADCAST_EMAIL, GruStorageDbPlugin.getPlugin( ) );
-
-        daoUtil.setInt( 1, notification.getId( ) );
-
-        daoUtil.executeQuery( );
-
-        while ( daoUtil.next( ) )
+        if ( nNotificationId != 0 )
         {
             BroadcastNotification broadcastEmailNotification = new BroadcastNotification( );
 
@@ -423,17 +658,8 @@ public final class NotificationDAO implements INotificationDAO
             broadcastEmailNotification.setCc( string2Emails( daoUtil.getString( COLUMN_BROADCAST_EMAIL_COPIES ) ) );
             broadcastEmailNotification.setBcc( string2Emails( daoUtil.getString( COLUMN_BROADCAST_EMAIL_BLIND_COPIES ) ) );
 
-            listBroadcastEmailNotifications.add( broadcastEmailNotification );
+            notification.addBroadcastEmail( broadcastEmailNotification );
         }
-
-        daoUtil.free( );
-
-        if ( listBroadcastEmailNotifications.isEmpty( ) )
-        {
-            listBroadcastEmailNotifications = null;
-        }
-
-        notification.setBroadcastEmail( listBroadcastEmailNotifications );
     }
 
     /**
@@ -560,9 +786,10 @@ public final class NotificationDAO implements INotificationDAO
         {
             StringBuilder sbSqlQuery = new StringBuilder( );
 
-            for ( int i = 0; i < notification.getBroadcastEmail( ).size( ); i++ )
+            sbSqlQuery.append( SQL_QUERY_INSERT_BROADCAST_EMAIL );
+            for ( int i = 1; i < notification.getBroadcastEmail( ).size( ); i++ )
             {
-                sbSqlQuery.append( SQL_QUERY_INSERT_BROADCAST_EMAIL );
+                sbSqlQuery.append( SQL_QUERY_INSERT_BROADCAST_EMAIL_MORE_VALUES );
             }
 
             DAOUtil daoUtil = new DAOUtil( sbSqlQuery.toString( ), GruStorageDbPlugin.getPlugin( ) );
