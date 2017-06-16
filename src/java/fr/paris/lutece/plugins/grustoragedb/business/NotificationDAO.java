@@ -81,33 +81,33 @@ public final class NotificationDAO implements INotificationDAO
 
     private static final String SQL_QUERY_INSERT = "INSERT INTO grustoragedb_notification ( id, demand_id, demand_type_id, date, has_backoffice, has_sms, has_customer_email, has_mydashboard, has_broadcast_email, notification_content ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );";
     private static final String SQL_QUERY_DELETE = "DELETE FROM grustoragedb_notification WHERE demand_id = ? AND demand_type_id = ?";
-    
+
     ObjectMapper _mapper;
 
     /**
-	 * Constructor
-	 */
+     * Constructor
+     */
     public NotificationDAO( )
     {
-	    super( );
-	    _mapper = new ObjectMapper( );
-	    _mapper.configure( DeserializationFeature.UNWRAP_ROOT_VALUE, false );
-	    _mapper.configure( DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false );
-	    _mapper.configure( SerializationFeature.WRAP_ROOT_VALUE, false );
-	    _mapper.configure( Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true );
+        super( );
+        _mapper = new ObjectMapper( );
+        _mapper.configure( DeserializationFeature.UNWRAP_ROOT_VALUE, false );
+        _mapper.configure( DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false );
+        _mapper.configure( SerializationFeature.WRAP_ROOT_VALUE, false );
+        _mapper.configure( Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true );
     }
 
-	/**
+    /**
      * {@inheritDoc}
      */
     @Override
     public List<Notification> loadByDemand( String strDemandId, String strDemandTypeId )
     {
-    	NotificationFilter filter = new NotificationFilter( );
-    	filter.setDemandId( strDemandId );
-    	filter.setDemandTypeId( strDemandTypeId );
-    	
-    	return loadByFilter( filter );
+        NotificationFilter filter = new NotificationFilter( );
+        filter.setDemandId( strDemandId );
+        filter.setDemandTypeId( strDemandTypeId );
+
+        return loadByFilter( filter );
     }
 
     /**
@@ -130,16 +130,16 @@ public final class NotificationDAO implements INotificationDAO
             Notification notification;
             try
             {
-	            notification = _mapper.readValue( strNotificationJson, Notification.class );
-	            listNotifications.add( notification );
+                notification = _mapper.readValue( strNotificationJson, Notification.class );
+                listNotifications.add( notification );
             }
-            catch ( JsonParseException | JsonMappingException e )
+            catch( JsonParseException | JsonMappingException e )
             {
-            	AppLogService.error( "Error while read JSON of notification " + nNotificationId, e);
+                AppLogService.error( "Error while read JSON of notification " + nNotificationId, e );
             }
-            catch ( IOException e )
+            catch( IOException e )
             {
-            	AppLogService.error( "Error while read JSON of notification " + nNotificationId, e);
+                AppLogService.error( "Error while read JSON of notification " + nNotificationId, e );
             }
         }
 
@@ -160,44 +160,48 @@ public final class NotificationDAO implements INotificationDAO
         // WHERE
         if ( notificationFilter.containsDemandId( ) )
         {
-        	sbQuery.append( SQL_QUERY_FILTER_WHERE_BASE );
+            sbQuery.append( SQL_QUERY_FILTER_WHERE_BASE );
             sbQuery.append( SQL_QUERY_FILTER_WHERE_DEMANDID );
             hasOneWhere = true;
         }
         if ( notificationFilter.containsDemandTypeId( ) )
         {
-        	sbQuery.append( BooleanUtils.toString( hasOneWhere, SQL_QUERY_AND, SQL_QUERY_FILTER_WHERE_BASE ) );
+            sbQuery.append( BooleanUtils.toString( hasOneWhere, SQL_QUERY_AND, SQL_QUERY_FILTER_WHERE_BASE ) );
             sbQuery.append( SQL_QUERY_FILTER_WHERE_DEMANDTYPEID );
             hasOneWhere = true;
         }
         if ( notificationFilter.containsHasBackofficeNotification( ) )
         {
-        	sbQuery.append( BooleanUtils.toString( hasOneWhere, SQL_QUERY_AND, SQL_QUERY_FILTER_WHERE_BASE ) );
-        	sbQuery.append( BooleanUtils.toString( notificationFilter.getHasBackofficeNotification( ), SQL_QUERY_FILTER_HAS_BACKOFFICE, SQL_QUERY_FILTER_NO_BACKOFFICE ) );
+            sbQuery.append( BooleanUtils.toString( hasOneWhere, SQL_QUERY_AND, SQL_QUERY_FILTER_WHERE_BASE ) );
+            sbQuery.append( BooleanUtils.toString( notificationFilter.getHasBackofficeNotification( ), SQL_QUERY_FILTER_HAS_BACKOFFICE,
+                    SQL_QUERY_FILTER_NO_BACKOFFICE ) );
             hasOneWhere = true;
         }
         if ( notificationFilter.containsHasSmsNotification( ) )
         {
-        	sbQuery.append( BooleanUtils.toString( hasOneWhere, SQL_QUERY_AND, SQL_QUERY_FILTER_WHERE_BASE ) );
-        	sbQuery.append( BooleanUtils.toString( notificationFilter.getHasSmsNotification( ), SQL_QUERY_FILTER_HAS_SMS, SQL_QUERY_FILTER_NO_SMS ) );
+            sbQuery.append( BooleanUtils.toString( hasOneWhere, SQL_QUERY_AND, SQL_QUERY_FILTER_WHERE_BASE ) );
+            sbQuery.append( BooleanUtils.toString( notificationFilter.getHasSmsNotification( ), SQL_QUERY_FILTER_HAS_SMS, SQL_QUERY_FILTER_NO_SMS ) );
             hasOneWhere = true;
         }
         if ( notificationFilter.containsHasCustomerEmailNotification( ) )
         {
-        	sbQuery.append( BooleanUtils.toString( hasOneWhere, SQL_QUERY_AND, SQL_QUERY_FILTER_WHERE_BASE ) );
-        	sbQuery.append( BooleanUtils.toString( notificationFilter.getHasCustomerEmailNotification( ), SQL_QUERY_FILTER_HAS_CUSTOMER_EMAIL, SQL_QUERY_FILTER_NO_CUSTOMER_EMAIL ) );
+            sbQuery.append( BooleanUtils.toString( hasOneWhere, SQL_QUERY_AND, SQL_QUERY_FILTER_WHERE_BASE ) );
+            sbQuery.append( BooleanUtils.toString( notificationFilter.getHasCustomerEmailNotification( ), SQL_QUERY_FILTER_HAS_CUSTOMER_EMAIL,
+                    SQL_QUERY_FILTER_NO_CUSTOMER_EMAIL ) );
             hasOneWhere = true;
         }
         if ( notificationFilter.containsHasMyDashboardNotification( ) )
         {
-        	sbQuery.append( BooleanUtils.toString( hasOneWhere, SQL_QUERY_AND, SQL_QUERY_FILTER_WHERE_BASE ) );
-        	sbQuery.append( BooleanUtils.toString( notificationFilter.getHasMyDashboardNotification( ), SQL_QUERY_FILTER_HAS_MYDASHBOARD, SQL_QUERY_FILTER_NO_MYDASHBOARD ) );
+            sbQuery.append( BooleanUtils.toString( hasOneWhere, SQL_QUERY_AND, SQL_QUERY_FILTER_WHERE_BASE ) );
+            sbQuery.append( BooleanUtils.toString( notificationFilter.getHasMyDashboardNotification( ), SQL_QUERY_FILTER_HAS_MYDASHBOARD,
+                    SQL_QUERY_FILTER_NO_MYDASHBOARD ) );
             hasOneWhere = true;
         }
         if ( notificationFilter.containsHasBroadcastEmailNotification( ) )
         {
-        	sbQuery.append( BooleanUtils.toString( hasOneWhere, SQL_QUERY_AND, SQL_QUERY_FILTER_WHERE_BASE ) );
-        	sbQuery.append( BooleanUtils.toString( notificationFilter.getHasBroadcastEmailNotification( ), SQL_QUERY_FILTER_HAS_BROADCAST_EMAIL, SQL_QUERY_FILTER_NO_BROADCAST_EMAIL ) );
+            sbQuery.append( BooleanUtils.toString( hasOneWhere, SQL_QUERY_AND, SQL_QUERY_FILTER_WHERE_BASE ) );
+            sbQuery.append( BooleanUtils.toString( notificationFilter.getHasBroadcastEmailNotification( ), SQL_QUERY_FILTER_HAS_BROADCAST_EMAIL,
+                    SQL_QUERY_FILTER_NO_BROADCAST_EMAIL ) );
         }
 
         // ORDER
@@ -241,19 +245,19 @@ public final class NotificationDAO implements INotificationDAO
         daoUtil.setString( nIndex++, notification.getDemand( ).getId( ) );
         daoUtil.setString( nIndex++, notification.getDemand( ).getTypeId( ) );
         daoUtil.setLong( nIndex++, notification.getDate( ) );
-        daoUtil.setInt( nIndex++, BooleanUtils.toInteger( ( notification.getBackofficeNotification( )!=null ), 1, 0 ) );
-        daoUtil.setInt( nIndex++, BooleanUtils.toInteger( ( notification.getSmsNotification( )!=null ), 1, 0 ) );
-        daoUtil.setInt( nIndex++, BooleanUtils.toInteger( ( notification.getEmailNotification( )!=null ), 1, 0 ) );
-        daoUtil.setInt( nIndex++, BooleanUtils.toInteger( ( notification.getMyDashboardNotification( )!=null ), 1, 0 ) );
-        daoUtil.setInt( nIndex++, BooleanUtils.toInteger( ( notification.getBroadcastEmail( )!=null && notification.getBroadcastEmail( ).size( )>0 ), 1, 0 ) );
+        daoUtil.setInt( nIndex++, BooleanUtils.toInteger( ( notification.getBackofficeNotification( ) != null ), 1, 0 ) );
+        daoUtil.setInt( nIndex++, BooleanUtils.toInteger( ( notification.getSmsNotification( ) != null ), 1, 0 ) );
+        daoUtil.setInt( nIndex++, BooleanUtils.toInteger( ( notification.getEmailNotification( ) != null ), 1, 0 ) );
+        daoUtil.setInt( nIndex++, BooleanUtils.toInteger( ( notification.getMyDashboardNotification( ) != null ), 1, 0 ) );
+        daoUtil.setInt( nIndex++, BooleanUtils.toInteger( ( notification.getBroadcastEmail( ) != null && notification.getBroadcastEmail( ).size( ) > 0 ), 1, 0 ) );
         try
         {
-	        daoUtil.setBytes( nIndex++, _mapper.writeValueAsBytes( notification ) );
-	        daoUtil.executeUpdate( );
+            daoUtil.setBytes( nIndex++, _mapper.writeValueAsBytes( notification ) );
+            daoUtil.executeUpdate( );
         }
-        catch ( JsonProcessingException e )
+        catch( JsonProcessingException e )
         {
-        	AppLogService.error( "Error while writing JSON of notification", e);
+            AppLogService.error( "Error while writing JSON of notification", e );
         }
         daoUtil.free( );
 
