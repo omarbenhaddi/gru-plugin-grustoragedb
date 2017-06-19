@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang.StringUtils;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser.Feature;
@@ -127,6 +128,11 @@ public final class NotificationDAO implements INotificationDAO
         {
             String strNotificationJson = daoUtil.getString( COLUMN_NOTIFICATION_CONTENT );
             int nNotificationId = daoUtil.getInt( COLUMN_NOTIFICATION_ID );
+            if ( StringUtils.isEmpty( strNotificationJson ) )
+            {
+                AppLogService.error( "JSON notification is empty for notification " + nNotificationId );
+                continue;
+            }
             Notification notification;
             try
             {
