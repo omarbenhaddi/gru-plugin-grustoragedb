@@ -200,13 +200,13 @@ public final class DemandDAO implements IDemandDAO
 
         int nIndex = 1;
 
-        //update
+        // update
         daoUtil.setInt( nIndex++, demand.getStatusId( ) );
         daoUtil.setString( nIndex++, demand.getCustomer( ).getId( ) );
         daoUtil.setLong( nIndex++, demand.getClosureDate( ) );
         daoUtil.setInt( nIndex++, demand.getCurrentStep( ) );
         daoUtil.setString( nIndex++, demand.getSubtypeId( ) );
-        //where primary_key
+        // where primary_key
         daoUtil.setString( nIndex++, demand.getId( ) );
         daoUtil.setString( nIndex++, demand.getTypeId( ) );
 
