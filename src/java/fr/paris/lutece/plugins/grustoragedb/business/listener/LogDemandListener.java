@@ -49,7 +49,7 @@ public class LogDemandListener implements IDemandListener
     @Override
     public void onCreateDemand( Demand demand )
     {
-        AppLogService.info( "Demand [" + demand.getId( ) + "] of type [" + demand.getTypeId( ) + "] has been created" );
+        AppLogService.info( "Demand [" + demand.getId( ) + "] of type [" + demand.getTypeId( ) + "/" + demand.getSubtypeId( ) + "] has been created" );
     }
 
     /**
@@ -58,7 +58,7 @@ public class LogDemandListener implements IDemandListener
     @Override
     public void onUpdateDemand( Demand demand )
     {
-        AppLogService.info( "Demand [" + demand.getId( ) + "] of type [" + demand.getTypeId( ) + "] has been updated" );
+        AppLogService.info( "Demand [" + demand.getId( ) + "] of type [" + demand.getTypeId( ) + "/" + demand.getSubtypeId( ) + "] has been updated" );
     }
 
     /**

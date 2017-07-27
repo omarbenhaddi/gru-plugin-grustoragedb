@@ -5,6 +5,7 @@ DROP TABLE IF EXISTS grustoragedb_demand;
 CREATE TABLE grustoragedb_demand (
 id varchar(50) NOT NULL,
 type_id varchar(50) NOT NULL,
+subtype_id varchar(50) NULL,
 reference varchar(50) NOT NULL,
 status_id int NOT NULL default 0,
 customer_id varchar(50) NULL,

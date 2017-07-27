@@ -57,6 +57,8 @@ public class DemandDAOTest extends LuteceTestCase
     private static final String DEMAND_ID_2 = "DemandId2";
     private static final String DEMAND_TYPE_ID_1 = "DemandTypeId1";
     private static final String DEMAND_TYPE_ID_2 = "DemandTypeId2";
+    private static final String DEMAND_SUBTYPE_ID_1 = "DemandSubtypeId1";
+    private static final String DEMAND_SUBTYPE_ID_2 = "DemandSubtypeId2";
     private static final String DEMAND_REFERENCE_1 = "DemandReference1";
     private static final String DEMAND_REFERENCE_2 = "DemandReference2";
     private static final long DEMAND_CREATION_DATE_1 = 1L;
@@ -86,6 +88,7 @@ public class DemandDAOTest extends LuteceTestCase
         Demand demand = new Demand( );
         demand.setId( DEMAND_ID_1 );
         demand.setTypeId( DEMAND_TYPE_ID_1 );
+        demand.setSubtypeId( DEMAND_SUBTYPE_ID_1 );
         demand.setReference( DEMAND_REFERENCE_1 );
         demand.setStatusId( Demand.STATUS_INPROGRESS );
 
@@ -102,6 +105,7 @@ public class DemandDAOTest extends LuteceTestCase
         Demand demandStored = _demandDao.load( demand.getId( ), demand.getTypeId( ) );
         assertThat( demandStored.getId( ), is( demand.getId( ) ) );
         assertThat( demandStored.getTypeId( ), is( demand.getTypeId( ) ) );
+        assertThat( demandStored.getSubtypeId( ), is( demand.getSubtypeId( ) ) );
         assertThat( demandStored.getReference( ), is( demand.getReference( ) ) );
         assertThat( demandStored.getStatusId( ), is( demand.getStatusId( ) ) );
         assertThat( demandStored.getCustomer( ).getId( ), is( demand.getCustomer( ).getId( ) ) );
@@ -113,6 +117,7 @@ public class DemandDAOTest extends LuteceTestCase
         // Update test
         demand.setId( DEMAND_ID_2 );
         demand.setTypeId( DEMAND_TYPE_ID_2 );
+        demand.setSubtypeId( DEMAND_SUBTYPE_ID_2 );
         demand.setReference( DEMAND_REFERENCE_2 );
         demand.setStatusId( Demand.STATUS_CLOSED );
         customer = new Customer( );
@@ -130,11 +135,13 @@ public class DemandDAOTest extends LuteceTestCase
 
         demand.setId( DEMAND_ID_1 );
         demand.setTypeId( DEMAND_TYPE_ID_1 );
+        demand.setSubtypeId( DEMAND_SUBTYPE_ID_1 );
         _demandDao.store( demand );
 
         demandStored = _demandDao.load( demand.getId( ), demand.getTypeId( ) );
         assertThat( demandStored.getId( ), is( demand.getId( ) ) );
         assertThat( demandStored.getTypeId( ), is( demand.getTypeId( ) ) );
+        assertThat( demandStored.getSubtypeId( ), is( demand.getSubtypeId( ) ) );
         assertThat( demandStored.getReference( ), is( not( demand.getReference( ) ) ) );
         assertThat( demandStored.getStatusId( ), is( demand.getStatusId( ) ) );
         assertThat( demandStored.getCustomer( ).getId( ), is( demand.getCustomer( ).getId( ) ) );
@@ -151,6 +158,7 @@ public class DemandDAOTest extends LuteceTestCase
         demandStored = iteratorDemand.next( );
         assertThat( demandStored.getId( ), is( DEMAND_ID_1 ) );
         assertThat( demandStored.getTypeId( ), is( DEMAND_TYPE_ID_1 ) );
+        assertThat( demandStored.getSubtypeId( ), is( DEMAND_SUBTYPE_ID_1 ) );
 
         // List test by reference
         Collection<Demand> collectionDemands2 = _demandDao.loadByReference( DEMAND_REFERENCE_1 );
@@ -160,6 +168,7 @@ public class DemandDAOTest extends LuteceTestCase
         demandStored = iteratorDemand2.next( );
         assertThat( demandStored.getId( ), is( DEMAND_ID_1 ) );
         assertThat( demandStored.getTypeId( ), is( DEMAND_TYPE_ID_1 ) );
+        assertThat( demandStored.getSubtypeId( ), is( DEMAND_SUBTYPE_ID_1 ) );
 
         // Delete test
         _demandDao.delete( DEMAND_ID_1, DEMAND_TYPE_ID_1 );

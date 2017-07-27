@@ -64,6 +64,8 @@ public class NotificationDAOTest extends LuteceTestCase
     private static final String DEMAND_ID_2 = "2";
     private static final String DEMAND_TYPE_ID_1 = "1";
     private static final String DEMAND_TYPE_ID_2 = "2";
+    private static final String DEMAND_SUBTYPE_ID_1 = "sub1";
+    private static final String DEMAND_SUBTYPE_ID_2 = "sub2";
     private static final String DEMAND_REFERENCE_1 = "DemandReference1";
     private static final String DEMAND_REFERENCE_2 = "DemandReference2";
     private static final int DEMAND_STATUS_ID_1 = 1;
@@ -139,6 +141,7 @@ public class NotificationDAOTest extends LuteceTestCase
         Demand demand = new Demand( );
         demand.setId( DEMAND_ID_1 );
         demand.setTypeId( DEMAND_TYPE_ID_1 );
+        demand.setSubtypeId( DEMAND_SUBTYPE_ID_1 );
         demand.setReference( DEMAND_REFERENCE_1 );
         demand.setStatusId( DEMAND_STATUS_ID_1 );
 
@@ -168,6 +171,7 @@ public class NotificationDAOTest extends LuteceTestCase
 
         assertThat( notificationStored.getDemand( ).getId( ), is( notification.getDemand( ).getId( ) ) );
         assertThat( notificationStored.getDemand( ).getTypeId( ), is( notification.getDemand( ).getTypeId( ) ) );
+        assertThat( notificationStored.getDemand( ).getSubtypeId( ), is( notification.getDemand( ).getSubtypeId( ) ) );
 
         collectionNotificationStored = _notificationDAO.loadByFilter( filterDemand );
         assertThat( collectionNotificationStored.size( ), is( 1 ) );
@@ -431,6 +435,7 @@ public class NotificationDAOTest extends LuteceTestCase
         Demand demand = new Demand( );
         demand.setId( DEMAND_ID_1 );
         demand.setTypeId( DEMAND_TYPE_ID_1 );
+        demand.setSubtypeId( DEMAND_SUBTYPE_ID_1 );
         demand.setReference( DEMAND_REFERENCE_1 );
         demand.setStatusId( DEMAND_STATUS_ID_1 );
 
@@ -443,6 +448,7 @@ public class NotificationDAOTest extends LuteceTestCase
         Demand demand2 = new Demand( );
         demand2.setId( DEMAND_ID_2 );
         demand2.setTypeId( DEMAND_TYPE_ID_2 );
+        demand.setSubtypeId( DEMAND_SUBTYPE_ID_2 );
         demand2.setReference( DEMAND_REFERENCE_2 );
         demand2.setStatusId( DEMAND_STATUS_ID_2 );
 
