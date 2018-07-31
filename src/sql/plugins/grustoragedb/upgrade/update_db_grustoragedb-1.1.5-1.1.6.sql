@@ -1,0 +1,1 @@
+ALTER TABLE grustoragedb_demand MODIFY customer_id VARCHAR(255) NULL;
