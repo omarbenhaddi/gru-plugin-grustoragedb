@@ -3,6 +3,7 @@
 --
 DROP TABLE IF EXISTS grustoragedb_demand;
 CREATE TABLE grustoragedb_demand (
+demand_id int NOT NULL AUTO_INCREMENT,
 id varchar(50) NOT NULL,
 type_id varchar(50) NOT NULL,
 subtype_id varchar(50) NULL,
@@ -13,8 +14,9 @@ creation_date bigint NOT NULL,
 closure_date bigint NULL,
 max_steps int NULL,
 current_step int NULL,
-PRIMARY KEY (id, type_id)
+PRIMARY KEY ( demand_id )
 );
+ALTER TABLE grustoragedb_demand ADD UNIQUE db_demand_index ( id, type_id );
 
 --
 -- Structure for table grustoragedb_notification

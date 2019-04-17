@@ -41,6 +41,7 @@ import fr.paris.lutece.util.sql.DAOUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * This class provides Data Access methods for Demand objects stored in SQL database
@@ -48,6 +49,7 @@ import java.util.Collection;
 public final class DemandDAO implements IDemandDAO
 {
     // Columns
+    private static final String COLUMN_DEMAND_ID = "demand_id";
     private static final String COLUMN_ID = "id";
     private static final String COLUMN_TYPE_ID = "type_id";
     private static final String COLUMN_SUBTYPE_ID = "subtype_id";
@@ -60,10 +62,13 @@ public final class DemandDAO implements IDemandDAO
     private static final String COLUMN_CURRENT_STEP = "current_step";
 
     // SQL queries
-    private static final String SQL_QUERY_DEMAND_ALL_FIELDS = "id, type_id, subtype_id, reference, status_id, customer_id, creation_date, closure_date, max_steps, current_step";
+    private static final String SQL_QUERY_DEMAND_ALL_FIELDS = " demand_id, id, type_id, subtype_id, reference, status_id, customer_id, creation_date, closure_date, max_steps, current_step";
+    private static final String SQL_QUERY_DEMAND_ALL_FIELDS_WITH_NO_DEMAND_ID = " id, type_id, subtype_id, reference, status_id, customer_id, creation_date, closure_date, max_steps, current_step";
     private static final String SQL_QUERY_DEMAND_SELECT = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS + " FROM grustoragedb_demand WHERE id = ? AND type_id = ?";
+    private static final String SQL_QUERY_DEMAND_SELECT_BY_DEMAND_ID = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS
+            + " FROM grustoragedb_demand WHERE demand_id = ? ";
     private static final String SQL_QUERY_DEMAND_SELECT_ALL = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS + " FROM grustoragedb_demand";
-    private static final String SQL_QUERY_DEMAND_INSERT = "INSERT INTO grustoragedb_demand ( " + SQL_QUERY_DEMAND_ALL_FIELDS
+    private static final String SQL_QUERY_DEMAND_INSERT = "INSERT INTO grustoragedb_demand ( " + SQL_QUERY_DEMAND_ALL_FIELDS_WITH_NO_DEMAND_ID
             + " ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DEMAND_UPDATE = "UPDATE grustoragedb_demand SET status_id = ?, customer_id = ?, closure_date = ?, current_step = ?, subtype_id = ? WHERE id = ? AND type_id = ?";
     private static final String SQL_QUERY_DEMAND_DELETE = "DELETE FROM grustoragedb_demand WHERE id = ? AND type_id = ? ";
@@ -232,6 +237,51 @@ public final class DemandDAO implements IDemandDAO
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> loadAllIds( )
+    {
+        List<String> collectionIds = new ArrayList<>( );
+
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_SELECT_ALL, GruStorageDbPlugin.getPlugin( ) );
+        daoUtil.executeQuery( );
+
+        while ( daoUtil.next( ) )
+        {
+            collectionIds.add( String.valueOf( dao2Demand( daoUtil ).getDemandId( ) ) );
+        }
+
+        daoUtil.free( );
+
+        return collectionIds;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Demand loadById( String strId )
+    {
+        Demand demand = null;
+
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_SELECT_BY_DEMAND_ID, GruStorageDbPlugin.getPlugin( ) );
+
+        daoUtil.setString( 1, strId );
+        daoUtil.executeQuery( );
+
+        while ( daoUtil.next( ) )
+        {
+            demand = dao2Demand( daoUtil );
+            break;
+        }
+
+        daoUtil.free( );
+
+        return demand;
+    }
+
+    /**
      * Converts data from DAO to a Demand object
      * 
      * @param daoUtil
@@ -242,6 +292,7 @@ public final class DemandDAO implements IDemandDAO
     {
         Demand demand = new Demand( );
 
+        demand.setDemandId( daoUtil.getInt( COLUMN_DEMAND_ID ) );
         demand.setId( daoUtil.getString( COLUMN_ID ) );
         demand.setTypeId( daoUtil.getString( COLUMN_TYPE_ID ) );
         demand.setSubtypeId( daoUtil.getString( COLUMN_SUBTYPE_ID ) );
