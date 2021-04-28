@@ -1,0 +1,16 @@
+<#macro tabs2 tab >
+<@tabs>
+	<@tabList>
+			<li <#if tab="demand">class="active"</#if> >
+				<@aButton href="jsp/admin/plugins/grustoragedb/ManageDemand.jsp">#i18n{grustoragedb.manage_demand.pageTitle}</@aButton>
+			</li>
+			<li <#if tab="notification">class="active"</#if> >
+				<@aButton href="jsp/admin/plugins/grustoragedb/ManageNotification.jsp">#i18n{grustoragedb.manage_notification.pageTitle}</@aButton>
+			</li>
+			<li <#if tab="event">class="active"</#if> >
+				<@aButton href="jsp/admin/plugins/grustoragedb/ManageNotificationEvent.jsp">#i18n{grustoragedb.manage_event.pageTitle}</@aButton>
+			</li>
+	</@tabList>
+</@tabs>
+
+</#macro>

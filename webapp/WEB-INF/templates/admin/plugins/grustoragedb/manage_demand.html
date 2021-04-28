@@ -1,0 +1,97 @@
+<#include "managedemand_tabs.html" />
+<@tabs2 tab="demand" />
+
+<@box>
+	<@boxHeader title='#i18n{grustoragedb.manage_demand.title}' boxTools=true>
+	</@boxHeader>
+	
+	<@boxBody>
+	
+	
+	<@tform class='form-horizontal' method="post" action="jsp/admin/plugins/grustoragedb/ManageDemand.jsp" name="manage_demand">
+	 	
+	 	<@formGroup labelFor='demand_id' tabIndex='1' labelKey='#i18n{grustoragedb.manage_demand.demand_id.label}' >
+		 	<@input type='text' id="demand_id" name="demand_id" />
+                </@formGroup>
+                
+		<@formGroup labelFor='demand_type_id' tabIndex='2' labelKey='#i18n{grustoragedb.manage_demand.demand_type_id.label}' >
+		 	<@input type='text' id="demand_type_id" name="demand_type_id" />
+                </@formGroup>
+                
+		<@formGroup labelFor='start_date' tabIndex='3' labelKey='#i18n{grustoragedb.manage_demand.start_date.label}' >
+                        <@input type='date' id="start_date" name="start_date" language=.lang />
+                </@formGroup>
+                
+		<@formGroup labelFor='end_date'  tabIndex='4' labelKey='#i18n{grustoragedb.manage_demand.end_date.label}' >
+		 	<@input type='date' id="end_date" name="end_date" language=.lang />
+                </@formGroup>
+           	
+		<@formGroup>
+                        <@button type='submit' tabIndex='5' title='#i18n{portal.util.labelSearch}' />
+		</@formGroup>
+		
+	</@tform>
+	
+        <@messages infos=infos />
+        <@paginationAdmin paginator=paginator combo=1 />
+        <div class="clearfix"></div>
+        
+    	<@table>
+	        <tr>
+	            <th>#i18n{grustoragedb.manage_demand.columnDemandDate}</th>
+	            <th>#i18n{grustoragedb.manage_demand.columnDemandId}</th>
+	            <th>#i18n{grustoragedb.manage_demand.columnTypeId}</th>
+	            <th>#i18n{grustoragedb.manage_demand.columnStatusId}</th>
+	            <th>#i18n{grustoragedb.manage_demand.columnReference}</th>
+	            <th>#i18n{grustoragedb.manage_demand.columnsubTypeId}</th>
+	            <th>#i18n{grustoragedb.manage_demand.columnCustomerId}</th>
+	            <th>#i18n{grustoragedb.manage_demand.action}</th>
+	        </tr>
+	        <@tableHeadBodySeparator />
+        	<#list demand_list as demand >
+        		<tr>
+		                <td>
+                                        ${demand.creationDate?number_to_datetime!''}
+                                </td>
+                                <td>
+                                        ${demand.id!''}
+                                </td>
+                                <td>
+                                        ${demand.typeId!''}
+                                </td>
+                                <td>
+                                        ${demand.statusId!''}
+                                </td>
+                                <td>
+                                        ${demand.reference!''}
+                                </td>
+                                <td>
+                                        ${demand.subtypeId!''}
+                                </td>
+                                <td>
+                                        ${demand.customer.id!''}
+                                </td>
+                                <td>
+                                        <@tform type='in-line' method="post" action="jsp/admin/plugins/grustoragedb/ManageNotification.jsp" >
+                                                <input type="hidden" id="demand_id" name="demand_id" value="${demand.id}"/>
+                                                <input type="hidden" id="demand_type_id" name="demand_type_id" value="${demand.typeId}"/>
+
+                                                <@formGroup>
+                                                        <@button type='submit' title='#i18n{grustoragedb.manage_notification.pageTitle}' buttonIcon='envelope' />
+                                                </@formGroup>
+                                        </@tform>
+                                        <@tform type='in-line' method="post" action="jsp/admin/plugins/grustoragedb/ManageNotificationEvent.jsp" >
+                                                <input type="hidden" id="demand_id" name="demand_id" value="${demand.id}"/>
+                                                <input type="hidden" id="demand_type_id" name="demand_type_id" value="${demand.typeId}"/>
+
+                                                <@formGroup>
+                                                        <@button type='submit' title='#i18n{grustoragedb.manage_event.pageTitle}' buttonIcon='flag' />
+                                                </@formGroup>
+                                        </@tform>
+			        </td>
+        		</tr>
+        	</#list>
+   		</@table>
+   	  	<@paginationAdmin paginator=paginator />
+	</@boxBody>
+</@box>

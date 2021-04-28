@@ -52,12 +52,14 @@ import java.util.List;
 public final class NotificationEventDAO implements INotificationEventDAO
 {
     // Constants
-    private static final String SQL_QUERY_SELECTALL = "SELECT id_notification_event, event_date, type, status, redelivry, message, demand_id, demand_type_id, notification_date FROM grustoragedb_notification_event ";
-    private static final String SQL_QUERY_SELECT_BY_ID = SQL_QUERY_SELECTALL + " WHERE id_notification_event = ?";
+    private static final String SQL_QUERY_SELECTALL = "SELECT id, event_date, type, status, redelivry, message, demand_id, demand_type_id, notification_date FROM grustoragedb_notification_event ";
+    private static final String SQL_QUERY_SELECT_BY_ID = SQL_QUERY_SELECTALL + " WHERE id = ?";
     private static final String SQL_QUERY_INSERT = "INSERT INTO grustoragedb_notification_event ( event_date, type, status, redelivry, message, demand_id, demand_type_id, notification_date ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? ) ";
-    private static final String SQL_QUERY_DELETE = "DELETE FROM grustoragedb_notification_event WHERE id_notification_event = ? ";
+    private static final String SQL_QUERY_DELETE = "DELETE FROM grustoragedb_notification_event WHERE id = ? ";
     private static final String SQL_QUERY_SELECT_BY_DEMAND = SQL_QUERY_SELECTALL + " WHERE demand_id = ? AND demand_type_id = ? ";
+    private static final String SQL_QUERY_SELECT_BY_NOTIFICATION = SQL_QUERY_SELECTALL + " WHERE demand_id = ? AND demand_type_id = ? and notification_date = ? ";
     private static final String SQL_QUERY_SELECT_BY_FILTER = SQL_QUERY_SELECTALL + " WHERE 1  ";
+    private static final String SQL_QUERY_FILTER_BY_DEMAND_ID = " AND demand_id = ? ";
     private static final String SQL_QUERY_FILTER_BY_DEMAND_TYPE_ID = " AND demand_type_id = ? ";
     private static final String SQL_QUERY_FILTER_BY_STARTDATE = " AND event_date >= ? ";
     private static final String SQL_QUERY_FILTER_BY_ENDDATE = " AND event_date <= ? ";
@@ -160,11 +162,42 @@ public final class NotificationEventDAO implements INotificationEventDAO
      * {@inheritDoc }
      */
     @Override
+    public List<NotificationEvent> loadByNotification( String strDemandId, String strDemandTypeId, long lNotificationDate) 
+    {
+        List<NotificationEvent> notificationEventList = new ArrayList<>(  );
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_NOTIFICATION, GruStorageDbPlugin.getPlugin( ) ) )
+        {
+            daoUtil.setString( 1, strDemandId );
+	    daoUtil.setString( 2, strDemandTypeId );
+            daoUtil.setLong( 3, lNotificationDate );
+            
+            daoUtil.executeQuery( );
+
+            while ( daoUtil.next( ) )
+            {
+                NotificationEvent notificationEvent = getItemFromDao( daoUtil );
+
+                notificationEventList.add( notificationEvent );
+            }
+
+            daoUtil.free( );
+            return notificationEventList;
+        }
+    }
+ 
+    /**
+     * {@inheritDoc }
+     */
+    @Override
     public List<NotificationEvent> loadByFilter(NotificationFilter filter) {
         
         List<NotificationEvent> notificationEventList = new ArrayList<>(  );
         StringBuilder strSql = new StringBuilder( SQL_QUERY_SELECT_BY_FILTER );
         
+        if ( filter.containsDemandId( ) )
+        {
+            strSql.append( SQL_QUERY_FILTER_BY_DEMAND_ID );
+        }
         if ( filter.containsDemandTypeId( ) )
         {
             strSql.append( SQL_QUERY_FILTER_BY_DEMAND_TYPE_ID );
@@ -185,6 +218,10 @@ public final class NotificationEventDAO implements INotificationEventDAO
         {
             int i = 1; 
 	    if ( filter.containsDemandId( ) )
+            {
+                daoUtil.setString( i++ , filter.getDemandId( ) );
+            }
+            if ( filter.containsDemandTypeId( ) )
             {
                 daoUtil.setString( i++ , filter.getDemandTypeId( ) );
             }

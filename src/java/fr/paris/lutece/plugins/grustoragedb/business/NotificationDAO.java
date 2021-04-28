@@ -80,6 +80,8 @@ public final class NotificationDAO implements INotificationDAO
     private static final String SQL_QUERY_FILTER_NO_MYDASHBOARD = " has_mydashboard = 0 ";
     private static final String SQL_QUERY_FILTER_HAS_BROADCAST_EMAIL = " has_broadcast_email != 0 ";
     private static final String SQL_QUERY_FILTER_NO_BROADCAST_EMAIL = " has_broadcast_email = 0 ";
+    private static final String SQL_QUERY_FILTER_WHERE_START_DATE = " date >= ? ";
+    private static final String SQL_QUERY_FILTER_WHERE_END_DATE = " date <= ? ";
     private static final String SQL_QUERY_AND = " AND ";
 
     private static final String SQL_QUERY_INSERT = "INSERT INTO grustoragedb_notification ( id, demand_id, demand_type_id, date, has_backoffice, has_sms, has_customer_email, has_mydashboard, has_broadcast_email, notification_content ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );";
@@ -120,7 +122,7 @@ public final class NotificationDAO implements INotificationDAO
     public List<Notification> loadByFilter( NotificationFilter notificationFilter )
     {
         String strSQL = getFilterCriteriaClauses( SQL_QUERY_FILTER_SELECT_BASE, notificationFilter );
-        List<Notification> listNotifications = new ArrayList<Notification>( );
+        List<Notification> listNotifications = new ArrayList<>( );
         DAOUtil daoUtil = new DAOUtil( strSQL, GruStorageDbPlugin.getPlugin( ) );
         addFilterCriteriaValues( daoUtil, notificationFilter );
 
@@ -242,6 +244,19 @@ public final class NotificationDAO implements INotificationDAO
             sbQuery.append( BooleanUtils.toString( hasOneWhere, SQL_QUERY_AND, SQL_QUERY_FILTER_WHERE_BASE ) );
             sbQuery.append( BooleanUtils.toString( notificationFilter.getHasBroadcastEmailNotification( ), SQL_QUERY_FILTER_HAS_BROADCAST_EMAIL,
                     SQL_QUERY_FILTER_NO_BROADCAST_EMAIL ) );
+            hasOneWhere = true;
+        }
+        if ( notificationFilter.containsStartDate( ) )
+        {
+            sbQuery.append( BooleanUtils.toString( hasOneWhere, SQL_QUERY_AND, SQL_QUERY_FILTER_WHERE_BASE ) );            
+            sbQuery.append( SQL_QUERY_FILTER_WHERE_START_DATE );
+            hasOneWhere = true;
+        }
+        if ( notificationFilter.containsEndDate( ) )
+        {
+            sbQuery.append( BooleanUtils.toString( hasOneWhere, SQL_QUERY_AND, SQL_QUERY_FILTER_WHERE_BASE ) );            
+            sbQuery.append( SQL_QUERY_FILTER_WHERE_END_DATE );
+            hasOneWhere = true;
         }
 
         // ORDER
@@ -269,6 +284,14 @@ public final class NotificationDAO implements INotificationDAO
         if ( notificationFilter.containsDemandTypeId( ) )
         {
             daoUtil.setString( nIndex++, notificationFilter.getDemandTypeId( ) );
+        }
+        if ( notificationFilter.containsStartDate( ) )
+        {
+            daoUtil.setLong( nIndex++, notificationFilter.getStartDate( ) );
+        }
+        if ( notificationFilter.containsEndDate( ) )
+        {
+            daoUtil.setLong( nIndex++, notificationFilter.getEndDate( ) );
         }
     }
 
@@ -361,5 +384,19 @@ public final class NotificationDAO implements INotificationDAO
             return listNotifs.get( 0 );
         }
         return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<Notification> loadByDemandAndDate(String strDemandId, String strDemandTypeId, long lDate) {
+        NotificationFilter filter = new NotificationFilter( );
+        filter.setDemandId( strDemandId );
+        filter.setDemandTypeId( strDemandTypeId );
+        filter.setStartDate( lDate );
+        filter.setEndDate( lDate );
+
+        return loadByFilter( filter );
     }
 }
