@@ -17,5 +17,9 @@ ALTER TABLE grustoragedb_notification_event
 ADD INDEX `IDX_NOTIFICATION_EVENT_DEMAND_ID` (`demand_id` ASC, `demand_type_id` ASC) ;
 ;
 ALTER TABLE grustoragedb_notification_event
-ADD INDEX `IDX_NOTIFICATION_EVENT_DATE` (event_date ASC) ;
+ADD INDEX `IDX_NOTIFICATION_EVENT_DATE` (event_date ASC, `demand_type_id` ASC) ;
+;
+
+ALTER TABLE grustoragedb_notification
+ADD INDEX `idx_grustoragedb_notification_date` (`date` ASC, `demand_type_id` ASC) ;
 ;

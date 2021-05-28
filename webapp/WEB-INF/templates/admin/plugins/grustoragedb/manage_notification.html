@@ -86,11 +86,11 @@
                                         </#if>
                                     </td>
                                     <td><#if notification.myDashboardNotification ?? >
-                                        Status : ${notification.myDashboardNotification.statusText}<br>
-                                        Subject : ${notification.myDashboardNotification.subject}<br>
-                                        Sender name : ${notification.myDashboardNotification.senderName}<br>
-                                        data : ${notification.myDashboardNotification.data}<br>
-                                        message : ${notification.myDashboardNotification.message}
+                                        Status : ${notification.myDashboardNotification.statusText!''}<br>
+                                        Subject : ${notification.myDashboardNotification.subject!''}<br>
+                                        Sender name : ${notification.myDashboardNotification.senderName!''}<br>
+                                        data : ${notification.myDashboardNotification.data!''}<br>
+                                        message : ${notification.myDashboardNotification.message!''}
                                         <#else>
                                         -
                                         </#if>

@@ -45,6 +45,7 @@ import java.sql.Statement;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * This class provides Data Access methods for NotificationEvent objects
@@ -63,6 +64,7 @@ public final class NotificationEventDAO implements INotificationEventDAO
     private static final String SQL_QUERY_FILTER_BY_DEMAND_TYPE_ID = " AND demand_type_id = ? ";
     private static final String SQL_QUERY_FILTER_BY_STARTDATE = " AND event_date >= ? ";
     private static final String SQL_QUERY_FILTER_BY_ENDDATE = " AND event_date <= ? ";
+    private static final String SQL_QUERY_FILTER_BY_STATUS = " AND status = ? ";
 
     /**
      * {@inheritDoc }
@@ -213,6 +215,11 @@ public final class NotificationEventDAO implements INotificationEventDAO
             strSql.append( SQL_QUERY_FILTER_BY_ENDDATE );
         }
         
+        if ( !StringUtils.isEmpty( filter.getEventStatus( ) ) )
+        {
+            strSql.append( SQL_QUERY_FILTER_BY_STATUS );
+        }
+        
         
         try( DAOUtil daoUtil = new DAOUtil( strSql.toString( ), GruStorageDbPlugin.getPlugin( ) ) )
         {
@@ -232,6 +239,10 @@ public final class NotificationEventDAO implements INotificationEventDAO
             if ( filter.containsEndDate( ) )
             {
                 daoUtil.setLong( i++ , filter.getEndDate( ) );
+            }
+            if ( !StringUtils.isEmpty( filter.getEventStatus( ) ) )
+            {
+                 daoUtil.setString( i++ , filter.getEventStatus( ) );
             }
             
             daoUtil.executeQuery(  );

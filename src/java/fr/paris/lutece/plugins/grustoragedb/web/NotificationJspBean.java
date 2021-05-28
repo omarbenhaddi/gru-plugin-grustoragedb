@@ -8,10 +8,9 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import fr.paris.lutece.plugins.grubusiness.business.notification.Notification;
-import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationEvent;
 import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationFilter;
-import fr.paris.lutece.plugins.grustoragedb.business.NotificationEventHome;
 import fr.paris.lutece.plugins.grustoragedb.business.NotificationHome;
+import fr.paris.lutece.plugins.grustoragedb.service.JsonGeneration;
 import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
 import fr.paris.lutece.util.date.DateUtil;
@@ -99,6 +98,11 @@ public class NotificationJspBean extends AbstractManageDemandJspBean {
             listNotification = NotificationHome.findByFilter( filter );
         }
     	
+        if ( !StringUtils.isEmpty( request.getParameter( "generate_json" ) ) )
+        {
+            JsonGeneration.generateJson( listNotification );
+        }
+            
     	Map<String, Object> model = getPaginatedListModel(request, MARK_NOTIFICATION_LIST, listNotification, JSP_MANAGE_NOTIFICATIONS );
         return getPage( PROPERTY_PAGE_TITLE_MANAGE_NOTIFICATION, TEMPLATE_MANAGE_NOTIFICATION, model );
     }
