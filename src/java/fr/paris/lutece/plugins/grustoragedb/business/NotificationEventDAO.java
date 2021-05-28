@@ -53,9 +53,9 @@ import org.apache.commons.lang3.StringUtils;
 public final class NotificationEventDAO implements INotificationEventDAO
 {
     // Constants
-    private static final String SQL_QUERY_SELECTALL = "SELECT id, event_date, type, status, redelivry, message, demand_id, demand_type_id, notification_date FROM grustoragedb_notification_event ";
+    private static final String SQL_QUERY_SELECTALL = "SELECT id, event_date, type, status, redelivry, message, msg_id, demand_id, demand_type_id, notification_date FROM grustoragedb_notification_event ";
     private static final String SQL_QUERY_SELECT_BY_ID = SQL_QUERY_SELECTALL + " WHERE id = ?";
-    private static final String SQL_QUERY_INSERT = "INSERT INTO grustoragedb_notification_event ( event_date, type, status, redelivry, message, demand_id, demand_type_id, notification_date ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? ) ";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO grustoragedb_notification_event ( event_date, type, status, redelivry, message, demand_id, demand_type_id, notification_date, msg_id ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM grustoragedb_notification_event WHERE id = ? ";
     private static final String SQL_QUERY_SELECT_BY_DEMAND = SQL_QUERY_SELECTALL + " WHERE demand_id = ? AND demand_type_id = ? ";
     private static final String SQL_QUERY_SELECT_BY_NOTIFICATION = SQL_QUERY_SELECTALL + " WHERE demand_id = ? AND demand_type_id = ? and notification_date = ? ";
@@ -83,6 +83,7 @@ public final class NotificationEventDAO implements INotificationEventDAO
             daoUtil.setString( nIndex++ , String.valueOf( notificationEvent.getDemand( ).getId( ) ) );
             daoUtil.setString( nIndex++ , String.valueOf( notificationEvent.getDemand( ).getTypeId( ) ) );
             daoUtil.setLong( nIndex++ , notificationEvent.getNotificationDate( ) );
+            daoUtil.setString( nIndex++ , notificationEvent.getMsgId( ) );
             
             daoUtil.executeUpdate( );
             if ( daoUtil.nextGeneratedKey( ) ) 
@@ -334,6 +335,8 @@ public final class NotificationEventDAO implements INotificationEventDAO
             event.setMessage( daoUtil.getString( nIndex++ ) );
             notificationEvent.setEvent( event );
 
+            notificationEvent.setMsgId( daoUtil.getString( nIndex++ ) );
+            
             Demand demand = new Demand( );
             demand.setId( daoUtil.getString( nIndex++ ) );  
             demand.setTypeId( daoUtil.getString( nIndex++ ) );

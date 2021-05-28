@@ -50,52 +50,53 @@
 	        </tr>
 	        <@tableHeadBodySeparator />
         		<#list notification_event_list as notificationEvent >
-	        		<tr>                                   
-                                    <td>
-                                            ${notificationEvent.event.eventDate?number_to_datetime!''}
-                                    </td>
-                                    <td>
-                                            ${notificationEvent.notificationDate?number_to_datetime!''}
-                                    </td>
-			            <td>
-                                            ${notificationEvent.demand.id}
-                                    </td>
-                                    <td>
-                                            ${notificationEvent.demand.typeId}
-                                    </td>                                    
-                                    <td>
-                                            ${notificationEvent.event.type!''}
-                                    </td>                                   
-                                    <td>
-                                            ${notificationEvent.event.status!''}
-                                    </td>                                   
-                                    <td>
-                                            ${notificationEvent.event.redelivry!''}
-                                    </td>                                   
-                                    <td>
-                                            ${notificationEvent.event.message!''}
-                                    </td>
-                                    <td>
-                                            <@tform type='in-line' method="post" action="jsp/admin/plugins/grustoragedb/ManageDemand.jsp" >
-                                                    <input type="hidden" id="demand_id" name="demand_id" value="${notificationEvent.demand.id}"/>
-                                                    <input type="hidden" id="demand_type_id" name="demand_type_id" value="${notificationEvent.demand.typeId}"/>
+                <tr>                                   
+                    <td>
+                            ${notificationEvent.event.eventDate?number_to_datetime!''}
+                    </td>
+                    <td>
+                            ${notificationEvent.notificationDate?number_to_datetime!''}
+                    </td>
+                    <td>
+                            ${notificationEvent.demand.id}
+                    </td>
+                    <td>
+                            ${notificationEvent.demand.typeId}
+                    </td>                                    
+                    <td>
+                            ${notificationEvent.event.type!''}
+                    </td>                                   
+                    <td>
+                            ${notificationEvent.event.status!''}
+                    </td>                                   
+                    <td>
+                            ${notificationEvent.event.redelivry!''}
+                    </td>                                   
+                    <td>
+                            <#if notificationEvent.msgId?? >[${notificationEvent.msgId}]<br></#if>
+                            ${notificationEvent.event.message!''}
+                    </td>
+                    <td>
+                            <@tform type='in-line' method="post" action="jsp/admin/plugins/grustoragedb/ManageDemand.jsp" >
+                                    <input type="hidden" id="demand_id" name="demand_id" value="${notificationEvent.demand.id}"/>
+                                    <input type="hidden" id="demand_type_id" name="demand_type_id" value="${notificationEvent.demand.typeId}"/>
 
-                                                    <@formGroup>
-                                                            <@button type='submit' title='#i18n{grustoragedb.manage_demand.pageTitle}' buttonIcon='question' />
-                                                    </@formGroup>
-                                            </@tform>
-                                            <@tform type='in-line' method="post" action="jsp/admin/plugins/grustoragedb/ManageNotification.jsp" >
-                                                    <input type="hidden" id="demand_id" name="demand_id" value="${notificationEvent.demand.id}"/>
-                                                    <input type="hidden" id="demand_type_id" name="demand_type_id" value="${notificationEvent.demand.typeId}"/>
-                                                    <input type="hidden" id="demand_type_id" name="notification_date" value="${notificationEvent.notificationDate}"/>
+                                    <@formGroup>
+                                            <@button type='submit' title='#i18n{grustoragedb.manage_demand.pageTitle}' buttonIcon='question' />
+                                    </@formGroup>
+                            </@tform>
+                            <@tform type='in-line' method="post" action="jsp/admin/plugins/grustoragedb/ManageNotification.jsp" >
+                                    <input type="hidden" id="demand_id" name="demand_id" value="${notificationEvent.demand.id}"/>
+                                    <input type="hidden" id="demand_type_id" name="demand_type_id" value="${notificationEvent.demand.typeId}"/>
+                                    <input type="hidden" id="demand_type_id" name="notification_date" value="${notificationEvent.notificationDate}"/>
 
-                                                    <@formGroup>
-                                                            <@button type='submit' title='#i18n{grustoragedb.manage_notification.pageTitle}' buttonIcon='envelope' />
-                                                    </@formGroup>
-                                            </@tform>
-                                            
-                                    </td>
-		        	</tr>
+                                    <@formGroup>
+                                            <@button type='submit' title='#i18n{grustoragedb.manage_notification.pageTitle}' buttonIcon='envelope' />
+                                    </@formGroup>
+                            </@tform>
+
+                    </td>
+                </tr>
        			 </#list>
   			</@table>
 	</@boxBody>
