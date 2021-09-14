@@ -86,7 +86,7 @@ public final class NotificationDAO implements INotificationDAO
 
     private static final String SQL_QUERY_INSERT = "INSERT INTO grustoragedb_notification ( id, demand_id, demand_type_id, date, has_backoffice, has_sms, has_customer_email, has_mydashboard, has_broadcast_email, notification_content ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );";
     private static final String SQL_QUERY_DELETE = "DELETE FROM grustoragedb_notification WHERE demand_id = ? AND demand_type_id = ?";
-
+    private static final String SQL_QUERY_DISTINCT_DEMAND_TYPE_ID = " SELECT DISTINCT demand_type_id FROM grustoragedb_notification ORDER BY demand_type_id ";
     ObjectMapper _mapper;
 
     /**
@@ -398,5 +398,27 @@ public final class NotificationDAO implements INotificationDAO
         filter.setEndDate( lDate );
 
         return loadByFilter( filter );
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> loadDistinctDemandTypeIds( )
+    {
+        List<String> listIds = new ArrayList<>( );
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DISTINCT_DEMAND_TYPE_ID, GruStorageDbPlugin.getPlugin( ) );
+        
+        daoUtil.executeQuery( );
+
+        while ( daoUtil.next( ) )
+        {
+            String strId = daoUtil.getString( 1 );
+            listIds.add( strId );
+        }
+
+        daoUtil.free( );
+
+        return listIds;
     }
 }

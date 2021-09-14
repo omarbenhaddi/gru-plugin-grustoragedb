@@ -13,6 +13,7 @@ import fr.paris.lutece.plugins.grustoragedb.business.NotificationHome;
 import fr.paris.lutece.plugins.grustoragedb.service.JsonGeneration;
 import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
+import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.date.DateUtil;
 import java.sql.Timestamp;
 import org.apache.commons.lang.StringUtils;
@@ -24,6 +25,8 @@ public class NotificationJspBean extends AbstractManageDemandJspBean {
     private static final String TEMPLATE_MANAGE_NOTIFICATION = "/admin/plugins/grustoragedb/manage_notification.html";
     
     private static final String MARK_NOTIFICATION_LIST = "notification_list";
+    private static final String MARK_DEMAND_TYPE_ID_LIST = "demand_type_id_list";    
+    private static final String MARK_DEMAND_TYPE_ID = "demand_type_id";
     
     private static final String JSP_MANAGE_NOTIFICATIONS = "jsp/admin/plugins/grustoragedb/ManageNotification.jsp";
     
@@ -39,7 +42,10 @@ public class NotificationJspBean extends AbstractManageDemandJspBean {
     private static final String PARAMETER_DEMAND_TYPE_ID = "demand_type_id";
     private static final String PARAMETER_NOTIFICATION_DATE = "notification_date";
     private static final String PARAMETER_START_DATE = "start_date";
-    private static final String PARAMETER_END_DATE = "end_date";   
+    private static final String PARAMETER_END_DATE = "end_date";
+    
+    // instance variables
+    private ReferenceList _listDemandTypeId ;
     
     /**
      * Build the Manage View
@@ -51,6 +57,11 @@ public class NotificationJspBean extends AbstractManageDemandJspBean {
     {
     	List<Notification> listNotification = new ArrayList<>();
         
+        if ( _listDemandTypeId == null )
+        {
+            _listDemandTypeId = NotificationHome.getDemandTypeIds( );
+        }
+                
         NotificationFilter filter = new NotificationFilter( );
         long lNotificationDate = -1;
         
@@ -101,9 +112,15 @@ public class NotificationJspBean extends AbstractManageDemandJspBean {
         if ( !StringUtils.isEmpty( request.getParameter( "generate_json" ) ) )
         {
             JsonGeneration.generateJson( listNotification );
+            //reinit
+            listNotification =  new ArrayList<Notification>( );
         }
             
     	Map<String, Object> model = getPaginatedListModel(request, MARK_NOTIFICATION_LIST, listNotification, JSP_MANAGE_NOTIFICATIONS );
+        
+        model.put( MARK_DEMAND_TYPE_ID_LIST, _listDemandTypeId );
+        model.put( MARK_DEMAND_TYPE_ID, request.getParameter( PARAMETER_DEMAND_TYPE_ID ) );
+        
         return getPage( PROPERTY_PAGE_TITLE_MANAGE_NOTIFICATION, TEMPLATE_MANAGE_NOTIFICATION, model );
     }
 }

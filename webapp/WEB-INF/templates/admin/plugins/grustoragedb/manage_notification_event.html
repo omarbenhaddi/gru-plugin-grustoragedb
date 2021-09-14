@@ -10,19 +10,19 @@
 	<@tform class='form-horizontal' method="post" action="jsp/admin/plugins/grustoragedb/ManageNotificationEvent.jsp" name="manage_notification_event">
 	 	
 	 	<@formGroup labelFor='demand_id' tabIndex='1' labelKey='#i18n{grustoragedb.manage_demand.demand_id.label}' >
-		 	<@input type='text' id="demand_id" name="demand_id" />
+		 	<@input type='text' id="demand_id" name="demand_id" value=demand_id!'' />
                 </@formGroup>
                 
 		<@formGroup labelFor='demand_type_id' tabIndex='2' labelKey='#i18n{grustoragedb.manage_demand.demand_type_id.label}' >
-		 	<@input type='text' id="demand_type_id" name="demand_type_id" />
+                        <@select name="demand_type_id" id="demand_type_id" items=demand_type_id_list![] default_value=demand_type_id!'' />
                 </@formGroup>
                 
 		<@formGroup labelFor='start_date' tabIndex='3' labelKey='#i18n{grustoragedb.manage_demand.start_date.label}' >
-		 	<@input type='date' id="start_date" name="start_date" language=.lang />
+		 	<@input type='date' id="start_date" name="start_date" language=.lang value=start_date!.now?date?string["dd/MM/yyyy"] />
                 </@formGroup>
                 
 		<@formGroup labelFor='end_date'  tabIndex='4' labelKey='#i18n{grustoragedb.manage_demand.end_date.label}' >
-		 	<@input type='date' id="end_date" name="end_date" language=.lang />
+		 	<@input type='date' id="end_date" name="end_date" language=.lang value=end_date!'' />
                 </@formGroup>
            	
 		<@formGroup>

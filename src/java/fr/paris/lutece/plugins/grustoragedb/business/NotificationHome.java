@@ -6,6 +6,7 @@ import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationFil
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
+import fr.paris.lutece.util.ReferenceList;
 
 import java.util.List;
 
@@ -72,6 +73,7 @@ public final class NotificationHome
     {
         return _dao.loadByFilter( filter );
     }
+
     /**
      * Find the notifications according to the filter
      * 
@@ -81,6 +83,24 @@ public final class NotificationHome
     public static List<Notification> getAll(NotificationFilter notificationFilter )
     {
         return _dao.loadByFilter( notificationFilter );
+    }
+
+    /**
+     * Get distinct demand type ids list
+     * 
+     * @return the  list
+     */
+    public static ReferenceList getDemandTypeIds( )
+    {
+        List<String> strList = _dao.loadDistinctDemandTypeIds( );
+        
+        ReferenceList refList = new ReferenceList( );
+        for (String strId : strList )
+        {
+            refList.addItem(strId, strId);
+        }
+        
+        return refList;
     }
 }
 
