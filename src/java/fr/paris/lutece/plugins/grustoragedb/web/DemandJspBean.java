@@ -16,7 +16,7 @@ import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
 import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.date.DateUtil;
 import java.sql.Timestamp;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 @Controller( controllerJsp = "ManageDemand.jsp", controllerPath = "jsp/admin/plugins/grustoragedb/", right = "DEMAND_MANAGEMENT" )
 public class DemandJspBean extends AbstractManageDemandJspBean {
@@ -106,8 +106,8 @@ public class DemandJspBean extends AbstractManageDemandJspBean {
     	Map<String, Object> model = getPaginatedListModel(request, MARK_DEMAND_LIST, listDemand, JSP_MANAGE_DEMANDS );
         
         model.put( MARK_DEMAND_TYPE_ID_LIST, _listDemandTypeId );
-        model.put( MARK_DEMAND_ID, request.getParameter( PARAMETER_DEMAND_TYPE_ID ) );
-        model.put( MARK_DEMAND_TYPE_ID, request.getParameter( PARAMETER_DEMAND_ID ) );
+        model.put( MARK_DEMAND_ID, request.getParameter( PARAMETER_DEMAND_ID ) );
+        model.put( MARK_DEMAND_TYPE_ID, request.getParameter( PARAMETER_DEMAND_TYPE_ID ) );
         model.put( MARK_START_DATE, request.getParameter( PARAMETER_START_DATE ) );
         model.put( MARK_END_DATE, request.getParameter( PARAMETER_END_DATE ) );
         
