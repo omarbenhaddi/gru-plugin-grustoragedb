@@ -2,8 +2,12 @@ package fr.paris.lutece.plugins.grustoragedb.web;
 
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -15,18 +19,24 @@ import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
 import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.date.DateUtil;
+import fr.paris.lutece.util.html.AbstractPaginator;
+
 import java.sql.Timestamp;
 import org.apache.commons.lang3.StringUtils;
 
 @Controller( controllerJsp = "ManageNotification.jsp", controllerPath = "jsp/admin/plugins/grustoragedb/", right = "DEMAND_MANAGEMENT" )
-public class NotificationJspBean extends AbstractManageDemandJspBean {
+public class NotificationJspBean extends AbstractManageDemandJspBean<Integer, Notification> 
+{
 	
     // Templates
     private static final String TEMPLATE_MANAGE_NOTIFICATION = "/admin/plugins/grustoragedb/manage_notification.html";
     
     private static final String MARK_NOTIFICATION_LIST = "notification_list";
     private static final String MARK_DEMAND_TYPE_ID_LIST = "demand_type_id_list";    
+    private static final String MARK_DEMAND_ID = "demand_id";
     private static final String MARK_DEMAND_TYPE_ID = "demand_type_id";
+    private static final String MARK_START_DATE = "start_date";
+    private static final String MARK_END_DATE = "end_date";
     
     private static final String JSP_MANAGE_NOTIFICATIONS = "jsp/admin/plugins/grustoragedb/ManageNotification.jsp";
     
@@ -36,6 +46,7 @@ public class NotificationJspBean extends AbstractManageDemandJspBean {
 
     // Views
     private static final String VIEW_MANAGE_NOTIFICATION = "manageNotification";
+    private static final String VIEW_COMPRESS_NOTIFICATION = "compressNotificationWithCare";
 
     //Parameters
     private static final String PARAMETER_DEMAND_ID = "demand_id";
@@ -46,6 +57,8 @@ public class NotificationJspBean extends AbstractManageDemandJspBean {
     
     // instance variables
     private ReferenceList _listDemandTypeId ;
+    private List<Integer>  _listNotificationId = new ArrayList<>( );
+    private NotificationFilter _currentFilter;
     
     /**
      * Build the Manage View
@@ -55,72 +68,127 @@ public class NotificationJspBean extends AbstractManageDemandJspBean {
     @View( value = VIEW_MANAGE_NOTIFICATION, defaultView = true )
     public String getManageNotification( HttpServletRequest request) 
     {
-    	List<Notification> listNotification = new ArrayList<>();
-        
+    	// init demand type Ids for select 
         if ( _listDemandTypeId == null )
         {
             _listDemandTypeId = NotificationHome.getDemandTypeIds( );
         }
-                
-        NotificationFilter filter = new NotificationFilter( );
-        long lNotificationDate = -1;
         
-    	if ( !StringUtils.isEmpty( request.getParameter( PARAMETER_DEMAND_ID ) ) )
-        {
-            filter.setDemandId( request.getParameter( PARAMETER_DEMAND_ID ) );
-        }
-        
-        if ( !StringUtils.isEmpty( request.getParameter( PARAMETER_DEMAND_TYPE_ID ) ) )
-        {
-            filter.setDemandTypeId( request.getParameter( PARAMETER_DEMAND_TYPE_ID ) );
-        }
-        
-        if ( !StringUtils.isEmpty( request.getParameter( PARAMETER_NOTIFICATION_DATE ) ) )
-        {
-            lNotificationDate = Long.parseLong( request.getParameter( PARAMETER_NOTIFICATION_DATE ) );
-        }
-        
-        if ( !StringUtils.isEmpty( request.getParameter( PARAMETER_START_DATE ) ) )
-        {
-            String strStartDate = request.getParameter( PARAMETER_START_DATE );
-            Timestamp tStartDate = DateUtil.formatTimestamp( strStartDate, getLocale( ) );
-            if ( tStartDate != null )
-            {
-                filter.setStartDate( tStartDate.getTime( ) );
-            }
-        }
-        
-        if ( !StringUtils.isEmpty( request.getParameter( PARAMETER_END_DATE ) ) )
-        {
-            String strEndDate = request.getParameter( PARAMETER_END_DATE );
-            Timestamp tEndDate = DateUtil.formatTimestamp( strEndDate, getLocale( ) );
-            if ( tEndDate != null )
-            {
-                filter.setEndDate( tEndDate.getTime( ) );
-            }
-        }
-        
-        if ( filter.containsDemandId( ) && filter.containsDemandTypeId( ) && lNotificationDate > 0 )
-        {
-            listNotification = NotificationHome.findByNotification( filter.getDemandId( ), filter.getDemandTypeId( ), lNotificationDate );
-        }
-        else if ( filter.containsDemandId( ) || filter.containsDemandTypeId( ) || filter.containsStartDate( ) || filter.containsEndDate( ) )
-        {
-            listNotification = NotificationHome.findByFilter( filter );
-        }
+        // initial call (no pagination)
+    	if ( request.getParameter( AbstractPaginator.PARAMETER_PAGE_INDEX ) == null || _listNotificationId.isEmpty( ))
+    	{
+    		// new search...
+	    	_currentFilter = new NotificationFilter( );
+	        long lNotificationDate = -1;
+	        
+	    	if ( !StringUtils.isEmpty( request.getParameter( PARAMETER_DEMAND_ID ) ) )
+	        {
+	    		_currentFilter.setDemandId( request.getParameter( PARAMETER_DEMAND_ID ) );
+	        }
+	        
+	        if ( !StringUtils.isEmpty( request.getParameter( PARAMETER_DEMAND_TYPE_ID ) ) )
+	        {
+	        	_currentFilter.setDemandTypeId( request.getParameter( PARAMETER_DEMAND_TYPE_ID ) );
+	        }
+	        
+	        if ( !StringUtils.isEmpty( request.getParameter( PARAMETER_NOTIFICATION_DATE ) ) )
+	        {
+	            lNotificationDate = Long.parseLong( request.getParameter( PARAMETER_NOTIFICATION_DATE ) );
+	        }
+	        
+	        if ( !StringUtils.isEmpty( request.getParameter( PARAMETER_START_DATE ) ) )
+	        {
+	            String strStartDate = request.getParameter( PARAMETER_START_DATE );
+	            Date dStartDate = DateUtil.parseIsoDate( strStartDate );
+	            if ( dStartDate != null )
+	            {
+	            	_currentFilter.setStartDate( dStartDate.getTime( ) );
+	            }
+	        }
+	        
+	        if ( !StringUtils.isEmpty( request.getParameter( PARAMETER_END_DATE ) ) )
+	        {
+	            String strEndDate = request.getParameter( PARAMETER_END_DATE );
+	            Date dEndDate = DateUtil.parseIsoDate( strEndDate );            
+	            if ( dEndDate != null )
+	            {
+	            	_currentFilter.setEndDate( dEndDate.getTime( ) );
+	            }
+	        }
+	        
+	        if ( _currentFilter.containsDemandId( ) && _currentFilter.containsDemandTypeId( ) && lNotificationDate > 0 )
+	        {
+	            List<Notification> listNotification = NotificationHome.findByNotification( _currentFilter.getDemandId( ), _currentFilter.getDemandTypeId( ), lNotificationDate );
+	            
+	            _listNotificationId = listNotification.stream( ).map( Notification::getId ).collect( Collectors.toList( ) );
+	            
+	        }
+	        else if ( _currentFilter.containsDemandId( ) || _currentFilter.containsDemandTypeId( ) || _currentFilter.containsStartDate( ) || _currentFilter.containsEndDate( ) )
+	        {
+	            _listNotificationId = NotificationHome.findIdsByFilter( _currentFilter );
+	        }
+    	}
     	
-        if ( !StringUtils.isEmpty( request.getParameter( "generate_json" ) ) )
-        {
-            JsonGeneration.generateJson( listNotification );
-            //reinit
-            listNotification =  new ArrayList<Notification>( );
-        }
-            
-    	Map<String, Object> model = getPaginatedListModel(request, MARK_NOTIFICATION_LIST, listNotification, JSP_MANAGE_NOTIFICATIONS );
+    	Map<String, Object> model = getPaginatedListModel(request, MARK_NOTIFICATION_LIST, _listNotificationId, JSP_MANAGE_NOTIFICATIONS );
         
         model.put( MARK_DEMAND_TYPE_ID_LIST, _listDemandTypeId );
-        model.put( MARK_DEMAND_TYPE_ID, request.getParameter( PARAMETER_DEMAND_TYPE_ID ) );
+        
+        if ( !StringUtils.isEmpty( _currentFilter.getDemandId( ) ) )
+        {
+        	model.put( MARK_DEMAND_ID, _currentFilter.getDemandId( ) );
+        }
+        if ( !StringUtils.isBlank( _currentFilter.getDemandTypeId( ) ) )
+        {
+        	model.put( MARK_DEMAND_TYPE_ID, _currentFilter.getDemandTypeId( ) );
+        }
+        if ( _currentFilter.getStartDate( ) > 0 ) 
+        {
+        	model.put( MARK_START_DATE, new Date( _currentFilter.getStartDate( ) ) );
+        }
+        if ( _currentFilter.getEndDate( ) > 0 ) 
+        {
+        	model.put( MARK_END_DATE, new Date( _currentFilter.getEndDate( ) ) );
+        }
         
         return getPage( PROPERTY_PAGE_TITLE_MANAGE_NOTIFICATION, TEMPLATE_MANAGE_NOTIFICATION, model );
     }
+
+    /**
+     * compress data
+     * can be used to compress existing data (or decompress) by setting the properties compress=true / decompress=false 
+     * !!! warning : call it with care !!!
+     * 
+     * @param request The HTTP request
+     * @return The page
+     */
+    @View( value = VIEW_COMPRESS_NOTIFICATION )
+    public String getCompressNotification( HttpServletRequest request) 
+    {
+    	List<Integer> listNotificationId = NotificationHome.findIdsByFilter( _currentFilter );
+        
+    	for (Integer id : listNotificationId )
+    	{
+    		Optional<Notification> optNotif = NotificationHome.getById( id );
+    		if ( optNotif.isPresent( ) ) 
+    		{
+    			NotificationHome.remove( optNotif.get().getId( ) );
+    			NotificationHome.create( optNotif.get() );
+    		}
+    	}
+    	
+        return getManageNotification( request );
+    }
+
+	@Override
+	List<Notification> getItemsFromIds(List<Integer> listIds) {
+		
+		List<Notification> listNotification = NotificationHome.getByIds( listIds );
+		
+		// keep original order
+		return listNotification.stream()
+         	    .sorted(Comparator.comparingInt( notif -> listIds.indexOf( notif.getId())))
+         	    .collect(Collectors.toList());
+	}
+    
+    
 }

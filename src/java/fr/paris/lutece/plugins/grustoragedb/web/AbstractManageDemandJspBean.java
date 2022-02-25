@@ -47,9 +47,12 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * ManageProject JSP Bean abstract class for JSP Bean
  */
-public abstract class AbstractManageDemandJspBean extends MVCAdminJspBean
+public abstract class AbstractManageDemandJspBean<S,T> extends MVCAdminJspBean
 {
-    // Rights
+
+	private static final long serialVersionUID = 1L;
+
+	// Rights
     public static final String RIGHT_MANAGEDEMAND = "DEMAND_MANAGEMENT";
     
     // Properties
@@ -74,7 +77,7 @@ public abstract class AbstractManageDemandJspBean extends MVCAdminJspBean
      * @param strManageJsp The JSP
      * @return The model
      */
-    protected <T> Map<String, Object> getPaginatedListModel( HttpServletRequest request, String strBookmark, List<T> list,
+    protected Map<String, Object> getPaginatedListModel( HttpServletRequest request, String strBookmark, List<S> list,
         String strManageJsp )
     {
         int nDefaultItemsPerPage = AppPropertiesService.getPropertyInt( PROPERTY_DEFAULT_LIST_ITEM_PER_PAGE, 50 );
@@ -85,14 +88,24 @@ public abstract class AbstractManageDemandJspBean extends MVCAdminJspBean
         String strUrl = url.getUrl(  );
 
         // PAGINATOR
-        LocalizedPaginator<T> paginator = new LocalizedPaginator<>( list, _nItemsPerPage, strUrl, PARAMETER_PAGE_INDEX, _strCurrentPageIndex, getLocale(  ) );
+        LocalizedPaginator<S> paginator = new LocalizedPaginator<>( list, _nItemsPerPage, strUrl, PARAMETER_PAGE_INDEX, _strCurrentPageIndex, getLocale(  ) );
 
-        Map<String, Object> model = getModel(  );
+        Map<String, Object> model = getModel( );
 
         model.put( MARK_NB_ITEMS_PER_PAGE, String.valueOf( _nItemsPerPage ) );
         model.put( MARK_PAGINATOR, paginator );
-        model.put( strBookmark, paginator.getPageItems(  ) );
+        model.put( strBookmark, getItemsFromIds ( paginator.getPageItems( ) ) );
 
         return model;
     }
+    
+    /**
+     * Get Items from Ids list
+     * 
+     * @param <S> the generic type of the Ids
+     * @param <T> the generic type of the items
+     * @param listIds
+     * @return the populated list of items corresponding to the id List
+     */
+    abstract  List<T> getItemsFromIds ( List<S> listIds ) ;
 }

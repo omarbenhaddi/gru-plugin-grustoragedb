@@ -43,6 +43,7 @@ import fr.paris.lutece.util.sql.DAOUtil;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This class provides Data Access methods for Demand objects stored in SQL database
@@ -69,6 +70,8 @@ public final class DemandDAO implements IDemandDAO
     private static final String SQL_QUERY_DEMAND_SELECT_BY_DEMAND_ID = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS
             + " FROM grustoragedb_demand WHERE demand_id = ? ";
     private static final String SQL_QUERY_DEMAND_SELECT_ALL = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS + " FROM grustoragedb_demand";
+    private static final String SQL_QUERY_DEMAND_SELECT_DEMAND_IDS = "SELECT demand_id FROM grustoragedb_demand ";
+    private static final String SQL_QUERY_DEMAND_SELECT_BY_IDS = SQL_QUERY_DEMAND_SELECT_ALL + " where demand_id in ( %s )";
     private static final String SQL_QUERY_DEMAND_INSERT = "INSERT INTO grustoragedb_demand ( " + SQL_QUERY_DEMAND_ALL_FIELDS_WITH_NO_DEMAND_ID
             + " ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DEMAND_UPDATE = "UPDATE grustoragedb_demand SET status_id = ?, customer_id = ?, closure_date = ?, current_step = ?, subtype_id = ? WHERE id = ? AND type_id = ?";
@@ -83,7 +86,7 @@ public final class DemandDAO implements IDemandDAO
     private static final String SQL_FILTER_BY_DEMAND_TYPE_ID = " AND type_id = ? ";
     private static final String SQL_FILTER_BY_START_DATE = " AND creation_date >= ? ";
     private static final String SQL_FILTER_BY_END_DATE = " AND creation_date <= ? ";
-    private static final String SQL_QUERY_FILTER_ORDER = " ORDER BY creation_date DESC, id DESC";
+    private static final String SQL_QUERY_FILTER_ORDER = " ORDER BY id ASC";
     
     /**
      * {@inheritDoc}
@@ -136,6 +139,36 @@ public final class DemandDAO implements IDemandDAO
      * {@inheritDoc}
      */
     @Override
+    public List<Demand> loadByIds( List<Integer> listIds )
+    {
+        List<Demand> listDemands = new ArrayList<>( );
+        
+        if (listIds.isEmpty( ) ) return listDemands;
+        
+        String sql = String.format( SQL_QUERY_DEMAND_SELECT_BY_IDS, listIds.stream( ).map(v -> "?").collect(Collectors.joining(", ")));
+        DAOUtil daoUtil = new DAOUtil( sql, GruStorageDbPlugin.getPlugin( ) );
+
+        int index = 1;
+        for( Integer strId : listIds ) {
+        	daoUtil.setInt( index++, strId );
+        }
+        
+        daoUtil.executeQuery( );
+
+        while ( daoUtil.next( ) )
+        {
+        	listDemands.add( dao2Demand( daoUtil ) );
+        }
+
+        daoUtil.free( );
+
+        return listDemands;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Collection<Demand> loadByReference( String strReference )
     {
         Collection<Demand> collectionDemands = new ArrayList<>( );
@@ -159,80 +192,18 @@ public final class DemandDAO implements IDemandDAO
      * {@inheritDoc}
      */
     @Override
-    public Collection<Demand> loadAllDemands() {
-        Collection<Demand> collectionDemands = new ArrayList<Demand>( );
-        
-        DAOUtil daoUtil = new DAOUtil(SQL_QUERY_DEMAND_SELECT_ALL, GruStorageDbPlugin.getPlugin());
-
-        daoUtil.executeQuery( );
-
-        while ( daoUtil.next( ) )
-        {
-            collectionDemands.add( dao2Demand( daoUtil ) );
-        }
-
-        daoUtil.free( );
-
-        return collectionDemands;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Collection<Demand> loadByFilter( NotificationFilter filter )
     {
         Collection<Demand> collectionDemands = new ArrayList<>( );
         StringBuilder sql = new StringBuilder( SQL_QUERY_DEMAND_SELECT_ALL + SQL_QUERY_FILTER_WHERE_BASE );
         
-        if ( filter.containsDemandId( ) )
-        {
-            sql.append( SQL_FILTER_BY_DEMAND_ID );
-        }
-        
-        if ( filter.containsDemandTypeId( ) )
-        {
-            sql.append( SQL_FILTER_BY_DEMAND_TYPE_ID );
-        }
-
-        if ( filter.containsStartDate( ) )
-        {
-            sql.append( SQL_FILTER_BY_START_DATE );
-        }
-        
-        if ( filter.containsEndDate( ) )
-        {
-            sql.append( SQL_FILTER_BY_END_DATE );
-        }
-        
-        sql.append( SQL_QUERY_FILTER_ORDER );
+        buildSql( sql, filter);
         
         DAOUtil daoUtil = new DAOUtil( sql.toString( ), GruStorageDbPlugin.getPlugin( ) );
-        int i = 1;
         
-        if ( filter.containsDemandId( ) )
-        {
-            daoUtil.setString( i++, filter.getDemandId( ) );
-        }
-        
-        if ( filter.containsDemandTypeId( ) )
-        {
-            daoUtil.setString( i++, filter.getDemandTypeId( ) );
-        }
-
-        if ( filter.containsStartDate( ) )
-        {
-            daoUtil.setLong( i++, filter.getStartDate( ) );
-        }
-        
-        if ( filter.containsEndDate( ) )
-        {
-            daoUtil.setLong( i++, filter.getEndDate( ) );
-        }
-        
-        
+        fillDao( daoUtil, filter);
+                
         daoUtil.executeQuery( );
-
         while ( daoUtil.next( ) )
         {
             collectionDemands.add( dao2Demand( daoUtil ) );
@@ -242,7 +213,33 @@ public final class DemandDAO implements IDemandDAO
 
         return collectionDemands;
     }
-    
+ 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<Integer> loadIdsByFilter( NotificationFilter filter )
+    {
+    	List<Integer> listIds = new ArrayList<>( );
+        StringBuilder sql = new StringBuilder( SQL_QUERY_DEMAND_SELECT_DEMAND_IDS + SQL_QUERY_FILTER_WHERE_BASE );
+        
+        buildSql( sql, filter);
+        
+        DAOUtil daoUtil = new DAOUtil( sql.toString( ), GruStorageDbPlugin.getPlugin( ) );
+        
+        fillDao( daoUtil, filter);
+                
+        daoUtil.executeQuery( );
+        while ( daoUtil.next( ) )
+        {
+        	listIds.add( daoUtil.getInt( 1 ) );
+        }
+
+        daoUtil.free( );
+
+        return listIds;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -386,4 +383,64 @@ public final class DemandDAO implements IDemandDAO
         return demand;
     }
 
+    /**
+     * build the sql with selected filters
+     * 
+     * @param sql
+     * @param filter
+     */
+    private void buildSql( StringBuilder sql, NotificationFilter filter) 
+    {
+
+        if ( filter.containsDemandId( ) )
+        {
+            sql.append( SQL_FILTER_BY_DEMAND_ID );
+        }
+        
+        if ( filter.containsDemandTypeId( ) )
+        {
+            sql.append( SQL_FILTER_BY_DEMAND_TYPE_ID );
+        }
+
+        if ( filter.containsStartDate( ) )
+        {
+            sql.append( SQL_FILTER_BY_START_DATE );
+        }
+        
+        if ( filter.containsEndDate( ) )
+        {
+            sql.append( SQL_FILTER_BY_END_DATE );
+        }
+        
+        sql.append( SQL_QUERY_FILTER_ORDER );
+    }
+
+    /**
+     * fill the dao with filter's values 
+     * @param daoUtil
+     * @param filter
+     */
+    private void fillDao( DAOUtil daoUtil, NotificationFilter filter)
+    {
+    	int i=1;
+    	if ( filter.containsDemandId( ) )
+        {
+            daoUtil.setString( i++, filter.getDemandId( ) );
+        }
+        
+        if ( filter.containsDemandTypeId( ) )
+        {
+            daoUtil.setString( i++, filter.getDemandTypeId( ) );
+        }
+
+        if ( filter.containsStartDate( ) )
+        {
+            daoUtil.setLong( i++, filter.getStartDate( ) );
+        }
+        
+        if ( filter.containsEndDate( ) )
+        {
+            daoUtil.setLong( i++, filter.getEndDate( ) );
+        }
+    }
 }

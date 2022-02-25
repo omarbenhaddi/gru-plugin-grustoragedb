@@ -34,8 +34,11 @@
 package fr.paris.lutece.plugins.grustoragedb.business;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -53,7 +56,9 @@ import fr.paris.lutece.plugins.grubusiness.business.notification.Notification;
 import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationFilter;
 import fr.paris.lutece.plugins.grustoragedb.service.GruStorageDbPlugin;
 import fr.paris.lutece.portal.service.util.AppLogService;
+import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.util.sql.DAOUtil;
+import fr.paris.lutece.util.string.StringUtil;
 
 /**
  * This class provides Data Access methods for Notification objects stored in SQL database
@@ -64,12 +69,12 @@ public final class NotificationDAO implements INotificationDAO
     private static final String COLUMN_NOTIFICATION_ID = "id";
     private static final String SQL_QUERY_NEW_PK = "SELECT max( id ) FROM grustoragedb_notification";
     private static final String SQL_QUERY_FILTER_SELECT_BASE = "SELECT id, notification_content FROM grustoragedb_notification ";
-    private static final String SQL_QUERY_FILTER_SELECT_ID_BASE = "SELECT id FROM grustoragedb_notification ";
+    private static final String SQL_QUERY_FILTER_SELECT_ID_BASE = "SELECT distinct id FROM grustoragedb_notification ";
     private static final String SQL_QUERY_FILTER_WHERE_BASE = " WHERE ";
     private static final String SQL_QUERY_FILTER_WHERE_DEMANDID = " demand_id = ? ";
-    private static final String SQL_QUERY_FILTER_WHERE_ID = " id = ? ";
+    private static final String SQL_QUERY_FILTER_WHERE_ID_IN = " id in ( %s )";
     private static final String SQL_QUERY_FILTER_WHERE_DEMANDTYPEID = " demand_type_id = ? ";
-    private static final String SQL_QUERY_FILTER_ORDER = " ORDER BY date DESC, id ASC";
+    private static final String SQL_QUERY_FILTER_ORDER = " ORDER BY id ASC";
     private static final String SQL_QUERY_FILTER_HAS_BACKOFFICE = " has_backoffice != 0 ";
     private static final String SQL_QUERY_FILTER_NO_BACKOFFICE = " has_backoffice = 0 ";
     private static final String SQL_QUERY_FILTER_HAS_SMS = " has_sms != 0 ";
@@ -85,8 +90,13 @@ public final class NotificationDAO implements INotificationDAO
     private static final String SQL_QUERY_AND = " AND ";
 
     private static final String SQL_QUERY_INSERT = "INSERT INTO grustoragedb_notification ( id, demand_id, demand_type_id, date, has_backoffice, has_sms, has_customer_email, has_mydashboard, has_broadcast_email, notification_content ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );";
-    private static final String SQL_QUERY_DELETE = "DELETE FROM grustoragedb_notification WHERE demand_id = ? AND demand_type_id = ?";
+    private static final String SQL_QUERY_DELETE = "DELETE FROM grustoragedb_notification WHERE id = ?";
+    private static final String SQL_QUERY_DELETE_BY_DEMAND = "DELETE FROM grustoragedb_notification WHERE demand_id = ? AND demand_type_id = ?";
     private static final String SQL_QUERY_DISTINCT_DEMAND_TYPE_ID = " SELECT DISTINCT demand_type_id FROM grustoragedb_notification ORDER BY demand_type_id ";
+    
+    private static final String PROPERTY_COMPRESS_NOTIFICATION = "grustoragedb.notification.compress";
+    private static final String PROPERTY_DECOMPRESS_NOTIFICATION = "grustoragedb.notification.decompress";
+    
     ObjectMapper _mapper;
 
     /**
@@ -100,6 +110,7 @@ public final class NotificationDAO implements INotificationDAO
         _mapper.configure( DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false );
         _mapper.configure( SerializationFeature.WRAP_ROOT_VALUE, false );
         _mapper.configure( Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true );
+        // => _mapper.configure( JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS.mappedFeature( ) , true );  ??
     }
 
     /**
@@ -122,66 +133,41 @@ public final class NotificationDAO implements INotificationDAO
     public List<Notification> loadByFilter( NotificationFilter notificationFilter )
     {
         String strSQL = getFilterCriteriaClauses( SQL_QUERY_FILTER_SELECT_BASE, notificationFilter );
-        List<Notification> listNotifications = new ArrayList<>( );
-        DAOUtil daoUtil = new DAOUtil( strSQL, GruStorageDbPlugin.getPlugin( ) );
-        addFilterCriteriaValues( daoUtil, notificationFilter );
-
-        daoUtil.executeQuery( );
-
-        while ( daoUtil.next( ) )
+        
+        try ( DAOUtil daoUtil = new DAOUtil( strSQL, GruStorageDbPlugin.getPlugin( ) ) )
         {
-            String strNotificationJson = daoUtil.getString( COLUMN_NOTIFICATION_CONTENT );
-            int nNotificationId = daoUtil.getInt( COLUMN_NOTIFICATION_ID );
-            if ( StringUtils.isEmpty( strNotificationJson ) )
-            {
-                AppLogService.error( "JSON notification is empty for notification " + nNotificationId );
-                continue;
-            }
-            Notification notification;
-            try
-            {
-                notification = _mapper.readValue( strNotificationJson, Notification.class );
-                notification.setId( nNotificationId );
-                listNotifications.add( notification );
-            }
-            catch( JsonParseException | JsonMappingException e )
-            {
-                AppLogService.error( "Error while read JSON of notification " + nNotificationId, e );
-            }
-            catch( IOException e )
-            {
-                AppLogService.error( "Error while read JSON of notification " + nNotificationId, e );
-            }
+	        addFilterCriteriaValues( daoUtil, notificationFilter );
+	
+	        daoUtil.executeQuery( );
+	
+	        return getNotificationsFromDao( daoUtil );
         }
-
-        daoUtil.free( );
-
-        return listNotifications;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<String> loadIdsByFilter( NotificationFilter notificationFilter )
+    public List<Integer> loadIdsByFilter( NotificationFilter notificationFilter )
     {
         String strSQL = getFilterCriteriaClauses( SQL_QUERY_FILTER_SELECT_ID_BASE, notificationFilter );
-        List<String> listIds = new ArrayList<>( );
-        DAOUtil daoUtil = new DAOUtil( strSQL, GruStorageDbPlugin.getPlugin( ) );
-        addFilterCriteriaValues( daoUtil, notificationFilter );
-
-        daoUtil.executeQuery( );
-
-        while ( daoUtil.next( ) )
+        List<Integer> listIds = new ArrayList<>( );
+        
+        try ( DAOUtil daoUtil = new DAOUtil( strSQL, GruStorageDbPlugin.getPlugin( ) ) )
         {
-            int nNotificationId = daoUtil.getInt( COLUMN_NOTIFICATION_ID );
-            String strNotificationId = String.valueOf( nNotificationId );
-            listIds.add( strNotificationId );
+	        
+	        addFilterCriteriaValues( daoUtil, notificationFilter );
+	
+	        daoUtil.executeQuery( );
+	
+	        while ( daoUtil.next( ) )
+	        {
+	            int nNotificationId = daoUtil.getInt( COLUMN_NOTIFICATION_ID );
+	            listIds.add( nNotificationId );
+	        }
+	
+	        return listIds;
         }
-
-        daoUtil.free( );
-
-        return listIds;
     }
 
     /**
@@ -194,6 +180,19 @@ public final class NotificationDAO implements INotificationDAO
         boolean hasOneWhere = false;
 
         // WHERE
+
+        if ( notificationFilter.containsId( ) )
+        {
+            sbQuery.append( BooleanUtils.toString( hasOneWhere, SQL_QUERY_AND, SQL_QUERY_FILTER_WHERE_BASE ) );
+            
+            String sql = String.format( SQL_QUERY_FILTER_WHERE_ID_IN, 
+            		notificationFilter.getIds( ).stream( )
+	        			.map(v -> "?" )
+	        			.collect(Collectors.joining( ", ") ) );
+	        
+            sbQuery.append( sql );
+            hasOneWhere = true;
+        }
         if ( notificationFilter.containsDemandId( ) )
         {
             sbQuery.append( SQL_QUERY_FILTER_WHERE_BASE );
@@ -204,12 +203,6 @@ public final class NotificationDAO implements INotificationDAO
         {
             sbQuery.append( BooleanUtils.toString( hasOneWhere, SQL_QUERY_AND, SQL_QUERY_FILTER_WHERE_BASE ) );
             sbQuery.append( SQL_QUERY_FILTER_WHERE_DEMANDTYPEID );
-            hasOneWhere = true;
-        }
-        if ( notificationFilter.containsId( ) )
-        {
-            sbQuery.append( BooleanUtils.toString( hasOneWhere, SQL_QUERY_AND, SQL_QUERY_FILTER_WHERE_BASE ) );
-            sbQuery.append( SQL_QUERY_FILTER_WHERE_ID );
             hasOneWhere = true;
         }
         if ( notificationFilter.containsHasBackofficeNotification( ) )
@@ -273,13 +266,16 @@ public final class NotificationDAO implements INotificationDAO
     {
         int nIndex = 1;
 
+        if ( notificationFilter.containsId( ) )
+        {
+            for (Integer id : notificationFilter.getIds( ) )
+            {
+                daoUtil.setInt( nIndex++, id );            	
+            }
+        }
         if ( notificationFilter.containsDemandId( ) )
         {
             daoUtil.setString( nIndex++, notificationFilter.getDemandId( ) );
-        }
-        if ( notificationFilter.containsId( ) )
-        {
-            daoUtil.setString( nIndex++, notificationFilter.getId( ) );
         }
         if ( notificationFilter.containsDemandTypeId( ) )
         {
@@ -304,29 +300,43 @@ public final class NotificationDAO implements INotificationDAO
         int nNotificationId = newPrimaryKey( );
         notification.setId( nNotificationId );
 
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, GruStorageDbPlugin.getPlugin( ) );
-
-        int nIndex = 1;
-
-        daoUtil.setInt( nIndex++, notification.getId( ) );
-        daoUtil.setString( nIndex++, notification.getDemand( ).getId( ) );
-        daoUtil.setString( nIndex++, notification.getDemand( ).getTypeId( ) );
-        daoUtil.setLong( nIndex++, notification.getDate( ) );
-        daoUtil.setInt( nIndex++, BooleanUtils.toInteger( ( notification.getBackofficeNotification( ) != null ), 1, 0 ) );
-        daoUtil.setInt( nIndex++, BooleanUtils.toInteger( ( notification.getSmsNotification( ) != null ), 1, 0 ) );
-        daoUtil.setInt( nIndex++, BooleanUtils.toInteger( ( notification.getEmailNotification( ) != null ), 1, 0 ) );
-        daoUtil.setInt( nIndex++, BooleanUtils.toInteger( ( notification.getMyDashboardNotification( ) != null ), 1, 0 ) );
-        daoUtil.setInt( nIndex++, BooleanUtils.toInteger( ( notification.getBroadcastEmail( ) != null && notification.getBroadcastEmail( ).size( ) > 0 ), 1, 0 ) );
-        try
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, GruStorageDbPlugin.getPlugin( ) ) )
         {
-            daoUtil.setBytes( nIndex++, _mapper.writeValueAsBytes( notification ) );
-            daoUtil.executeUpdate( );
+
+	        int nIndex = 1;
+	
+	        daoUtil.setInt( nIndex++, notification.getId( ) );
+	        daoUtil.setString( nIndex++, notification.getDemand( ).getId( ) );
+	        daoUtil.setString( nIndex++, notification.getDemand( ).getTypeId( ) );
+	        daoUtil.setLong( nIndex++, notification.getDate( ) );
+	        daoUtil.setInt( nIndex++, BooleanUtils.toInteger( ( notification.getBackofficeNotification( ) != null ), 1, 0 ) );
+	        daoUtil.setInt( nIndex++, BooleanUtils.toInteger( ( notification.getSmsNotification( ) != null ), 1, 0 ) );
+	        daoUtil.setInt( nIndex++, BooleanUtils.toInteger( ( notification.getEmailNotification( ) != null ), 1, 0 ) );
+	        daoUtil.setInt( nIndex++, BooleanUtils.toInteger( ( notification.getMyDashboardNotification( ) != null ), 1, 0 ) );
+	        daoUtil.setInt( nIndex++, BooleanUtils.toInteger( ( notification.getBroadcastEmail( ) != null && notification.getBroadcastEmail( ).size( ) > 0 ), 1, 0 ) );
+	        
+        	String strNotificationContent =  _mapper.writeValueAsString( notification ) ;
+        	byte[] bytes ; 
+        	if ( AppPropertiesService.getPropertyBoolean( PROPERTY_COMPRESS_NOTIFICATION , false) )
+        	{
+        		bytes = StringUtil.compress( strNotificationContent );
+        	}
+        	else
+        	{
+        		bytes = strNotificationContent.getBytes( "UTF-8" );
+        	}
+            daoUtil.setBytes( nIndex, bytes);
+	        
+	        daoUtil.executeUpdate( );
         }
         catch( JsonProcessingException e )
         {
             AppLogService.error( "Error while writing JSON of notification", e );
         }
-        daoUtil.free( );
+        catch( IOException e )
+        {
+            AppLogService.error( "Error while compressing or writing JSON of notification", e );
+        }
 
         return notification;
     }
@@ -335,15 +345,29 @@ public final class NotificationDAO implements INotificationDAO
      * {@inheritDoc}
      */
     @Override
+    public void delete( int id )
+    {
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, GruStorageDbPlugin.getPlugin( ) ) )
+        {
+	        daoUtil.setInt( 1, id );	
+	        daoUtil.executeUpdate( );
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void deleteByDemand( String strDemandId, String strDemandTypeId )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, GruStorageDbPlugin.getPlugin( ) );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE_BY_DEMAND, GruStorageDbPlugin.getPlugin( ) ) )
+        {
 
-        daoUtil.setString( 1, strDemandId );
-        daoUtil.setString( 2, strDemandTypeId );
-
-        daoUtil.executeUpdate( );
-        daoUtil.free( );
+	        daoUtil.setString( 1, strDemandId );
+	        daoUtil.setString( 2, strDemandTypeId );
+	
+	        daoUtil.executeUpdate( );
+        }
     }
 
     /**
@@ -353,39 +377,62 @@ public final class NotificationDAO implements INotificationDAO
      */
     private int newPrimaryKey( )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_NEW_PK, GruStorageDbPlugin.getPlugin( ) );
-        daoUtil.executeQuery( );
-
-        int nKey = 1;
-
-        if ( daoUtil.next( ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_NEW_PK, GruStorageDbPlugin.getPlugin( ) ) )
         {
-            nKey = daoUtil.getInt( 1 ) + 1;
+	        daoUtil.executeQuery( );
+	
+	        int nKey = 1;
+	
+	        if ( daoUtil.next( ) )
+	        {
+	            nKey = daoUtil.getInt( 1 ) + 1;
+	        }
+	        
+	        return nKey;
         }
-
-        daoUtil.free( );
-
-        return nKey;
+        
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Notification loadById( String strId )
+    public Optional<Notification> loadById( int id )
     {
         NotificationFilter filter = new NotificationFilter( );
-        filter.setId( strId );
+        List<Integer> list = new ArrayList<>( );
+        list.add( id );
+        filter.setIds( list );
 
         List<Notification> listNotifs = loadByFilter( filter );
 
         if ( listNotifs.size( ) == 1 )
         {
-            return listNotifs.get( 0 );
+            return Optional.of( listNotifs.get( 0 ) );
         }
-        return null;
+        
+        return Optional.empty( );
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<Notification> loadByIds( List<Integer> listIds )
+    {
+    	if (listIds.isEmpty( ) ) 
+    	{
+    		return new ArrayList<>();
+    	}
+    	else
+    	{
+	        NotificationFilter filter = new NotificationFilter( );
+	        filter.setIds( listIds );
+	
+	        return loadByFilter( filter );
+    	}
+    }
+    
     /**
      * {@inheritDoc}
      */
@@ -407,18 +454,68 @@ public final class NotificationDAO implements INotificationDAO
     public List<String> loadDistinctDemandTypeIds( )
     {
         List<String> listIds = new ArrayList<>( );
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DISTINCT_DEMAND_TYPE_ID, GruStorageDbPlugin.getPlugin( ) );
         
-        daoUtil.executeQuery( );
-
-        while ( daoUtil.next( ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DISTINCT_DEMAND_TYPE_ID, GruStorageDbPlugin.getPlugin( ) ) )
         {
-            String strId = daoUtil.getString( 1 );
-            listIds.add( strId );
+	        
+	        daoUtil.executeQuery( );
+	
+	        while ( daoUtil.next( ) )
+	        {
+	            String strId = daoUtil.getString( 1 );
+	            listIds.add( strId );
+	        }
+	        
+	        return listIds;
+        }        
+    }
+
+    /**
+     * get notification list from dao
+     * 
+     * @param daoUtil
+     * @return the list
+     */
+    private List<Notification> getNotificationsFromDao( DAOUtil daoUtil )
+    {
+    	List<Notification> listNotifications = new ArrayList<>();
+    	
+    	while ( daoUtil.next( ) )
+        {
+            byte[] bNotificationJson = daoUtil.getBytes( COLUMN_NOTIFICATION_CONTENT );
+            int nNotificationId = daoUtil.getInt( COLUMN_NOTIFICATION_ID );
+            if ( bNotificationJson == null )
+            {
+                AppLogService.error( "JSON notification is empty for notification " + nNotificationId );
+                continue;
+            }
+            
+            Notification notification;
+            try
+            {
+            	String strNotification ;
+            	if ( AppPropertiesService.getPropertyBoolean( PROPERTY_DECOMPRESS_NOTIFICATION , false) )
+            	{
+            		strNotification = StringUtil.decompress( bNotificationJson );
+            	}
+            	else
+            	{
+            		strNotification = new String( bNotificationJson, StandardCharsets.UTF_8 );
+            	}
+                notification = _mapper.readValue( strNotification, Notification.class );
+                notification.setId( nNotificationId );
+                listNotifications.add( notification );
+            }
+            catch( JsonParseException | JsonMappingException e )
+            {
+                AppLogService.error( "Error while read JSON of notification " + nNotificationId , e );
+            }
+            catch( IOException e )
+            {
+                AppLogService.error( "Error while read JSON of notification " + nNotificationId , e );
+            }
         }
 
-        daoUtil.free( );
-
-        return listIds;
+        return listNotifications;
     }
 }

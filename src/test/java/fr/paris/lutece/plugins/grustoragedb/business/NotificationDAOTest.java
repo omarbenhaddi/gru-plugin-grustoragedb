@@ -47,7 +47,7 @@ import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationFil
 import fr.paris.lutece.plugins.grubusiness.business.notification.SMSNotification;
 import fr.paris.lutece.test.LuteceTestCase;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -163,28 +163,28 @@ public class NotificationDAOTest extends LuteceTestCase
         NotificationFilter filterDemand = new NotificationFilter( );
         filterDemand.setDemandId( strDemandId );
         filterDemand.setDemandTypeId( strDemandTypeId );
-        Collection<Notification> collectionNotificationStored = _notificationDAO.loadByDemand( strDemandId, strDemandTypeId );
-        assertThat( collectionNotificationStored.size( ), is( 1 ) );
+        List<Notification> collectionNotificationStored = _notificationDAO.loadByDemand( strDemandId, strDemandTypeId );
+        assertEquals( collectionNotificationStored.size( ), 1 );
 
         Iterator<Notification> iterator = collectionNotificationStored.iterator( );
         Notification notificationStored = iterator.next( );
 
-        assertThat( notificationStored.getDemand( ).getId( ), is( notification.getDemand( ).getId( ) ) );
-        assertThat( notificationStored.getDemand( ).getTypeId( ), is( notification.getDemand( ).getTypeId( ) ) );
-        assertThat( notificationStored.getDemand( ).getSubtypeId( ), is( notification.getDemand( ).getSubtypeId( ) ) );
+        assertEquals( notificationStored.getDemand( ).getId( ), notification.getDemand( ).getId( ) );
+        assertEquals( notificationStored.getDemand( ).getTypeId( ), notification.getDemand( ).getTypeId( ) );
+        assertEquals( notificationStored.getDemand( ).getSubtypeId( ), notification.getDemand( ).getSubtypeId( ) );
 
         collectionNotificationStored = _notificationDAO.loadByFilter( filterDemand );
-        assertThat( collectionNotificationStored.size( ), is( 1 ) );
+        assertEquals( collectionNotificationStored.size( ), 1 );
         collectionNotificationStored = _notificationDAO.loadByFilter( _filterSMS );
-        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        assertEquals( collectionNotificationStored.size( ), 0 );
         collectionNotificationStored = _notificationDAO.loadByFilter( _filterCustomerEmail );
-        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        assertEquals( collectionNotificationStored.size( ), 0 );
         collectionNotificationStored = _notificationDAO.loadByFilter( _filterBackoffice );
-        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        assertEquals( collectionNotificationStored.size( ), 0 );
         collectionNotificationStored = _notificationDAO.loadByFilter( _filterMyDashboard );
-        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        assertEquals( collectionNotificationStored.size( ), 0 );
         collectionNotificationStored = _notificationDAO.loadByFilter( _filterBroadcast );
-        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        assertEquals( collectionNotificationStored.size( ), 0 );
 
         notification.setDate( NOTIFICATION_DATE_2 );
 
@@ -195,26 +195,26 @@ public class NotificationDAOTest extends LuteceTestCase
         _notificationDAO.insert( notification );
 
         collectionNotificationStored = _notificationDAO.loadByDemand( strDemandId, strDemandTypeId );
-        assertThat( collectionNotificationStored.size( ), is( 2 ) );
+        assertEquals( collectionNotificationStored.size( ), 2 );
         iterator = collectionNotificationStored.iterator( );
         notificationStored = iterator.next( );
 
         BackofficeNotification backofficeNotificationStored = notificationStored.getBackofficeNotification( );
-        assertThat( backofficeNotificationStored.getMessage( ), is( backofficeNotification.getMessage( ) ) );
-        assertThat( backofficeNotificationStored.getStatusText( ), is( backofficeNotification.getStatusText( ) ) );
+        assertEquals( backofficeNotificationStored.getMessage( ), backofficeNotification.getMessage( ) );
+        assertEquals( backofficeNotificationStored.getStatusText( ), backofficeNotification.getStatusText( ) );
 
         collectionNotificationStored = _notificationDAO.loadByFilter( filterDemand );
-        assertThat( collectionNotificationStored.size( ), is( 2 ) );
+        assertEquals( collectionNotificationStored.size( ), 2 );
         collectionNotificationStored = _notificationDAO.loadByFilter( _filterBackoffice );
-        assertThat( collectionNotificationStored.size( ), is( 1 ) );
+        assertEquals( collectionNotificationStored.size( ), 1 );
         collectionNotificationStored = _notificationDAO.loadByFilter( _filterSMS );
-        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        assertEquals( collectionNotificationStored.size( ), 0 );
         collectionNotificationStored = _notificationDAO.loadByFilter( _filterCustomerEmail );
-        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        assertEquals( collectionNotificationStored.size( ), 0 );
         collectionNotificationStored = _notificationDAO.loadByFilter( _filterMyDashboard );
-        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        assertEquals( collectionNotificationStored.size( ), 0 );
         collectionNotificationStored = _notificationDAO.loadByFilter( _filterBroadcast );
-        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        assertEquals( collectionNotificationStored.size( ), 0 );
 
         notification.setDate( NOTIFICATION_DATE_3 );
 
@@ -225,26 +225,26 @@ public class NotificationDAOTest extends LuteceTestCase
         _notificationDAO.insert( notification );
 
         collectionNotificationStored = _notificationDAO.loadByDemand( strDemandId, strDemandTypeId );
-        assertThat( collectionNotificationStored.size( ), is( 3 ) );
+        assertEquals( collectionNotificationStored.size( ), 3 );
         iterator = collectionNotificationStored.iterator( );
         notificationStored = iterator.next( );
 
         SMSNotification smsNotificationStored = notificationStored.getSmsNotification( );
-        assertThat( smsNotificationStored.getMessage( ), is( smsNotification.getMessage( ) ) );
-        assertThat( smsNotificationStored.getPhoneNumber( ), is( smsNotification.getPhoneNumber( ) ) );
+        assertEquals( smsNotificationStored.getMessage( ), smsNotification.getMessage( ) );
+        assertEquals( smsNotificationStored.getPhoneNumber( ), smsNotification.getPhoneNumber( ) );
 
         collectionNotificationStored = _notificationDAO.loadByFilter( filterDemand );
-        assertThat( collectionNotificationStored.size( ), is( 3 ) );
+        assertEquals( collectionNotificationStored.size( ), 3 );
         collectionNotificationStored = _notificationDAO.loadByFilter( _filterBackoffice );
-        assertThat( collectionNotificationStored.size( ), is( 2 ) );
+        assertEquals( collectionNotificationStored.size( ), 2 );
         collectionNotificationStored = _notificationDAO.loadByFilter( _filterSMS );
-        assertThat( collectionNotificationStored.size( ), is( 1 ) );
+        assertEquals( collectionNotificationStored.size( ), 1 );
         collectionNotificationStored = _notificationDAO.loadByFilter( _filterCustomerEmail );
-        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        assertEquals( collectionNotificationStored.size( ), 0 );
         collectionNotificationStored = _notificationDAO.loadByFilter( _filterMyDashboard );
-        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        assertEquals( collectionNotificationStored.size( ), 0 );
         collectionNotificationStored = _notificationDAO.loadByFilter( _filterBroadcast );
-        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        assertEquals( collectionNotificationStored.size( ), 0 );
 
         notification.setDate( NOTIFICATION_DATE_4 );
 
@@ -260,31 +260,31 @@ public class NotificationDAOTest extends LuteceTestCase
         _notificationDAO.insert( notification );
 
         collectionNotificationStored = _notificationDAO.loadByDemand( strDemandId, strDemandTypeId );
-        assertThat( collectionNotificationStored.size( ), is( 4 ) );
+        assertEquals( collectionNotificationStored.size( ), 4 );
         iterator = collectionNotificationStored.iterator( );
         notificationStored = iterator.next( );
 
         EmailNotification emailNotificationStored = notificationStored.getEmailNotification( );
-        assertThat( emailNotificationStored.getSenderEmail( ), is( emailNotification.getSenderEmail( ) ) );
-        assertThat( emailNotificationStored.getSenderName( ), is( emailNotification.getSenderName( ) ) );
-        assertThat( emailNotificationStored.getSubject( ), is( emailNotification.getSubject( ) ) );
-        assertThat( emailNotificationStored.getMessage( ), is( emailNotification.getMessage( ) ) );
-        assertThat( emailNotificationStored.getRecipient( ), is( emailNotification.getRecipient( ) ) );
-        assertThat( emailNotificationStored.getCc( ), is( emailNotification.getCc( ) ) );
-        assertThat( emailNotificationStored.getCci( ), is( emailNotification.getCci( ) ) );
+        assertEquals( emailNotificationStored.getSenderEmail( ), emailNotification.getSenderEmail( ) );
+        assertEquals( emailNotificationStored.getSenderName( ), emailNotification.getSenderName( ) );
+        assertEquals( emailNotificationStored.getSubject( ), emailNotification.getSubject( ) );
+        assertEquals( emailNotificationStored.getMessage( ), emailNotification.getMessage( ) );
+        assertEquals( emailNotificationStored.getRecipient( ), emailNotification.getRecipient( ) );
+        assertEquals( emailNotificationStored.getCc( ), emailNotification.getCc( ) );
+        assertEquals( emailNotificationStored.getCci( ), emailNotification.getCci( ) );
 
         collectionNotificationStored = _notificationDAO.loadByFilter( filterDemand );
-        assertThat( collectionNotificationStored.size( ), is( 4 ) );
+        assertEquals( collectionNotificationStored.size( ), 4 );
         collectionNotificationStored = _notificationDAO.loadByFilter( _filterBackoffice );
-        assertThat( collectionNotificationStored.size( ), is( 3 ) );
+        assertEquals( collectionNotificationStored.size( ), 3 );
         collectionNotificationStored = _notificationDAO.loadByFilter( _filterSMS );
-        assertThat( collectionNotificationStored.size( ), is( 2 ) );
+        assertEquals( collectionNotificationStored.size( ), 2 );
         collectionNotificationStored = _notificationDAO.loadByFilter( _filterCustomerEmail );
-        assertThat( collectionNotificationStored.size( ), is( 1 ) );
+        assertEquals( collectionNotificationStored.size( ), 1 );
         collectionNotificationStored = _notificationDAO.loadByFilter( _filterMyDashboard );
-        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        assertEquals( collectionNotificationStored.size( ), 0 );
         collectionNotificationStored = _notificationDAO.loadByFilter( _filterBroadcast );
-        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        assertEquals( collectionNotificationStored.size( ), 0 );
 
         notification.setDate( NOTIFICATION_DATE_5 );
 
@@ -299,30 +299,30 @@ public class NotificationDAOTest extends LuteceTestCase
         _notificationDAO.insert( notification );
 
         collectionNotificationStored = _notificationDAO.loadByDemand( strDemandId, strDemandTypeId );
-        assertThat( collectionNotificationStored.size( ), is( 5 ) );
+        assertEquals( collectionNotificationStored.size( ), 5 );
         iterator = collectionNotificationStored.iterator( );
         notificationStored = iterator.next( );
 
         MyDashboardNotification myDashboardNotificationStored = notificationStored.getMyDashboardNotification( );
-        assertThat( myDashboardNotificationStored.getStatusId( ), is( myDashboardNotification.getStatusId( ) ) );
-        assertThat( myDashboardNotificationStored.getStatusText( ), is( myDashboardNotification.getStatusText( ) ) );
-        assertThat( myDashboardNotificationStored.getMessage( ), is( myDashboardNotification.getMessage( ) ) );
-        assertThat( myDashboardNotificationStored.getSubject( ), is( myDashboardNotification.getSubject( ) ) );
-        assertThat( myDashboardNotificationStored.getData( ), is( myDashboardNotification.getData( ) ) );
-        assertThat( myDashboardNotificationStored.getSenderName( ), is( myDashboardNotification.getSenderName( ) ) );
+        assertEquals( myDashboardNotificationStored.getStatusId( ), myDashboardNotification.getStatusId( ) );
+        assertEquals( myDashboardNotificationStored.getStatusText( ), myDashboardNotification.getStatusText( ) );
+        assertEquals( myDashboardNotificationStored.getMessage( ), myDashboardNotification.getMessage( ) );
+        assertEquals( myDashboardNotificationStored.getSubject( ), myDashboardNotification.getSubject( ) );
+        assertEquals( myDashboardNotificationStored.getData( ), myDashboardNotification.getData( ) );
+        assertEquals( myDashboardNotificationStored.getSenderName( ), myDashboardNotification.getSenderName( ) );
 
         collectionNotificationStored = _notificationDAO.loadByFilter( filterDemand );
-        assertThat( collectionNotificationStored.size( ), is( 5 ) );
+        assertEquals( collectionNotificationStored.size( ), 5 );
         collectionNotificationStored = _notificationDAO.loadByFilter( _filterBackoffice );
-        assertThat( collectionNotificationStored.size( ), is( 4 ) );
+        assertEquals( collectionNotificationStored.size( ), 4 );
         collectionNotificationStored = _notificationDAO.loadByFilter( _filterSMS );
-        assertThat( collectionNotificationStored.size( ), is( 3 ) );
+        assertEquals( collectionNotificationStored.size( ), 3 );
         collectionNotificationStored = _notificationDAO.loadByFilter( _filterCustomerEmail );
-        assertThat( collectionNotificationStored.size( ), is( 2 ) );
+        assertEquals( collectionNotificationStored.size( ), 2 );
         collectionNotificationStored = _notificationDAO.loadByFilter( _filterMyDashboard );
-        assertThat( collectionNotificationStored.size( ), is( 1 ) );
+        assertEquals( collectionNotificationStored.size( ), 1 );
         collectionNotificationStored = _notificationDAO.loadByFilter( _filterBroadcast );
-        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        assertEquals( collectionNotificationStored.size( ), 0 );
 
         notification.setDate( NOTIFICATION_DATE_6 );
 
@@ -373,55 +373,55 @@ public class NotificationDAOTest extends LuteceTestCase
         _notificationDAO.insert( notification );
 
         collectionNotificationStored = _notificationDAO.loadByDemand( strDemandId, strDemandTypeId );
-        assertThat( collectionNotificationStored.size( ), is( 6 ) );
+        assertEquals( collectionNotificationStored.size( ), 6 );
         iterator = collectionNotificationStored.iterator( );
         notificationStored = iterator.next( );
 
         List<BroadcastNotification> listBroadcastNotificationsStored = notificationStored.getBroadcastEmail( );
-        assertThat( listBroadcastNotificationsStored.size( ), is( 2 ) );
+        assertEquals( listBroadcastNotificationsStored.size( ), 2 );
 
         BroadcastNotification broadcastNotificationStored = listBroadcastNotificationsStored.get( 0 );
-        assertThat( broadcastNotificationStored.getSenderEmail( ), is( broadcastNotification.getSenderEmail( ) ) );
-        assertThat( broadcastNotificationStored.getSenderName( ), is( broadcastNotification.getSenderName( ) ) );
-        assertThat( broadcastNotificationStored.getSubject( ), is( broadcastNotification.getSubject( ) ) );
-        assertThat( broadcastNotificationStored.getMessage( ), is( broadcastNotification.getMessage( ) ) );
+        assertEquals( broadcastNotificationStored.getSenderEmail( ), broadcastNotification.getSenderEmail( ) );
+        assertEquals( broadcastNotificationStored.getSenderName( ), broadcastNotification.getSenderName( ) );
+        assertEquals( broadcastNotificationStored.getSubject( ), broadcastNotification.getSubject( ) );
+        assertEquals( broadcastNotificationStored.getMessage( ), broadcastNotification.getMessage( ) );
 
         List<EmailAddress> listEmailAddressesStored = broadcastNotificationStored.getRecipient( );
-        assertThat( listEmailAddressesStored.size( ), is( 2 ) );
+        assertEquals( listEmailAddressesStored.size( ), 2 );
         listEmailAddressesStored = broadcastNotificationStored.getCc( );
-        assertThat( listEmailAddressesStored.size( ), is( 2 ) );
+        assertEquals( listEmailAddressesStored.size( ), 2 );
         listEmailAddressesStored = broadcastNotificationStored.getBcc( );
-        assertThat( listEmailAddressesStored.size( ), is( 2 ) );
+        assertEquals( listEmailAddressesStored.size( ), 2 );
 
         collectionNotificationStored = _notificationDAO.loadByFilter( filterDemand );
-        assertThat( collectionNotificationStored.size( ), is( 6 ) );
+        assertEquals( collectionNotificationStored.size( ), 6 );
         collectionNotificationStored = _notificationDAO.loadByFilter( _filterBackoffice );
-        assertThat( collectionNotificationStored.size( ), is( 5 ) );
+        assertEquals( collectionNotificationStored.size( ), 5 );
         collectionNotificationStored = _notificationDAO.loadByFilter( _filterSMS );
-        assertThat( collectionNotificationStored.size( ), is( 4 ) );
+        assertEquals( collectionNotificationStored.size( ), 4 );
         collectionNotificationStored = _notificationDAO.loadByFilter( _filterCustomerEmail );
-        assertThat( collectionNotificationStored.size( ), is( 3 ) );
+        assertEquals( collectionNotificationStored.size( ), 3 );
         collectionNotificationStored = _notificationDAO.loadByFilter( _filterMyDashboard );
-        assertThat( collectionNotificationStored.size( ), is( 2 ) );
+        assertEquals( collectionNotificationStored.size( ), 2 );
         collectionNotificationStored = _notificationDAO.loadByFilter( _filterBroadcast );
-        assertThat( collectionNotificationStored.size( ), is( 1 ) );
+        assertEquals( collectionNotificationStored.size( ), 1 );
 
         _notificationDAO.deleteByDemand( strDemandId, strDemandTypeId );
         collectionNotificationStored = _notificationDAO.loadByDemand( strDemandId, strDemandTypeId );
-        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        assertEquals( collectionNotificationStored.size( ), 0 );
 
         collectionNotificationStored = _notificationDAO.loadByFilter( filterDemand );
-        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        assertEquals( collectionNotificationStored.size( ), 0 );
         collectionNotificationStored = _notificationDAO.loadByFilter( _filterBackoffice );
-        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        assertEquals( collectionNotificationStored.size( ), 0 );
         collectionNotificationStored = _notificationDAO.loadByFilter( _filterSMS );
-        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        assertEquals( collectionNotificationStored.size( ), 0 );
         collectionNotificationStored = _notificationDAO.loadByFilter( _filterCustomerEmail );
-        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        assertEquals( collectionNotificationStored.size( ), 0 );
         collectionNotificationStored = _notificationDAO.loadByFilter( _filterMyDashboard );
-        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        assertEquals( collectionNotificationStored.size( ), 0 );
         collectionNotificationStored = _notificationDAO.loadByFilter( _filterBroadcast );
-        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        assertEquals( collectionNotificationStored.size( ), 0 );
 
         _demandDAO.delete( strDemandId, strDemandTypeId );
     }
@@ -469,25 +469,25 @@ public class NotificationDAOTest extends LuteceTestCase
         _notificationDAO.insert( notification );
 
         Collection<Notification> collectionNotificationStored = _notificationDAO.loadByDemand( DEMAND_ID_1, DEMAND_TYPE_ID_1 );
-        assertThat( collectionNotificationStored.size( ), is( 1 ) );
+        assertEquals( collectionNotificationStored.size( ), 1 );
 
         Iterator<Notification> iterator = collectionNotificationStored.iterator( );
         Notification notificationStored = iterator.next( );
-        assertThat( notificationStored.getDate( ), is( NOTIFICATION_DATE_1 ) );
+        assertSame( notificationStored.getDate( ), NOTIFICATION_DATE_1 );
 
         collectionNotificationStored = _notificationDAO.loadByDemand( DEMAND_ID_2, DEMAND_TYPE_ID_2 );
-        assertThat( collectionNotificationStored.size( ), is( 1 ) );
+        assertEquals( collectionNotificationStored.size( ), 1 );
         iterator = collectionNotificationStored.iterator( );
         notificationStored = iterator.next( );
-        assertThat( notificationStored.getDate( ), is( NOTIFICATION_DATE_2 ) );
+        assertSame( notificationStored.getDate( ), NOTIFICATION_DATE_2 );
 
         _notificationDAO.deleteByDemand( DEMAND_ID_1, DEMAND_TYPE_ID_1 );
         collectionNotificationStored = _notificationDAO.loadByDemand( DEMAND_ID_1, DEMAND_TYPE_ID_1 );
-        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        assertEquals( collectionNotificationStored.size( ), 0 );
 
         _notificationDAO.deleteByDemand( DEMAND_ID_2, DEMAND_TYPE_ID_2 );
         collectionNotificationStored = _notificationDAO.loadByDemand( DEMAND_ID_2, DEMAND_TYPE_ID_2 );
-        assertThat( collectionNotificationStored.size( ), is( 0 ) );
+        assertEquals( collectionNotificationStored.size( ), 0 );
 
         _demandDAO.delete( DEMAND_ID_1, DEMAND_TYPE_ID_1 );
         _demandDAO.delete( DEMAND_ID_2, DEMAND_TYPE_ID_2 );

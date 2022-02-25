@@ -31,9 +31,20 @@ public final class DemandHome
      * Finds all the demands 
      * @return all the demands. An empty collection is returned if no demands has been found.
      */
-    public static Collection<Demand> getAllDemands()
+    public static List<Demand> getByIds( List<Integer> listIds)
     {
-        return _dao.loadAllDemands();
+        return _dao.loadByIds( listIds);
+    }
+ 
+    /**
+     * search demands by filter
+     * 
+     * @param strKey
+     * @return 
+     */
+    public static List<Integer> searchIdsByFilter( NotificationFilter filter )
+    {
+        return _dao.loadIdsByFilter( filter );
     }
  
     /**
@@ -46,7 +57,6 @@ public final class DemandHome
     {
         return _dao.loadByFilter( filter );
     }
- 
  
 
     /**

@@ -41,10 +41,16 @@ import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationEve
 import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationFilter;
 import fr.paris.lutece.plugins.grustoragedb.service.GruStorageDbPlugin;
 import fr.paris.lutece.util.sql.DAOUtil;
+import net.sf.ehcache.search.expression.Not;
+
 import java.sql.Statement;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -54,17 +60,18 @@ public final class NotificationEventDAO implements INotificationEventDAO
 {
     // Constants
     private static final String SQL_QUERY_SELECTALL = "SELECT id, event_date, type, status, redelivry, message, msg_id, demand_id, demand_type_id, notification_date FROM grustoragedb_notification_event ";
-    private static final String SQL_QUERY_SELECT_BY_ID = SQL_QUERY_SELECTALL + " WHERE id = ?";
     private static final String SQL_QUERY_INSERT = "INSERT INTO grustoragedb_notification_event ( event_date, type, status, redelivry, message, demand_id, demand_type_id, notification_date, msg_id ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM grustoragedb_notification_event WHERE id = ? ";
     private static final String SQL_QUERY_SELECT_BY_DEMAND = SQL_QUERY_SELECTALL + " WHERE demand_id = ? AND demand_type_id = ? ";
     private static final String SQL_QUERY_SELECT_BY_NOTIFICATION = SQL_QUERY_SELECTALL + " WHERE demand_id = ? AND demand_type_id = ? and notification_date = ? ";
     private static final String SQL_QUERY_SELECT_BY_FILTER = SQL_QUERY_SELECTALL + " WHERE 1  ";
+    private static final String SQL_QUERY_FILTER_BY_ID = " AND id in ( %s ) ";    
     private static final String SQL_QUERY_FILTER_BY_DEMAND_ID = " AND demand_id = ? ";
     private static final String SQL_QUERY_FILTER_BY_DEMAND_TYPE_ID = " AND demand_type_id = ? ";
     private static final String SQL_QUERY_FILTER_BY_STARTDATE = " AND event_date >= ? ";
     private static final String SQL_QUERY_FILTER_BY_ENDDATE = " AND event_date <= ? ";
     private static final String SQL_QUERY_FILTER_BY_STATUS = " AND status = ? ";
+    private static final String SQL_QUERY_FILTER_ORDER_BY =" ORDER BY id ASC";
 
     /**
      * {@inheritDoc }
@@ -102,22 +109,33 @@ public final class NotificationEventDAO implements INotificationEventDAO
      * {@inheritDoc }
      */
     @Override
-    public NotificationEvent loadById( int nKey )
+    public Optional<NotificationEvent> loadById( int nKey )
     {
-        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_ID, GruStorageDbPlugin.getPlugin( ) ) )
+        List<Integer> list = new ArrayList<>( );
+        list.add( nKey );
+        
+        List<NotificationEvent> listEvent = loadByIds( list );
+        
+        if ( listEvent.size( ) == 1 )
         {
-	        daoUtil.setInt( 1 , nKey );
-	        daoUtil.executeQuery( );
-	        NotificationEvent notificationEvent = null;
-	
-	        if ( daoUtil.next( ) )
-	        {
-                    notificationEvent = getItemFromDao( daoUtil );           
-	        }
-	
-	        daoUtil.free( );
-	        return notificationEvent;
+	        return Optional.of( listEvent.get( 0 ) );
         }
+        else
+        {
+        	return Optional.empty( );
+        }
+    }
+    
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public List<NotificationEvent> loadByIds( List<Integer> listIds )
+    {
+        NotificationFilter filter = new NotificationFilter( );
+        filter.setIds( listIds );
+        
+        return loadByFilter( filter );
     }
 
     /**
@@ -197,54 +215,11 @@ public final class NotificationEventDAO implements INotificationEventDAO
         List<NotificationEvent> notificationEventList = new ArrayList<>(  );
         StringBuilder strSql = new StringBuilder( SQL_QUERY_SELECT_BY_FILTER );
         
-        if ( filter.containsDemandId( ) )
-        {
-            strSql.append( SQL_QUERY_FILTER_BY_DEMAND_ID );
-        }
-        if ( filter.containsDemandTypeId( ) )
-        {
-            strSql.append( SQL_QUERY_FILTER_BY_DEMAND_TYPE_ID );
-        }
-        
-        if ( filter.containsStartDate( ) )
-        {
-            strSql.append( SQL_QUERY_FILTER_BY_STARTDATE );
-        }
-        
-        if ( filter.containsEndDate( ) )
-        {
-            strSql.append( SQL_QUERY_FILTER_BY_ENDDATE );
-        }
-        
-        if ( !StringUtils.isEmpty( filter.getEventStatus( ) ) )
-        {
-            strSql.append( SQL_QUERY_FILTER_BY_STATUS );
-        }
-        
+        getFilterCriteriaClauses( strSql, filter );
         
         try( DAOUtil daoUtil = new DAOUtil( strSql.toString( ), GruStorageDbPlugin.getPlugin( ) ) )
         {
-            int i = 1; 
-	    if ( filter.containsDemandId( ) )
-            {
-                daoUtil.setString( i++ , filter.getDemandId( ) );
-            }
-            if ( filter.containsDemandTypeId( ) )
-            {
-                daoUtil.setString( i++ , filter.getDemandTypeId( ) );
-            }
-            if ( filter.containsStartDate( ) )
-            {
-                daoUtil.setLong( i++ , filter.getStartDate( ) );
-            }
-            if ( filter.containsEndDate( ) )
-            {
-                daoUtil.setLong( i++ , filter.getEndDate( ) );
-            }
-            if ( !StringUtils.isEmpty( filter.getEventStatus( ) ) )
-            {
-                 daoUtil.setString( i++ , filter.getEventStatus( ) );
-            }
+        	addFilterCriteriaValues( daoUtil, filter );
             
             daoUtil.executeQuery(  );
 	
@@ -269,37 +244,11 @@ public final class NotificationEventDAO implements INotificationEventDAO
         List<Integer> notificationEventList = new ArrayList<>( );
         StringBuilder strSql = new StringBuilder( SQL_QUERY_SELECT_BY_FILTER );
         
-        if ( filter.containsDemandTypeId( ) )
-        {
-            strSql.append( SQL_QUERY_FILTER_BY_DEMAND_TYPE_ID );
-        }
-        
-        if ( filter.containsStartDate( ) )
-        {
-            strSql.append( SQL_QUERY_FILTER_BY_STARTDATE );
-        }
-        
-        if ( filter.containsEndDate( ) )
-        {
-            strSql.append( SQL_QUERY_FILTER_BY_ENDDATE );
-        }
-        
+        getFilterCriteriaClauses( strSql, filter );        
         
         try( DAOUtil daoUtil = new DAOUtil( strSql.toString( ), GruStorageDbPlugin.getPlugin( ) ) )
         {
-            int i = 1; 
-	    if ( filter.containsDemandId( ) )
-            {
-                daoUtil.setString( i++ , filter.getDemandTypeId( ) );
-            }
-            if ( filter.containsStartDate( ) )
-            {
-                daoUtil.setLong( i++ , filter.getStartDate( ) );
-            }
-            if ( filter.containsEndDate( ) )
-            {
-                daoUtil.setLong( i++ , filter.getEndDate( ) );
-            }
+        	addFilterCriteriaValues( daoUtil, filter );
 	
             daoUtil.executeQuery(  );
             
@@ -347,4 +296,87 @@ public final class NotificationEventDAO implements INotificationEventDAO
             return notificationEvent ;
     }
 
+    /**
+     * build sql filter
+     * 
+     * @param sql
+     * @param filter
+     */
+    private void getFilterCriteriaClauses( StringBuilder sbSql, NotificationFilter filter ) 
+    {
+
+    	if ( filter.containsId( ) )
+        {
+            String sql = String.format( SQL_QUERY_FILTER_BY_ID, 
+            		filter.getIds( ).stream( )
+	        			.map(v -> "?" )
+	        			.collect(Collectors.joining( ", ") ) );
+	        
+            sbSql.append( sql );
+        }
+        if ( filter.containsDemandId( ) )
+        {
+            sbSql.append( SQL_QUERY_FILTER_BY_DEMAND_ID );
+        }
+        if ( filter.containsDemandTypeId( ) )
+        {
+            sbSql.append( SQL_QUERY_FILTER_BY_DEMAND_TYPE_ID );
+        }
+        
+        if ( filter.containsStartDate( ) )
+        {
+            sbSql.append( SQL_QUERY_FILTER_BY_STARTDATE );
+        }
+        
+        if ( filter.containsEndDate( ) )
+        {
+            sbSql.append( SQL_QUERY_FILTER_BY_ENDDATE );
+        }
+        
+        if ( !StringUtils.isEmpty( filter.getEventStatus( ) ) )
+        {
+            sbSql.append( SQL_QUERY_FILTER_BY_STATUS );
+        }
+        
+        sbSql.append( SQL_QUERY_FILTER_ORDER_BY );
+    }
+
+    /**
+     * fill DAO with values
+     * 
+     * @param daoUtil
+     * @param filter
+     */
+    private void addFilterCriteriaValues( DAOUtil daoUtil, NotificationFilter filter )
+    {
+
+        int i = 1; 
+        if ( filter.containsId( ) )
+        {
+            for (Integer id : filter.getIds( ) )
+            {
+                daoUtil.setInt( i++, id );            	
+            }
+        }
+        if ( filter.containsDemandId( ) )
+        {
+            daoUtil.setString( i++ , filter.getDemandId( ) );
+        }
+        if ( filter.containsDemandTypeId( ) )
+        {
+            daoUtil.setString( i++ , filter.getDemandTypeId( ) );
+        }
+        if ( filter.containsStartDate( ) )
+        {
+            daoUtil.setLong( i++ , filter.getStartDate( ) );
+        }
+        if ( filter.containsEndDate( ) )
+        {
+            daoUtil.setLong( i++ , filter.getEndDate( ) );
+        }
+        if ( !StringUtils.isEmpty( filter.getEventStatus( ) ) )
+        {
+             daoUtil.setString( i , filter.getEventStatus( ) );
+        }
+    }
 }
