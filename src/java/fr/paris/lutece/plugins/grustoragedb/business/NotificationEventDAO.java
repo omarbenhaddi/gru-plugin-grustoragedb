@@ -132,10 +132,17 @@ public final class NotificationEventDAO implements INotificationEventDAO
     @Override
     public List<NotificationEvent> loadByIds( List<Integer> listIds )
     {
-        NotificationFilter filter = new NotificationFilter( );
-        filter.setIds( listIds );
-        
-        return loadByFilter( filter );
+        if ( listIds != null && !listIds.isEmpty( ) )
+        {
+	    	NotificationFilter filter = new NotificationFilter( );
+	        filter.setIds( listIds );
+	        
+	        return loadByFilter( filter );
+        }
+        else
+        {
+        	return new ArrayList<>( );
+        }
     }
 
     /**

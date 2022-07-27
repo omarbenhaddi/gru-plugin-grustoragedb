@@ -420,7 +420,7 @@ public final class NotificationDAO implements INotificationDAO
     @Override
     public List<Notification> loadByIds( List<Integer> listIds )
     {
-    	if (listIds.isEmpty( ) ) 
+    	if ( listIds !=null && listIds.isEmpty( ) ) 
     	{
     		return new ArrayList<>();
     	}
