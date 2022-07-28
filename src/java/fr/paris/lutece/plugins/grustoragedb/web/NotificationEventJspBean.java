@@ -52,6 +52,7 @@ public class NotificationEventJspBean extends AbstractManageDemandJspBean<Intege
     private static final String PARAMETER_NOTIFICATION_DATE = "notification_date";
     private static final String PARAMETER_START_DATE = "start_date";
     private static final String PARAMETER_END_DATE = "end_date";   
+    private static final String PARAMETER_STATUS = "event_status";   
     
     // instance variables
     private ReferenceList _listDemandTypeId ;
@@ -115,6 +116,13 @@ public class NotificationEventJspBean extends AbstractManageDemandJspBean<Intege
 	            }
 	        }
 	        
+	        if ( !StringUtils.isEmpty( request.getParameter( PARAMETER_STATUS ) ) )
+	        {
+	        	_currentFilter.setEventStatus( request.getParameter( PARAMETER_STATUS ) );
+	        }
+	        
+	        
+	        // search
 	        if ( _currentFilter.containsDemandId( ) && _currentFilter.containsDemandTypeId( ) && lNotificationDate > 0 )
 	        {
 	        	List<NotificationEvent> listNotificationEvent =  NotificationEventHome.findByNotification( _currentFilter.getDemandId( ), _currentFilter.getDemandTypeId( ), lNotificationDate );

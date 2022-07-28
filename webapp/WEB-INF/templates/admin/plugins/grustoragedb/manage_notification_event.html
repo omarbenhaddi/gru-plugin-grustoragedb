@@ -27,6 +27,12 @@
 		 	<#if end_date??><#assign end_date_value = end_date?string["yyyy-MM-dd"] /></#if>
 		 	<@input type='date' id="end_date" name="end_date" language=.lang value=end_date_value!'' />
         </@formGroup>
+        
+        <@formGroup labelFor='event_status'  tabIndex='5' labelKey='#i18n{grustoragedb.manage_demand.event_status.label}' >		
+			<@checkBox labelKey='FAILED' name='event_status' id='event_status' value='FAILED'  />
+		 	
+        </@formGroup>
+           	
            	
 		<@formGroup>
                         <@button type='submit' tabIndex='5' title='#i18n{portal.util.labelSearch}' />
