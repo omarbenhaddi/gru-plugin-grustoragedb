@@ -34,6 +34,14 @@
 
 package fr.paris.lutece.plugins.grustoragedb.business;
 
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+
 import fr.paris.lutece.plugins.grubusiness.business.demand.Demand;
 import fr.paris.lutece.plugins.grubusiness.business.notification.Event;
 import fr.paris.lutece.plugins.grubusiness.business.notification.INotificationEventDAO;
@@ -41,17 +49,6 @@ import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationEve
 import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationFilter;
 import fr.paris.lutece.plugins.grustoragedb.service.GruStorageDbPlugin;
 import fr.paris.lutece.util.sql.DAOUtil;
-import net.sf.ehcache.search.expression.Not;
-
-import java.sql.Statement;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * This class provides Data Access methods for NotificationEvent objects
@@ -62,6 +59,7 @@ public final class NotificationEventDAO implements INotificationEventDAO
     private static final String SQL_QUERY_SELECTALL = "SELECT id, event_date, type, status, redelivry, message, msg_id, demand_id, demand_type_id, notification_date FROM grustoragedb_notification_event ";
     private static final String SQL_QUERY_INSERT = "INSERT INTO grustoragedb_notification_event ( event_date, type, status, redelivry, message, demand_id, demand_type_id, notification_date, msg_id ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM grustoragedb_notification_event WHERE id = ? ";
+    private static final String SQL_QUERY_DELETE_BY_DATE = "DELETE FROM grustoragedb_notification_event WHERE event_date < ? ";
     private static final String SQL_QUERY_SELECT_BY_DEMAND = SQL_QUERY_SELECTALL + " WHERE demand_id = ? AND demand_type_id = ? ";
     private static final String SQL_QUERY_SELECT_BY_NOTIFICATION = SQL_QUERY_SELECTALL + " WHERE demand_id = ? AND demand_type_id = ? and notification_date = ? ";
     private static final String SQL_QUERY_SELECT_BY_FILTER = SQL_QUERY_SELECTALL + " WHERE 1  ";
@@ -71,7 +69,7 @@ public final class NotificationEventDAO implements INotificationEventDAO
     private static final String SQL_QUERY_FILTER_BY_STARTDATE = " AND event_date >= ? ";
     private static final String SQL_QUERY_FILTER_BY_ENDDATE = " AND event_date <= ? ";
     private static final String SQL_QUERY_FILTER_BY_STATUS = " AND status = ? ";
-    private static final String SQL_QUERY_FILTER_ORDER_BY =" ORDER BY id ASC";
+    private static final String SQL_QUERY_FILTER_ORDER_BY =" ORDER BY event_date DESC ";
 
     /**
      * {@inheritDoc }
@@ -385,5 +383,22 @@ public final class NotificationEventDAO implements INotificationEventDAO
         {
              daoUtil.setString( i , filter.getEventStatus( ) );
         }
+    }
+
+
+	/**
+     * {@inheritDoc }
+     */
+	public String deleteBeforeDate( long lDate ) 
+    {
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE_BY_DATE, GruStorageDbPlugin.getPlugin( ) ) )
+        {
+	        daoUtil.setLong( 1 , lDate );
+	        daoUtil.executeUpdate( );
+	        daoUtil.free( );
+        } 
+        
+        
+        return "Success";
     }
 }

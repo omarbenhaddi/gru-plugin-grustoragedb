@@ -93,5 +93,19 @@ public final class NotificationEventHome
     {
         return _dao.loadIdsByFilter( notificationFilter );
     }
+    
+    /**
+     * Purge  the NotificationEvents after N days
+     * 
+     * @param the nb of days
+     * @return a success message
+     */
+    public static String purge( int nbDaysBeforePurge )
+    {
+    	long today = System.currentTimeMillis( ) ;
+    	long purgeBeforeDate = today - ( (long)nbDaysBeforePurge * 1000 * 3600 * 24 );
+    	
+        return _dao.deleteBeforeDate( purgeBeforeDate );
+    }
 }
 

@@ -17,5 +17,14 @@
         <min-core-version>5.0.0</min-core-version>
         <max-core-version/>	
     </core-version-dependency>
+    
+    <daemons>
+	    <daemon>
+	        <daemon-id>NotificationEventDaemon</daemon-id>
+	        <daemon-name>grustoragedb.daemon.NotificationEventDaemon.name</daemon-name>
+	        <daemon-description>grustoragedb.daemon.NotificationEventDaemon.description</daemon-description>
+	        <daemon-class>fr.paris.lutece.plugins.grustoragedb.service.NotificationEventDaemon</daemon-class>
+	    </daemon>
+	</daemons>
 
 </plug-in>

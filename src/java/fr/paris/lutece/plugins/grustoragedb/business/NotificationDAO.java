@@ -506,13 +506,13 @@ public final class NotificationDAO implements INotificationDAO
                 notification.setId( nNotificationId );
                 listNotifications.add( notification );
             }
-            catch( JsonParseException | JsonMappingException e )
+            catch ( JsonParseException | JsonMappingException e )
             {
-                AppLogService.error( "Error while read JSON of notification " + nNotificationId , e );
+                AppLogService.error( "Error while reading JSON of notification " + nNotificationId , e );
             }
             catch( IOException e )
             {
-                AppLogService.error( "Error while read JSON of notification " + nNotificationId , e );
+                AppLogService.error( "Error while reading JSON of notification " + nNotificationId , e );
             }
         }
 
