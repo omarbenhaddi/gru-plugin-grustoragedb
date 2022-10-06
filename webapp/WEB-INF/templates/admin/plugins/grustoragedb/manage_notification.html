@@ -98,15 +98,15 @@
                                         -
                                         </#if>
                                     </td>
-                                    <td><#if notification.listBroadcastEmail ?? >
-                                        <#list notification.listBroadcastEmail as broadcastEmail >
-                                            Sender name : ${broadcastEmail.senderName!''}<br>
-                                            Sernder mail : ${broadcastEmail.senderEmail!''}<br>
-                                            Recipient : ${broadcastEmail.recipient!''}<br>
-                                            Cc : ${broadcastEmail.cc!''}<br>
-                                            Bcc : ${broadcastEmail.bcc!''}<br>
-                                            Subject : ${broadcastEmail.subject!''}<br>
-                                            message : ${broadcastEmail.message!''}<br><br>
+									<td><#if notification.broadcastEmail ?? >
+                                        <#list notification.broadcastEmail as broadcastEmailItem >
+                                            Sender name : ${broadcastEmailItem.senderName!''}<br>
+                                            Sernder mail : ${broadcastEmailItem.senderEmail!''}<br>
+                                            Recipient : <#list broadcastEmailItem.recipient as item>${item}</#list><br>
+                                            Cc : <#list broadcastEmailItem.cc as item>${item}</#list><br>
+                                            Bcc : <#list broadcastEmailItem.bcc as item>${item}</#list><br>
+                                            Subject : ${broadcastEmailItem.subject!''}<br>
+                                            message : ${broadcastEmailItem.message!''}<br><br>
                                         </#list>
                                         <#else>
                                         -
