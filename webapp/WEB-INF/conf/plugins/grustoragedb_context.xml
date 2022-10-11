@@ -7,5 +7,7 @@
     <bean id="grustoragedb.DemandDAO" class="fr.paris.lutece.plugins.grustoragedb.business.DemandDAO" />
     <bean id="grustoragedb.NotificationDAO" class="fr.paris.lutece.plugins.grustoragedb.business.NotificationDAO" />
     <bean id="grustoragedb.NotificationEventDAO" class="fr.paris.lutece.plugins.grustoragedb.business.NotificationEventDAO" />
+ 
+ 	<bean id="demandType.provider" class="fr.paris.lutece.plugins.grustoragedb.service.HttpDemandTypeProvider" />
 
 </beans>

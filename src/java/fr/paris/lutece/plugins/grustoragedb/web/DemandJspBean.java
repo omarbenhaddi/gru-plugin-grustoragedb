@@ -16,6 +16,7 @@ import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationFil
 import fr.paris.lutece.plugins.grustoragedb.business.DemandHome;
 import fr.paris.lutece.plugins.grustoragedb.business.NotificationEventHome;
 import fr.paris.lutece.plugins.grustoragedb.business.NotificationHome;
+import fr.paris.lutece.plugins.grustoragedb.service.DemandTypeService;
 import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
 import fr.paris.lutece.util.ReferenceList;
@@ -69,7 +70,7 @@ public class DemandJspBean extends AbstractManageDemandJspBean<Integer, Demand> 
     {
     	if ( _listDemandTypeId == null )
         {
-            _listDemandTypeId = NotificationHome.getDemandTypeIds( );
+    		_listDemandTypeId = DemandTypeService.instance( ).getDemandTypesReferenceList( );
         }
         
     	// initial call (no pagination)
