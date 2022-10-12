@@ -40,6 +40,7 @@ import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationFil
 import fr.paris.lutece.plugins.grustoragedb.service.GruStorageDbPlugin;
 import fr.paris.lutece.util.sql.DAOUtil;
 
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -246,7 +247,7 @@ public final class DemandDAO implements IDemandDAO
     @Override
     public Demand insert( Demand demand )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_INSERT, GruStorageDbPlugin.getPlugin( ) );
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_INSERT, Statement.RETURN_GENERATED_KEYS, GruStorageDbPlugin.getPlugin( ) );
 
         int nIndex = 1;
 
@@ -262,6 +263,9 @@ public final class DemandDAO implements IDemandDAO
         daoUtil.setInt( nIndex++, demand.getCurrentStep( ) );
 
         daoUtil.executeUpdate( );
+        if( daoUtil.nextGeneratedKey( ) ) {
+            demand.setDemandId( daoUtil.getGeneratedKeyInt( 1 ) );
+        }
         daoUtil.free( );
 
         return demand;
