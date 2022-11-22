@@ -1,16 +1,23 @@
-<#macro tabs2 tab >
-<@tabs>
+<#macro grustoragedb_tabList current_tab >
+
 	<@tabList>
-			<li <#if tab="demand">class="active"</#if> >
-				<@aButton href="jsp/admin/plugins/grustoragedb/ManageDemand.jsp" buttonIcon="question">#i18n{grustoragedb.manage_demand.pageTitle}</@aButton>
-			</li>
-			<li <#if tab="notification">class="active"</#if> >
-				<@aButton href="jsp/admin/plugins/grustoragedb/ManageNotification.jsp" buttonIcon="envelope">#i18n{grustoragedb.manage_notification.pageTitle}</@aButton>
-			</li>
-			<li <#if tab="event">class="active"</#if> >
-				<@aButton href="jsp/admin/plugins/grustoragedb/ManageNotificationEvent.jsp" buttonIcon="flag">#i18n{grustoragedb.manage_event.pageTitle}</@aButton>
-			</li>
+						
+			<@tabLink active=( current_tab == "demand" ) 
+				title="#i18n{grustoragedb.manage_demand.pageTitle}"
+				href="jsp/admin/plugins/grustoragedb/ManageDemand.jsp" 
+				tabIcon="question"   />
+			
+			<@tabLink active=( current_tab == "notification" ) 
+				title="#i18n{grustoragedb.manage_notification.pageTitle}"
+				href="jsp/admin/plugins/grustoragedb/ManageNotification.jsp" 
+				tabIcon="envelope" />
+			
+			<@tabLink active=( current_tab == "event" )
+				title="#i18n{grustoragedb.manage_event.pageTitle}" 
+				href="jsp/admin/plugins/grustoragedb/ManageNotificationEvent.jsp" 
+				tabIcon="flag" />
+
 	</@tabList>
-</@tabs>
+
 
 </#macro>

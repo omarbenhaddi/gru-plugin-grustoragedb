@@ -1,10 +1,11 @@
 <#include "managedemand_tabs.html" />
-<@tabs2 tab="event" />
- 
-<@box>
-	<@boxHeader title='#i18n{grustoragedb.manage_event.pageTitle}' />
+
+<@tabs>
+	<@grustoragedb_tabList current_tab="event" />
 	
-	<@boxBody>
+	<@tabContent>
+		<@tabPanel id='event' active=true>
+
         
         	
 	<@tform class='form-horizontal' method="post" action="jsp/admin/plugins/grustoragedb/ManageNotificationEvent.jsp" name="manage_notification_event">
@@ -108,5 +109,9 @@
                 </tr>
        			 </#list>
   			</@table>
-	</@boxBody>
-</@box>
+  			<@paginationAdmin paginator=paginator />
+  			
+  			</@tabPanel>
+	</@tabContent>
+</@tabs>
+  			

@@ -1,12 +1,12 @@
 <#include "managedemand_tabs.html" />
-<@tabs2 tab="demand" />
 
-<@box>
-	<@boxHeader title='#i18n{grustoragedb.manage_demand.title}' boxTools=true>
-	</@boxHeader>
+<@tabs>
+	<@grustoragedb_tabList current_tab="demand" />
 	
-	<@boxBody>
-	
+	<@tabContent>
+		<@tabPanel id='demand' active=true>
+					
+
 	
 	<@tform class='form-horizontal' method="post" action="jsp/admin/plugins/grustoragedb/ManageDemand.jsp" name="manage_demand">
 	 	
@@ -96,5 +96,7 @@
         	</#list>
    		</@table>
    	  	<@paginationAdmin paginator=paginator />
-	</@boxBody>
-</@box>
+
+   	  	</@tabPanel>
+	</@tabContent>
+</@tabs>
