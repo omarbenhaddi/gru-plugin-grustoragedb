@@ -97,6 +97,9 @@ public final class NotificationDAO implements INotificationDAO
     private static final String PROPERTY_COMPRESS_NOTIFICATION = "grustoragedb.notification.compress";
     private static final String PROPERTY_DECOMPRESS_NOTIFICATION = "grustoragedb.notification.decompress";
     
+    private final String CHARECTER_REGEXP_FILTER = "[^\\p{L}\\p{M}\\p{N}\\p{P}\\p{Z}\\p{Cf}\\p{Cs}\\p{Sm}\\p{Sc}\\s]";
+
+    
     ObjectMapper _mapper;
 
     /**
@@ -316,6 +319,11 @@ public final class NotificationDAO implements INotificationDAO
 	        daoUtil.setInt( nIndex++, BooleanUtils.toInteger( ( notification.getBroadcastEmail( ) != null && notification.getBroadcastEmail( ).size( ) > 0 ), 1, 0 ) );
 	        
         	String strNotificationContent =  _mapper.writeValueAsString( notification ) ;
+        	
+        	// clean emoticons...
+        	strNotificationContent = strNotificationContent.replaceAll(CHARECTER_REGEXP_FILTER,"") ;
+            
+        	
         	byte[] bytes ; 
         	if ( AppPropertiesService.getPropertyBoolean( PROPERTY_COMPRESS_NOTIFICATION , false) )
         	{
