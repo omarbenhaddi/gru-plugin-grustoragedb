@@ -43,17 +43,21 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser.Feature;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
+import fr.paris.lutece.plugins.grubusiness.business.notification.BackofficeNotification;
+import fr.paris.lutece.plugins.grubusiness.business.notification.BroadcastNotification;
+import fr.paris.lutece.plugins.grubusiness.business.notification.EmailNotification;
+import fr.paris.lutece.plugins.grubusiness.business.notification.EnumNotificationType;
 import fr.paris.lutece.plugins.grubusiness.business.notification.INotificationDAO;
+import fr.paris.lutece.plugins.grubusiness.business.notification.MyDashboardNotification;
 import fr.paris.lutece.plugins.grubusiness.business.notification.Notification;
 import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationFilter;
+import fr.paris.lutece.plugins.grubusiness.business.notification.SMSNotification;
 import fr.paris.lutece.plugins.grustoragedb.service.GruStorageDbPlugin;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
@@ -65,40 +69,30 @@ import fr.paris.lutece.util.string.StringUtil;
  */
 public final class NotificationDAO implements INotificationDAO
 {
-    private static final String COLUMN_NOTIFICATION_CONTENT = "notification_content";
     private static final String COLUMN_NOTIFICATION_ID = "id";
+    private static final String COLUMN_DEMAND_ID = "demand_id";
+    private static final String COLUMN_DEMAND_TYPE_ID = "demand_type_id";
+    private static final String COLUMN_DATE = "date";
     private static final String SQL_QUERY_NEW_PK = "SELECT max( id ) FROM grustoragedb_notification";
-    private static final String SQL_QUERY_FILTER_SELECT_BASE = "SELECT id, notification_content FROM grustoragedb_notification ";
+    private static final String SQL_QUERY_FILTER_SELECT_BASE = "SELECT id, demand_id, demand_type_id, date FROM grustoragedb_notification ";
     private static final String SQL_QUERY_FILTER_SELECT_ID_BASE = "SELECT distinct id FROM grustoragedb_notification ";
     private static final String SQL_QUERY_FILTER_WHERE_BASE = " WHERE ";
     private static final String SQL_QUERY_FILTER_WHERE_DEMANDID = " demand_id = ? ";
     private static final String SQL_QUERY_FILTER_WHERE_ID_IN = " id in ( %s )";
     private static final String SQL_QUERY_FILTER_WHERE_DEMANDTYPEID = " demand_type_id = ? ";
     private static final String SQL_QUERY_FILTER_ORDER = " ORDER BY id ASC";
-    private static final String SQL_QUERY_FILTER_HAS_BACKOFFICE = " has_backoffice != 0 ";
-    private static final String SQL_QUERY_FILTER_NO_BACKOFFICE = " has_backoffice = 0 ";
-    private static final String SQL_QUERY_FILTER_HAS_SMS = " has_sms != 0 ";
-    private static final String SQL_QUERY_FILTER_NO_SMS = " has_sms = 0 ";
-    private static final String SQL_QUERY_FILTER_HAS_CUSTOMER_EMAIL = " has_customer_email != 0 ";
-    private static final String SQL_QUERY_FILTER_NO_CUSTOMER_EMAIL = " has_customer_email = 0 ";
-    private static final String SQL_QUERY_FILTER_HAS_MYDASHBOARD = " has_mydashboard != 0 ";
-    private static final String SQL_QUERY_FILTER_NO_MYDASHBOARD = " has_mydashboard = 0 ";
-    private static final String SQL_QUERY_FILTER_HAS_BROADCAST_EMAIL = " has_broadcast_email != 0 ";
-    private static final String SQL_QUERY_FILTER_NO_BROADCAST_EMAIL = " has_broadcast_email = 0 ";
     private static final String SQL_QUERY_FILTER_WHERE_START_DATE = " date >= ? ";
     private static final String SQL_QUERY_FILTER_WHERE_END_DATE = " date <= ? ";
     private static final String SQL_QUERY_AND = " AND ";
-
-    private static final String SQL_QUERY_INSERT = "INSERT INTO grustoragedb_notification ( id, demand_id, demand_type_id, date, has_backoffice, has_sms, has_customer_email, has_mydashboard, has_broadcast_email, notification_content ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );";
+    private static final String SQL_QUERY_FILTER_NOTIFICATION_TYPE = " id IN (SELECT notification_id FROM grustoragedb_notification_content WHERE notification_type in (  ";
+    
+    private static final String SQL_QUERY_INSERT = "INSERT INTO grustoragedb_notification ( id, demand_id, demand_type_id, date ) VALUES ( ?, ?, ?, ? );";
     private static final String SQL_QUERY_DELETE = "DELETE FROM grustoragedb_notification WHERE id = ?";
     private static final String SQL_QUERY_DELETE_BY_DEMAND = "DELETE FROM grustoragedb_notification WHERE demand_id = ? AND demand_type_id = ?";
     private static final String SQL_QUERY_DISTINCT_DEMAND_TYPE_ID = " SELECT DISTINCT demand_type_id FROM grustoragedb_notification ORDER BY demand_type_id ";
     
-    private static final String PROPERTY_COMPRESS_NOTIFICATION = "grustoragedb.notification.compress";
     private static final String PROPERTY_DECOMPRESS_NOTIFICATION = "grustoragedb.notification.decompress";
     
-    private final String CHARECTER_REGEXP_FILTER = "[^\\p{L}\\p{M}\\p{N}\\p{P}\\p{Z}\\p{Cf}\\p{Cs}\\p{Sm}\\p{Sc}\\s]";
-
     
     ObjectMapper _mapper;
 
@@ -143,7 +137,7 @@ public final class NotificationDAO implements INotificationDAO
 	
 	        daoUtil.executeQuery( );
 	
-	        return getNotificationsFromDao( daoUtil );
+	        return getNotificationsFromDao( daoUtil, notificationFilter );
         }
     }
 
@@ -208,40 +202,47 @@ public final class NotificationDAO implements INotificationDAO
             sbQuery.append( SQL_QUERY_FILTER_WHERE_DEMANDTYPEID );
             hasOneWhere = true;
         }
-        if ( notificationFilter.containsHasBackofficeNotification( ) )
+        if( notificationFilter.containsNotificationTypeFilter( ) )
         {
             sbQuery.append( BooleanUtils.toString( hasOneWhere, SQL_QUERY_AND, SQL_QUERY_FILTER_WHERE_BASE ) );
-            sbQuery.append( BooleanUtils.toString( notificationFilter.getHasBackofficeNotification( ), SQL_QUERY_FILTER_HAS_BACKOFFICE,
-                    SQL_QUERY_FILTER_NO_BACKOFFICE ) );
-            hasOneWhere = true;
+            sbQuery.append( SQL_QUERY_FILTER_NOTIFICATION_TYPE );
+            boolean hasOneNotiType = false;
+            if ( notificationFilter.containsHasBackofficeNotification( ) )
+            {
+                sbQuery.append( BooleanUtils.toString( hasOneNotiType, ", ", StringUtils.EMPTY ) );
+                sbQuery.append( "'" + EnumNotificationType.BACKOFFICE.name( ) + "'" );
+                hasOneNotiType = true;
+            }
+            if ( notificationFilter.containsHasSmsNotification( ) )
+            {
+                sbQuery.append( BooleanUtils.toString( hasOneNotiType, ", ", StringUtils.EMPTY ) );
+                sbQuery.append( "'" + EnumNotificationType.SMS.name( ) + "'" );
+                hasOneNotiType = true;
+            }
+            if ( notificationFilter.containsHasCustomerEmailNotification( ) )
+            {
+                sbQuery.append( BooleanUtils.toString( hasOneNotiType, ", ", StringUtils.EMPTY ) );
+                sbQuery.append( "'" + EnumNotificationType.CUSTOMER_EMAIL.name( ) + "'" );
+                hasOneNotiType = true;
+            }
+            if ( notificationFilter.containsHasMyDashboardNotification( ) )
+            {
+                sbQuery.append( BooleanUtils.toString( hasOneNotiType, ", ", StringUtils.EMPTY ) );
+                sbQuery.append( "'" + EnumNotificationType.MYDASHBOARD.name( ) + "'" );
+                hasOneNotiType = true;
+            }
+            if ( notificationFilter.containsHasBroadcastEmailNotification( ) )
+            {
+                sbQuery.append( BooleanUtils.toString( hasOneNotiType, ", ", StringUtils.EMPTY ) );
+                sbQuery.append( "'" + EnumNotificationType.BROADCAST_EMAIL.name( ) + "'" );
+                hasOneNotiType = true;
+            }
+            if( hasOneNotiType )
+            {
+                sbQuery.append( "))" );
+            }
         }
-        if ( notificationFilter.containsHasSmsNotification( ) )
-        {
-            sbQuery.append( BooleanUtils.toString( hasOneWhere, SQL_QUERY_AND, SQL_QUERY_FILTER_WHERE_BASE ) );
-            sbQuery.append( BooleanUtils.toString( notificationFilter.getHasSmsNotification( ), SQL_QUERY_FILTER_HAS_SMS, SQL_QUERY_FILTER_NO_SMS ) );
-            hasOneWhere = true;
-        }
-        if ( notificationFilter.containsHasCustomerEmailNotification( ) )
-        {
-            sbQuery.append( BooleanUtils.toString( hasOneWhere, SQL_QUERY_AND, SQL_QUERY_FILTER_WHERE_BASE ) );
-            sbQuery.append( BooleanUtils.toString( notificationFilter.getHasCustomerEmailNotification( ), SQL_QUERY_FILTER_HAS_CUSTOMER_EMAIL,
-                    SQL_QUERY_FILTER_NO_CUSTOMER_EMAIL ) );
-            hasOneWhere = true;
-        }
-        if ( notificationFilter.containsHasMyDashboardNotification( ) )
-        {
-            sbQuery.append( BooleanUtils.toString( hasOneWhere, SQL_QUERY_AND, SQL_QUERY_FILTER_WHERE_BASE ) );
-            sbQuery.append( BooleanUtils.toString( notificationFilter.getHasMyDashboardNotification( ), SQL_QUERY_FILTER_HAS_MYDASHBOARD,
-                    SQL_QUERY_FILTER_NO_MYDASHBOARD ) );
-            hasOneWhere = true;
-        }
-        if ( notificationFilter.containsHasBroadcastEmailNotification( ) )
-        {
-            sbQuery.append( BooleanUtils.toString( hasOneWhere, SQL_QUERY_AND, SQL_QUERY_FILTER_WHERE_BASE ) );
-            sbQuery.append( BooleanUtils.toString( notificationFilter.getHasBroadcastEmailNotification( ), SQL_QUERY_FILTER_HAS_BROADCAST_EMAIL,
-                    SQL_QUERY_FILTER_NO_BROADCAST_EMAIL ) );
-            hasOneWhere = true;
-        }
+        
         if ( notificationFilter.containsStartDate( ) )
         {
             sbQuery.append( BooleanUtils.toString( hasOneWhere, SQL_QUERY_AND, SQL_QUERY_FILTER_WHERE_BASE ) );            
@@ -312,38 +313,8 @@ public final class NotificationDAO implements INotificationDAO
 	        daoUtil.setString( nIndex++, notification.getDemand( ).getId( ) );
 	        daoUtil.setString( nIndex++, notification.getDemand( ).getTypeId( ) );
 	        daoUtil.setLong( nIndex++, notification.getDate( ) );
-	        daoUtil.setInt( nIndex++, BooleanUtils.toInteger( ( notification.getBackofficeNotification( ) != null ), 1, 0 ) );
-	        daoUtil.setInt( nIndex++, BooleanUtils.toInteger( ( notification.getSmsNotification( ) != null ), 1, 0 ) );
-	        daoUtil.setInt( nIndex++, BooleanUtils.toInteger( ( notification.getEmailNotification( ) != null ), 1, 0 ) );
-	        daoUtil.setInt( nIndex++, BooleanUtils.toInteger( ( notification.getMyDashboardNotification( ) != null ), 1, 0 ) );
-	        daoUtil.setInt( nIndex++, BooleanUtils.toInteger( ( notification.getBroadcastEmail( ) != null && notification.getBroadcastEmail( ).size( ) > 0 ), 1, 0 ) );
-	        
-        	String strNotificationContent =  _mapper.writeValueAsString( notification ) ;
-        	
-        	// clean emoticons...
-        	strNotificationContent = strNotificationContent.replaceAll(CHARECTER_REGEXP_FILTER,"") ;
-            
-        	
-        	byte[] bytes ; 
-        	if ( AppPropertiesService.getPropertyBoolean( PROPERTY_COMPRESS_NOTIFICATION , false) )
-        	{
-        		bytes = StringUtil.compress( strNotificationContent );
-        	}
-        	else
-        	{
-        		bytes = strNotificationContent.getBytes( "UTF-8" );
-        	}
-            daoUtil.setBytes( nIndex, bytes);
 	        
 	        daoUtil.executeUpdate( );
-        }
-        catch( JsonProcessingException e )
-        {
-            AppLogService.error( "Error while writing JSON of notification", e );
-        }
-        catch( IOException e )
-        {
-            AppLogService.error( "Error while compressing or writing JSON of notification", e );
         }
 
         return notification;
@@ -484,46 +455,89 @@ public final class NotificationDAO implements INotificationDAO
      * @param daoUtil
      * @return the list
      */
-    private List<Notification> getNotificationsFromDao( DAOUtil daoUtil )
+    private List<Notification> getNotificationsFromDao( DAOUtil daoUtil, NotificationFilter notificationFilter )
     {
     	List<Notification> listNotifications = new ArrayList<>();
-    	
     	while ( daoUtil.next( ) )
         {
-            byte[] bNotificationJson = daoUtil.getBytes( COLUMN_NOTIFICATION_CONTENT );
-            int nNotificationId = daoUtil.getInt( COLUMN_NOTIFICATION_ID );
-            if ( bNotificationJson == null )
-            {
-                AppLogService.error( "JSON notification is empty for notification " + nNotificationId );
-                continue;
-            }
+            Notification notification = new Notification( );
+            notification.setId( daoUtil.getInt( COLUMN_NOTIFICATION_ID ) );
+            notification.setDate( daoUtil.getLong( COLUMN_DATE ) );
             
-            Notification notification;
-            try
-            {
-            	String strNotification ;
-            	if ( AppPropertiesService.getPropertyBoolean( PROPERTY_DECOMPRESS_NOTIFICATION , false) )
-            	{
-            		strNotification = StringUtil.decompress( bNotificationJson );
-            	}
-            	else
-            	{
-            		strNotification = new String( bNotificationJson, StandardCharsets.UTF_8 );
-            	}
-                notification = _mapper.readValue( strNotification, Notification.class );
-                notification.setId( nNotificationId );
-                listNotifications.add( notification );
-            }
-            catch ( JsonParseException | JsonMappingException e )
-            {
-                AppLogService.error( "Error while reading JSON of notification " + nNotificationId , e );
-            }
-            catch( IOException e )
-            {
-                AppLogService.error( "Error while reading JSON of notification " + nNotificationId , e );
-            }
+            String strIdDemand = daoUtil.getString( COLUMN_DEMAND_ID ) ;
+            String strDemandTypeId = daoUtil.getString( COLUMN_DEMAND_TYPE_ID ) ;           
+            notification.setDemand( DemandHome.findByPrimaryKey( strIdDemand, strDemandTypeId ) );
+            setNotificationContent( notification, notificationFilter );
+            
+            listNotifications.add( notification );
         }
 
         return listNotifications;
+    }
+    
+    /**
+     * Retrieval of notification content
+     * @param notif
+     */
+    private void setNotificationContent ( Notification notif, NotificationFilter notificationFilter  )
+    {
+        List<NotificationContent> listNotificiationContent = NotificationContentHome.getNotificationContentsByIdAndTypeNotification( notif.getId( ), notificationFilter.getListNotificationType( ) );
+        
+        for ( NotificationContent notifContent : listNotificiationContent )
+        {
+            if ( EnumNotificationType.BACKOFFICE.name( ).equals( notifContent.getNotificationType( ) ) )
+            {
+               notif.setBackofficeNotification( convertToObject( notif.getId( ), notifContent.getContent( ), new TypeReference<BackofficeNotification>( ){ } ) );
+            }
+            if ( EnumNotificationType.BROADCAST_EMAIL.name( ).equals( notifContent.getNotificationType( ) ) )
+            {
+               notif.setBroadcastEmail( convertToObject( notif.getId( ), notifContent.getContent( ), new TypeReference<List<BroadcastNotification>>( ){ } ) );
+            }
+            if ( EnumNotificationType.CUSTOMER_EMAIL.name( ).equals( notifContent.getNotificationType( ) ) )
+            {
+               notif.setEmailNotification( convertToObject( notif.getId( ), notifContent.getContent( ), new TypeReference<EmailNotification>( ){ } ) );
+            }
+            if ( EnumNotificationType.MYDASHBOARD.name( ).equals( notifContent.getNotificationType( ) ) )
+            {
+               notif.setMyDashboardNotification( convertToObject( notif.getId( ), notifContent.getContent( ), new TypeReference<MyDashboardNotification>( ){ } ) );
+               //Status Mydashboard
+               notif.setSatusMyDashboard( notifContent.getStatus( ) );
+            }
+            if ( EnumNotificationType.SMS.name( ).equals( notifContent.getNotificationType( ) ) )
+            {
+               notif.setSmsNotification( convertToObject( notif.getId( ), notifContent.getContent( ), new TypeReference<SMSNotification>( ){ } ) );
+            }
+        }
+    }
+    
+    /**
+     * 
+     * @param <T>
+     * @param nIdNotification
+     * @param content
+     * @param typeReference
+     * @return
+     */
+    private <T> T convertToObject ( int nIdNotification, byte[] content, TypeReference<T> typeReference )
+    {
+        try
+        {
+            String strNotification;
+            if ( AppPropertiesService.getPropertyBoolean( PROPERTY_DECOMPRESS_NOTIFICATION, false ) )
+            {
+                strNotification = StringUtil.decompress( content );
+            } else
+            {
+                strNotification = new String( content, StandardCharsets.UTF_8 );
+            }
+            return _mapper.readValue( strNotification, typeReference );
+
+        }
+        catch ( IOException e)
+        {
+            AppLogService.error( "Error while reading JSON of notification " + nIdNotification, e );
+        }
+        
+        return null;
     }
 }

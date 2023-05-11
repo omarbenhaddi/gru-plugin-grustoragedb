@@ -46,6 +46,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * This class provides Data Access methods for Demand objects stored in SQL database
  */
@@ -63,10 +65,13 @@ public final class DemandDAO implements IDemandDAO
     private static final String COLUMN_CLOSURE_DATE = "closure_date";
     private static final String COLUMN_MAX_STEPS = "max_steps";
     private static final String COLUMN_CURRENT_STEP = "current_step";
-
+    private static final String COLUMN_MODIFY_DATE = "modify_date";
+    private static final String COLUMN_STATUS_MYDASHBOARD = "status_mydashboard";
+    private static final String COLUMN_IS_READ = "is_read";
+    
     // SQL queries
-    private static final String SQL_QUERY_DEMAND_ALL_FIELDS = " demand_id, id, type_id, subtype_id, reference, status_id, customer_id, creation_date, closure_date, max_steps, current_step";
-    private static final String SQL_QUERY_DEMAND_ALL_FIELDS_WITH_NO_DEMAND_ID = " id, type_id, subtype_id, reference, status_id, customer_id, creation_date, closure_date, max_steps, current_step";
+    private static final String SQL_QUERY_DEMAND_ALL_FIELDS = " demand_id, id, type_id, subtype_id, reference, status_id, customer_id, creation_date, closure_date, max_steps, current_step, modify_date, is_read";
+    private static final String SQL_QUERY_DEMAND_ALL_FIELDS_WITH_NO_DEMAND_ID = " id, type_id, subtype_id, reference, status_id, customer_id, creation_date, closure_date, max_steps, current_step, modify_date, is_read";
     private static final String SQL_QUERY_DEMAND_SELECT = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS + " FROM grustoragedb_demand WHERE id = ? AND type_id = ?";
     private static final String SQL_QUERY_DEMAND_SELECT_BY_DEMAND_ID = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS
             + " FROM grustoragedb_demand WHERE demand_id = ? ";
@@ -74,20 +79,46 @@ public final class DemandDAO implements IDemandDAO
     private static final String SQL_QUERY_DEMAND_SELECT_DEMAND_IDS = "SELECT demand_id FROM grustoragedb_demand ";
     private static final String SQL_QUERY_DEMAND_SELECT_BY_IDS = SQL_QUERY_DEMAND_SELECT_ALL + " where demand_id in ( %s )";
     private static final String SQL_QUERY_DEMAND_INSERT = "INSERT INTO grustoragedb_demand ( " + SQL_QUERY_DEMAND_ALL_FIELDS_WITH_NO_DEMAND_ID
-            + " ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) ";
-    private static final String SQL_QUERY_DEMAND_UPDATE = "UPDATE grustoragedb_demand SET status_id = ?, customer_id = ?, closure_date = ?, current_step = ?, subtype_id = ? WHERE id = ? AND type_id = ?";
+            + " ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) ";
+    private static final String SQL_QUERY_DEMAND_UPDATE = "UPDATE grustoragedb_demand SET status_id = ?, customer_id = ?, closure_date = ?, current_step = ?, subtype_id = ?, modify_date = ?, is_read = ? WHERE id = ? AND type_id = ?";
     private static final String SQL_QUERY_DEMAND_DELETE = "DELETE FROM grustoragedb_demand WHERE id = ? AND type_id = ? ";
     private static final String SQL_QUERY_DEMAND_SELECT_BY_CUSTOMER_ID = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS
             + " FROM grustoragedb_demand WHERE customer_id = ?";
     private static final String SQL_QUERY_DEMAND_SELECT_BY_REFERENCE = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS
             + " FROM grustoragedb_demand WHERE reference = ?";
+    
+    private static final String SQL_QUERY_DEMAND_WITH_LAST_STATUS = "SELECT gd.*, "
+            + "               ( SELECT gc.status "
+            + "                FROM grustoragedb_notification_content gc "
+            + "                WHERE gc.notification_id = gn.id "
+            + "                AND gc.notification_type = 'MYDASHBOARD' ) as status_mydashboard "
+            + " FROM grustoragedb_demand gd, grustoragedb_notification gn "
+            + " WHERE gd.id = gn.demand_id "
+            + " AND gd.id IN ( %s ) "
+            + " Group by gd.demand_id "
+            + " Order by date desc ";
+    
+    private static final String SQL_QUERY_IDS_BY_CUSTOMER_ID_AND_DEMANDTYPE_ID = "SELECT distinct(gd.demand_id) "
+            + " FROM grustoragedb_demand gd, grustoragedb_notification gn, grustoragedb_notification_content gc "
+            + " WHERE gd.id = gn.demand_id and gn.id = gc.notification_id "
+            + " AND customer_id = ? "
+            + " AND notification_type = ? ";
 
+    private static final String SQL_QUERY_IDS_BY_STATUS = "SELECT distinct(gd.demand_id) "
+            + " FROM grustoragedb_demand gd, grustoragedb_notification gn, grustoragedb_notification_content gc "
+            + " WHERE gd.id = gn.demand_id and gn.id = gc.notification_id "
+            + " AND customer_id = ? "
+            + " AND notification_type = ?"
+            + " AND gc.status IN ( ";
+    
     private static final String SQL_QUERY_FILTER_WHERE_BASE = " WHERE 1 ";
     private static final String SQL_FILTER_BY_DEMAND_ID = " AND id = ? ";
     private static final String SQL_FILTER_BY_DEMAND_TYPE_ID = " AND type_id = ? ";
     private static final String SQL_FILTER_BY_START_DATE = " AND creation_date >= ? ";
     private static final String SQL_FILTER_BY_END_DATE = " AND creation_date <= ? ";
     private static final String SQL_QUERY_FILTER_ORDER = " ORDER BY id ASC";
+    private static final String SQL_QUERY_DATE_ORDER = " ORDER BY modify_date DESC";
+    
     
     /**
      * {@inheritDoc}
@@ -261,7 +292,9 @@ public final class DemandDAO implements IDemandDAO
         daoUtil.setLong( nIndex++, demand.getClosureDate( ) );
         daoUtil.setInt( nIndex++, demand.getMaxSteps( ) );
         daoUtil.setInt( nIndex++, demand.getCurrentStep( ) );
-
+        daoUtil.setLong( nIndex++, demand.getModifyDate( ) );
+        daoUtil.setBoolean( nIndex++, demand.isRead( ) );
+        
         daoUtil.executeUpdate( );
         if( daoUtil.nextGeneratedKey( ) ) {
             demand.setDemandId( daoUtil.getGeneratedKeyInt( 1 ) );
@@ -287,10 +320,13 @@ public final class DemandDAO implements IDemandDAO
         daoUtil.setLong( nIndex++, demand.getClosureDate( ) );
         daoUtil.setInt( nIndex++, demand.getCurrentStep( ) );
         daoUtil.setString( nIndex++, demand.getSubtypeId( ) );
+        daoUtil.setLong( nIndex++, demand.getModifyDate( ) );
+        daoUtil.setBoolean( nIndex++, demand.isRead( ) );
+
         // where primary_key
         daoUtil.setString( nIndex++, demand.getId( ) );
         daoUtil.setString( nIndex++, demand.getTypeId( ) );
-
+        
         daoUtil.executeUpdate( );
         daoUtil.free( );
 
@@ -383,6 +419,8 @@ public final class DemandDAO implements IDemandDAO
         demand.setClosureDate( daoUtil.getLong( COLUMN_CLOSURE_DATE ) );
         demand.setMaxSteps( daoUtil.getInt( COLUMN_MAX_STEPS ) );
         demand.setCurrentStep( daoUtil.getInt( COLUMN_CURRENT_STEP ) );
+        demand.setModifyDate( daoUtil.getLong( COLUMN_MODIFY_DATE)  );
+        demand.setRead( daoUtil.getBoolean( COLUMN_IS_READ ) );
 
         return demand;
     }
@@ -445,6 +483,117 @@ public final class DemandDAO implements IDemandDAO
         if ( filter.containsEndDate( ) )
         {
             daoUtil.setLong( i++, filter.getEndDate( ) );
+        }
+    }
+
+    @Override
+    public List<Integer> loadIdsByCustomerIdAndIdDemandType( String strCustomerId, String strNotificationType, String strIdDemandType )
+    {
+        List<Integer> listIds = new ArrayList<>();
+        String strSql = SQL_QUERY_IDS_BY_CUSTOMER_ID_AND_DEMANDTYPE_ID;
+        
+        if( StringUtils.isNotEmpty( strIdDemandType )  )
+        {
+            strSql += SQL_FILTER_BY_DEMAND_TYPE_ID;
+        }
+        
+        strSql += SQL_QUERY_DATE_ORDER;
+        
+        try( DAOUtil daoUtil = new DAOUtil( strSql, GruStorageDbPlugin.getPlugin( )  ) )
+        {
+            daoUtil.setString( 1, strCustomerId );
+            daoUtil.setString( 2, strNotificationType );
+            
+            if( StringUtils.isNotEmpty( strIdDemandType )   )
+            {
+                daoUtil.setString( 3, strIdDemandType );
+            }
+            
+            daoUtil.executeQuery( );
+            
+            while( daoUtil.next( ) )
+            {
+                listIds.add( daoUtil.getInt( 1 ) );
+            }
+            
+            return listIds;
+        }
+    }
+
+    @Override
+    public List<Integer> loadIdsByStatus( String strCustomerId, List<String> listStatus, String strNotificationType, String strIdDemandType )
+    {
+        List<Integer> listIds = new ArrayList<>();  
+        String strQuery = SQL_QUERY_IDS_BY_STATUS;
+
+        if( !listStatus.isEmpty( ) )
+        {
+            strQuery += listStatus.stream( ).map( i -> "?" ).collect( Collectors.joining( "," ) ) + " ) ";
+        } 
+        
+        if( StringUtils.isNotEmpty( strIdDemandType )  )
+        {
+            strQuery += SQL_FILTER_BY_DEMAND_TYPE_ID;
+        }
+         
+        strQuery += SQL_QUERY_DATE_ORDER;
+        
+        try( DAOUtil daoUtil = new DAOUtil( strQuery, GruStorageDbPlugin.getPlugin( )  ) )
+        {
+            int nIndexIn = 1;
+            daoUtil.setString( nIndexIn++, strCustomerId );
+            daoUtil.setString( nIndexIn++, strNotificationType );
+            
+            for ( String strStatus :  listStatus )
+            {
+                daoUtil.setString( nIndexIn, strStatus );
+                nIndexIn++;
+            }
+            if( StringUtils.isNotEmpty( strIdDemandType )   )
+            {
+                daoUtil.setString( nIndexIn++, strIdDemandType );
+            }
+            
+            daoUtil.executeQuery( );
+            
+            while( daoUtil.next( ) )
+            {
+                listIds.add( daoUtil.getInt( 1 ) );
+            }
+            
+            return listIds;
+        }
+    }
+
+    @Override
+    public List<Demand> loadByIdsWithLastStatus( List<Integer> listIds )
+    {
+        List<Demand> listDemands = new ArrayList<>( );
+        
+        if (listIds.isEmpty( ) ) return listDemands;
+        
+        String sql = String.format( SQL_QUERY_DEMAND_WITH_LAST_STATUS, listIds.stream( ).map(v -> "?").collect(Collectors.joining(", ")));
+        try ( DAOUtil daoUtil = new DAOUtil( sql, GruStorageDbPlugin.getPlugin( ) ) )
+        {    
+            int index = 1;
+            for( Integer strId : listIds ) {
+                daoUtil.setInt( index++, strId );
+            }
+            
+            daoUtil.executeQuery( );
+    
+            while ( daoUtil.next( ) )
+            {
+                Demand demand = dao2Demand( daoUtil );
+                if( StringUtils.isNotEmpty( daoUtil.getString( COLUMN_STATUS_MYDASHBOARD )  ) )
+                {
+                    demand.setStatusMyDashboard( daoUtil.getString( COLUMN_STATUS_MYDASHBOARD )  );
+                }
+                listDemands.add( demand );
+                
+            }
+       
+            return listDemands;
         }
     }
 }

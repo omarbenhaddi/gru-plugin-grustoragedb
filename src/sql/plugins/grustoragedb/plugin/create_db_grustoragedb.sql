@@ -14,6 +14,7 @@ creation_date bigint NOT NULL,
 closure_date bigint NULL,
 max_steps int NULL,
 current_step int NULL,
+modify_date bigint NULL,
 PRIMARY KEY ( demand_id )
 );
 
@@ -28,12 +29,6 @@ id int NOT NULL,
 demand_id varchar(50) NOT NULL,
 demand_type_id varchar(50) NOT NULL,
 date bigint NOT NULL,
-has_backoffice int  default 0 NOT NULL,
-has_sms int default 0 NOT NULL ,
-has_customer_email int default 0 NOT NULL ,
-has_mydashboard int default 0 NOT NULL ,
-has_broadcast_email int default 0 NOT NULL , 
-notification_content LONG VARBINARY,
 PRIMARY KEY (id)
 );
 
@@ -62,3 +57,58 @@ CREATE INDEX IDX_NOTIFICATION_EVENT_DATE on grustoragedb_notification_event (eve
 
 ALTER TABLE grustoragedb_notification ADD CONSTRAINT fk_grustoragedb_notification_demand_id FOREIGN KEY (demand_id, demand_type_id)
       REFERENCES grustoragedb_demand (id, type_id) ON DELETE CASCADE ON UPDATE RESTRICT;
+      
+--
+-- Structure for table grustoragedb_status
+--
+
+DROP TABLE IF EXISTS grustoragedb_status;
+CREATE TABLE grustoragedb_status (
+id_status int AUTO_INCREMENT,
+status_name long varchar NOT NULL,
+label varchar(255) default '' NOT NULL,
+color_code varchar(255) default '' NOT NULL,
+PRIMARY KEY (id_status)
+);
+
+--
+-- Structure for table grustoragedb_demand_type
+--
+
+DROP TABLE IF EXISTS grustoragedb_demand_type;
+CREATE TABLE grustoragedb_demand_type (
+id_demand_type int AUTO_INCREMENT,
+code varchar(255) default '' NOT NULL,
+label varchar(255) default '' NOT NULL,
+code_category varchar(255) default '',
+PRIMARY KEY (id_demand_type)
+);
+
+--
+-- Structure for table grustoragedb_demand_category
+--
+
+DROP TABLE IF EXISTS grustoragedb_demand_category;
+CREATE TABLE grustoragedb_demand_category (
+id_demand_category int AUTO_INCREMENT,
+code varchar(255) default '' NOT NULL,
+label long varchar NOT NULL,
+PRIMARY KEY (id_demand_category)
+);
+
+--
+-- Structure for table grustoragedb_notification_content
+--
+
+DROP TABLE IF EXISTS grustoragedb_notification_content;
+CREATE TABLE grustoragedb_notification_content (
+id_notification_content int AUTO_INCREMENT,
+notification_id int NOT NULL,
+notification_type varchar(255) default '' NOT NULL,
+status varchar(255) NULL,
+content mediumblob,
+PRIMARY KEY (id_notification_content)
+);
+
+CREATE INDEX index_notification_id ON grustoragedb_notification_content (notification_id);
+CREATE INDEX index_notification_type ON grustoragedb_notification_content (notification_type);

@@ -78,7 +78,50 @@ public final class DemandHome
         return _dao.loadByCustomerId(strCustomerId);
     }
     
+    /**
+     * Finds all the demands by ids 
+     * @return all the demands. An empty collection is returned if no demands has been found.
+     */
+    public static List<Demand> getByIdsWithLastStatus( List<Integer> listIds )
+    {
+        return _dao.loadByIdsWithLastStatus( listIds);
+    }
     
-
+    /**
+     * Load demand ids ordered by date notification
+     * @param strCustomerId
+     * @param strNotificationType
+     * @param strIdDemandType (Optional can be null)
+     * @return The list of demand ids
+     */
+    public static List<Integer> getIdsByCustomerIdAndDemandTypeId( String strCustomerId,  String strNotificationType, String strIdDemandType  )
+    {
+        return _dao.loadIdsByCustomerIdAndIdDemandType( strCustomerId, strNotificationType, strIdDemandType );
+    }
+    
+    /**
+     * Load demand ids by status
+     * @param strCustomerId
+     * @param listStatus
+     * @param strNotificationType
+     * @param strIdDemandType
+     * @return The list of demand ids
+     */
+    public static List<Integer> getIdsByStatus( String strCustomerId, List<String> listStatus, String strNotificationType, String strIdDemandType )
+    {
+        return _dao.loadIdsByStatus( strCustomerId, listStatus, strNotificationType, strIdDemandType );
+    }
+    
+    /**
+     * Updates a demand
+     * 
+     * @param demand
+     *            the demand to update
+     * @return the updated demand
+     */
+    public static Demand update( Demand demand )
+    {
+        return _dao.store( demand );
+    }
 }
 

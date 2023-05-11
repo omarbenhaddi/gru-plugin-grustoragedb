@@ -26,5 +26,22 @@
 	        <daemon-class>fr.paris.lutece.plugins.grustoragedb.service.NotificationEventDaemon</daemon-class>
 	    </daemon>
 	</daemons>
-
+    <admin-features>
+        <admin-feature>
+            <feature-id>GRUSTORAGEDB_MANAGEMENT</feature-id>
+            <feature-title>grustoragedb.adminFeature.Manage.name</feature-title>
+            <feature-description>grustoragedb.adminFeature.Manage.description</feature-description>
+            <feature-level>0</feature-level>
+            <feature-url>jsp/admin/plugins/grustoragedb/ManageStatus.jsp</feature-url>
+            <feature-icon-url></feature-icon-url>
+        </admin-feature>
+		<admin-feature>
+			<feature-id>GRUSTORAGEDB_MANAGEMENT</feature-id>
+			<feature-title>grustoragedb.adminFeature.ManageDemandType.name</feature-title>
+			<feature-description>grustoragedb.adminFeature.ManageDemandType.description</feature-description>
+			<feature-level>0</feature-level>
+			<feature-url>jsp/admin/plugins/grustoragedb/ManageDemandTypes.jsp</feature-url>
+			<feature-icon-url/>
+		</admin-feature>
+    </admin-features>
 </plug-in>

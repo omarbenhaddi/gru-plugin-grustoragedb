@@ -1,0 +1,13 @@
+<#macro tabs2 tab >
+<@tabs>
+	<@tabList>
+			<li <#if tab="demandtype">class="active"</#if>>
+				<@aButton href="jsp/admin/plugins/grustoragedb/ManageDemandTypes.jsp">#i18n{grustoragedb.manage_demandtypes.pageTitle}</@aButton>
+			</li>
+			<li <#if tab="demandcategory">class="active"</#if>>
+				<@aButton href="jsp/admin/plugins/grustoragedb/ManageDemandCategorys.jsp">#i18n{grustoragedb.manage_demandcategorys.pageTitle}</@aButton>
+			</li>
+	</@tabList>
+</@tabs>
+
+</#macro>

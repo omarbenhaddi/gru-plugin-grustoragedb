@@ -32,58 +32,18 @@
  */
 package fr.paris.lutece.plugins.grustoragedb.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.paris.lutece.plugins.grustoragedb.business.DemandType;
+import fr.paris.lutece.plugins.grustoragedb.business.DemandTypeHome;
 
-import fr.paris.lutece.plugins.grubusiness.business.demand.DemandType;
-import fr.paris.lutece.portal.service.util.AppLogService;
-import fr.paris.lutece.portal.service.util.AppPropertiesService;
-import fr.paris.lutece.util.httpaccess.HttpAccess;
-import fr.paris.lutece.util.httpaccess.HttpAccessException;
-
-public class HttpDemandTypeProvider implements IDemandTypeProvider {
-
-	private static final String PROPERTY_URL_DEMAND_TYPE_LIST_REFERENCE = "grustoragedb.demandType.provider.url";
-	private ObjectMapper _mapper = new ObjectMapper( );
+public class DemandTypeProvider implements IDemandTypeProvider {
 	
 	
 	@Override
 	public List<DemandType> getDemandTypes() {
 		
-		try
-		{
-			String strUri = AppPropertiesService.getProperty( PROPERTY_URL_DEMAND_TYPE_LIST_REFERENCE );
-
-			HttpAccess ha = new HttpAccess( );
-
-			Map<String, String> headersRequest = new HashMap<>( );
-			Map<String, String> headersResponse = new HashMap<>( );
-
-			String strJson = ha.doGet( strUri, null, null, headersRequest, headersResponse );
-			
-			return _mapper.readValue(strJson, new TypeReference<List<DemandType>>(){} );
-		}
-		catch ( HttpAccessException e )
-		{
-			AppLogService.error( e );
-		} 
-		catch (JsonMappingException e) 
-		{
-			AppLogService.error( e );
-		} 
-		catch (JsonProcessingException e) 
-		{
-			AppLogService.error( e );
-		}
-
-		return new ArrayList<>( );
+		return DemandTypeHome.getDemandTypesList( );
 	}
 
 }

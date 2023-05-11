@@ -1,0 +1,46 @@
+<#include "manage_tabs.html" />
+<@tabs2 tab="status" />
+
+<@box>
+	<@boxHeader title='#i18n{grustoragedb.manage_status.title}' boxTools=true>
+		<@tform class='form-inline pull-right' name='manage_status' action='jsp/admin/plugins/grustoragedb/ManageStatus.jsp'>
+			<@button type='submit' name='view_createStatus' buttonIcon='plus' title='#i18n{grustoragedb.manage_status.buttonAdd}' />
+		</@tform>
+	</@boxHeader>
+	<@boxBody>    
+    <@messages infos=infos />
+    <@paginationAdmin paginator=paginator combo=1 />
+    <div class="clearfix"></div>
+    <@table>
+        <tr>
+            <th>#i18n{grustoragedb.manage_status.columnStatusName}</th>
+            <th>#i18n{grustoragedb.manage_status.columnLabel}</th>
+            <th>#i18n{grustoragedb.manage_status.columnColorCode}</th>
+            <th>#i18n{portal.util.labelActions}</th>
+        </tr>
+        <@tableHeadBodySeparator />
+        <#list status_list as status >
+        <tr>
+            <td>
+				${status.statusName}
+			</td>
+            <td>
+				${status.label}
+			</td>
+            <td>
+				${status.colorCode}
+			</td>
+        	<td>
+				<@aButton href='jsp/admin/plugins/grustoragedb/ManageStatus.jsp?view=modifyStatus&id=${status.id}' title='#i18n{portal.util.labelModify}' hideTitle=['all'] buttonIcon='pencil' />
+						
+				<@aButton href='jsp/admin/plugins/grustoragedb/ManageStatus.jsp?action=confirmRemoveStatus&id=${status.id}' title='#i18n{portal.util.labelDelete}' buttonIcon='trash' hideTitle=['all'] color='btn-danger'  />
+
+	        </td>
+        </tr>
+        </#list>
+    </@table>
+
+    <@paginationAdmin paginator=paginator />
+
+  </@boxBody>
+</@box>

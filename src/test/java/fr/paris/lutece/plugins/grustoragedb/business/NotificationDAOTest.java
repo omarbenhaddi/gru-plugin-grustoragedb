@@ -121,15 +121,10 @@ public class NotificationDAOTest extends LuteceTestCase
         _notificationDAO = new NotificationDAO( );
         _demandDAO = new DemandDAO( );
         _filterSMS = new NotificationFilter( );
-        _filterSMS.setHasSmsNotification( true );
         _filterCustomerEmail = new NotificationFilter( );
-        _filterCustomerEmail.setHasCustomerEmailNotification( true );
         _filterBackoffice = new NotificationFilter( );
-        _filterBackoffice.setHasBackofficeNotification( true );
         _filterMyDashboard = new NotificationFilter( );
-        _filterMyDashboard.setHasMyDashboardNotification( true );
         _filterBroadcast = new NotificationFilter( );
-        _filterBroadcast.setHasBroadcastEmailNotification( true );
     }
 
     /**

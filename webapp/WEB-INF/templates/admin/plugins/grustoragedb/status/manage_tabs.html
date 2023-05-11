@@ -1,0 +1,10 @@
+<#macro tabs2 tab >
+<@tabs>
+	<@tabList>
+			<li <#if tab="status">class="active"</#if>>
+				<@aButton href="jsp/admin/plugins/grustoragedb/ManageStatus.jsp">#i18n{grustoragedb.manage_status.pageTitle}</@aButton>
+			</li>
+	</@tabList>
+</@tabs>
+
+</#macro>

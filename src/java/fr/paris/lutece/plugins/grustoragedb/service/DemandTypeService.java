@@ -34,7 +34,7 @@ package fr.paris.lutece.plugins.grustoragedb.service;
 
 import java.util.List;
 
-import fr.paris.lutece.plugins.grubusiness.business.demand.DemandType;
+import fr.paris.lutece.plugins.grustoragedb.business.DemandType;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.util.ReferenceList;
 
@@ -83,7 +83,7 @@ public class DemandTypeService {
 
 		for ( DemandType demandType : getDemandTypes( ) )
 		{
-			list.addItem( demandType.getIdDemandType( ), String.valueOf(demandType.getIdDemandType( )) +": " + demandType.getLabel( ) );
+			list.addItem( demandType.getId( ), String.valueOf(demandType.getId( )) +": " + demandType.getLabel( ) );
 		}
 
 		// getDemandTypes().stream().forEach( demandType -> list.addItem( demandType.getIdDemandType( ), demandType.getLabel( ) ) );

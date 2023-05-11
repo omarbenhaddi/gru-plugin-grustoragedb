@@ -2,7 +2,7 @@ package fr.paris.lutece.plugins.grustoragedb.service;
 
 import java.util.List;
 
-import fr.paris.lutece.plugins.grubusiness.business.demand.DemandType;
+import fr.paris.lutece.plugins.grustoragedb.business.DemandType;
 
 public interface IDemandTypeProvider {
 	

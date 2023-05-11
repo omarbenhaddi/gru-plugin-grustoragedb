@@ -1,0 +1,25 @@
+<#include "manage_tabs.html" />
+<@tabs2 tab="status" />
+<@box>
+	<@boxHeader title='#i18n{grustoragedb.create_status.title}' />
+	<@boxBody>
+    <@tform name='create_status' action='jsp/admin/plugins/grustoragedb/ManageStatus.jsp' >
+
+        <@messages errors=errors />
+        <@input type="hidden" id="id" name="id"/>
+        <@input type="hidden" value="${token}" name="token" />
+
+		<@formGroup labelFor='status_name' labelKey='#i18n{grustoragedb.modify_status.labelStatusName}' mandatory=true>
+			<@input type='text' id='status_name' name='status_name'  value='${status.statusName!\'\'}' tabIndex='0' />
+		</@formGroup>
+		<@formGroup labelFor='label' labelKey='#i18n{grustoragedb.modify_status.labelLabel}' mandatory=true>
+			<@input type='text' id='label' name='label'  maxlength=255 value='${status.label!\'\'}' tabIndex='1' />
+		</@formGroup>
+		<@formGroup labelFor='color_code' labelKey='#i18n{grustoragedb.modify_status.labelColorCode}' mandatory=true>
+			<@input type='text' id='color_code' name='color_code'  maxlength=255 value='${status.colorCode!\'\'}' tabIndex='2' />
+		</@formGroup>
+				
+		<@actionButtons button1Name="action_createStatus" button2Name="view_manageStatus"/>
+    </@tform>
+	</@boxBody>
+</@box>
