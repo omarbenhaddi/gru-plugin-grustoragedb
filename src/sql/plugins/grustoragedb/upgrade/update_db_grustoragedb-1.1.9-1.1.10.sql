@@ -85,7 +85,7 @@ INSERT INTO core_user_right (id_right,id_user) VALUES ('GRUSTORAGEDB_DEMANDTYPE_
 --
 
 ALTER TABLE grustoragedb_demand
-ADD COLUMN modify_date bigint NULL,;
+ADD COLUMN modify_date bigint NULL;
 
 update grustoragedb_demand  set modify_date = creation_date;
 
