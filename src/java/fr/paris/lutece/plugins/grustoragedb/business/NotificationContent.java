@@ -33,8 +33,6 @@
  */
 package fr.paris.lutece.plugins.grustoragedb.business;
 
-import java.sql.Blob;
-import java.sql.Date;
 
 /**
  * This is the business class for the object NotificationContent
@@ -45,7 +43,7 @@ public class NotificationContent
     private int    _nId;
     private int _strIdNotification;
     private String _strNotificationType;
-    private String _strStatus;
+    private Integer _strStatusId;
     private byte[]   _content;
 
     /**
@@ -108,19 +106,19 @@ public class NotificationContent
 
     
     /**
-     * @return the _strStatus
+     * @return the _strStatusId
      */
-    public String getStatus( )
+    public Integer getStatusId( )
     {
-        return _strStatus;
+        return _strStatusId;
     }
 
     /**
-     * @param strStatus the _strStatus to set
+     * @param strStatus the _strStatusId to set
      */
-    public void setStatus( String strStatus )
+    public void setStatusId( Integer strStatusId )
     {
-        this._strStatus = strStatus;
+        this._strStatusId = strStatusId;
     }
 
     /**

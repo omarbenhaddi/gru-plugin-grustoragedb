@@ -6,7 +6,6 @@ import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationFil
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
-import fr.paris.lutece.util.ReferenceList;
 
 import java.util.Collection;
 import java.util.List;
@@ -79,15 +78,6 @@ public final class DemandHome
     }
     
     /**
-     * Finds all the demands by ids 
-     * @return all the demands. An empty collection is returned if no demands has been found.
-     */
-    public static List<Demand> getByIdsWithLastStatus( List<Integer> listIds )
-    {
-        return _dao.loadByIdsWithLastStatus( listIds);
-    }
-    
-    /**
      * Load demand ids ordered by date notification
      * @param strCustomerId
      * @param strNotificationType
@@ -124,4 +114,3 @@ public final class DemandHome
         return _dao.store( demand );
     }
 }
-

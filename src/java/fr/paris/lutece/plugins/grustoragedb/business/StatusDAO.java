@@ -49,14 +49,14 @@ import java.util.Optional;
 public final class StatusDAO implements IStatusDAO
 {
     // Constants
-    private static final String SQL_QUERY_SELECT                = "SELECT id_status, status_name, label, color_code FROM grustoragedb_status WHERE id_status = ?";
-    private static final String SQL_QUERY_INSERT                = "INSERT INTO grustoragedb_status ( status_name, label, color_code ) VALUES ( ?, ?, ? ) ";
+    private static final String SQL_QUERY_SELECT                = "SELECT id_status, status, status_code FROM grustoragedb_status WHERE id_status = ?";
+    private static final String SQL_QUERY_INSERT                = "INSERT INTO grustoragedb_status ( status, status_code ) VALUES ( ?, ? ) ";
     private static final String SQL_QUERY_DELETE                = "DELETE FROM grustoragedb_status WHERE id_status = ? ";
-    private static final String SQL_QUERY_UPDATE                = "UPDATE grustoragedb_status SET status_name = ?, label = ?, color_code = ? WHERE id_status = ?";
-    private static final String SQL_QUERY_SELECTALL             = "SELECT id_status, status_name, label, color_code FROM grustoragedb_status";
+    private static final String SQL_QUERY_UPDATE                = "UPDATE grustoragedb_status SET status = ?, status_code = ? WHERE id_status = ?";
+    private static final String SQL_QUERY_SELECTALL             = "SELECT id_status, status, status_code FROM grustoragedb_status";
     private static final String SQL_QUERY_SELECTALL_ID          = "SELECT id_status FROM grustoragedb_status";
-    private static final String SQL_QUERY_SELECTALL_BY_IDS      = "SELECT id_status, status_name, label, color_code FROM grustoragedb_status WHERE id_status IN (  ";
-    private static final String SQL_QUERY_SELECT_BY_STATUS_NAME = "SELECT id_status, status_name, label, color_code FROM grustoragedb_status WHERE ucase(status_name) = ?";
+    private static final String SQL_QUERY_SELECTALL_BY_IDS      = "SELECT id_status, status, status_code FROM grustoragedb_status WHERE id_status IN (  ";
+    private static final String SQL_QUERY_SELECT_BY_STATUS_NAME = "SELECT id_status, status, status_code FROM grustoragedb_status WHERE ucase(status) = ?";
 
     /**
      * {@inheritDoc }
@@ -67,9 +67,8 @@ public final class StatusDAO implements IStatusDAO
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, plugin ) )
         {
             int nIndex = 1;
-            daoUtil.setString( nIndex++, status.getStatusName( ) );
-            daoUtil.setString( nIndex++, status.getLabel( ) );
-            daoUtil.setString( nIndex++, status.getColorCode( ) );
+            daoUtil.setString( nIndex++, status.getStatus( ) );
+            daoUtil.setString( nIndex++, status.getCodeStatus( ) );
 
             daoUtil.executeUpdate( );
             if ( daoUtil.nextGeneratedKey( ) )
@@ -98,9 +97,8 @@ public final class StatusDAO implements IStatusDAO
                 int nIndex = 1;
 
                 status.setId( daoUtil.getInt( nIndex++ ) );
-                status.setStatusName( daoUtil.getString( nIndex++ ) );
-                status.setLabel( daoUtil.getString( nIndex++ ) );
-                status.setColorCode( daoUtil.getString( nIndex ) );
+                status.setStatus( daoUtil.getString( nIndex++ ) );
+                status.setCodeStatus( daoUtil.getString( nIndex++ ) );
             }
 
             return Optional.ofNullable( status );
@@ -130,9 +128,8 @@ public final class StatusDAO implements IStatusDAO
         {
             int nIndex = 1;
 
-            daoUtil.setString( nIndex++, status.getStatusName( ) );
-            daoUtil.setString( nIndex++, status.getLabel( ) );
-            daoUtil.setString( nIndex++, status.getColorCode( ) );
+            daoUtil.setString( nIndex++, status.getStatus( ) );
+            daoUtil.setString( nIndex++, status.getCodeStatus( ) );
             daoUtil.setInt( nIndex, status.getId( ) );
 
             daoUtil.executeUpdate( );
@@ -156,9 +153,8 @@ public final class StatusDAO implements IStatusDAO
                 int nIndex = 1;
 
                 status.setId( daoUtil.getInt( nIndex++ ) );
-                status.setStatusName( daoUtil.getString( nIndex++ ) );
-                status.setLabel( daoUtil.getString( nIndex++ ) );
-                status.setColorCode( daoUtil.getString( nIndex ) );
+                status.setStatus( daoUtil.getString( nIndex++ ) );
+                status.setCodeStatus( daoUtil.getString( nIndex ) );
 
                 statusList.add( status );
             }
@@ -242,9 +238,8 @@ public final class StatusDAO implements IStatusDAO
                     int nIndex = 1;
 
                     status.setId( daoUtil.getInt( nIndex++ ) );
-                    status.setStatusName( daoUtil.getString( nIndex++ ) );
-                    status.setLabel( daoUtil.getString( nIndex++ ) );
-                    status.setColorCode( daoUtil.getString( nIndex ) );
+                    status.setStatus( daoUtil.getString( nIndex++ ) );
+                    status.setCodeStatus( daoUtil.getString( nIndex ) );
 
                     statusList.add( status );
                 }
@@ -258,11 +253,11 @@ public final class StatusDAO implements IStatusDAO
     }
 
     @Override
-    public Optional<Status> loadByStatusName( String strStatusName, Plugin plugin )
+    public Optional<Status> loadByStatus( String strStatus, Plugin plugin )
     {
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_STATUS_NAME, plugin ) )
         {
-            daoUtil.setString( 1, strStatusName.toLowerCase( ) );
+            daoUtil.setString( 1, strStatus.toLowerCase( ) );
             daoUtil.executeQuery( );
             Status status = null;
 
@@ -272,9 +267,8 @@ public final class StatusDAO implements IStatusDAO
                 int nIndex = 1;
 
                 status.setId( daoUtil.getInt( nIndex++ ) );
-                status.setStatusName( daoUtil.getString( nIndex++ ) );
-                status.setLabel( daoUtil.getString( nIndex++ ) );
-                status.setColorCode( daoUtil.getString( nIndex ) );
+                status.setStatus( daoUtil.getString( nIndex++ ) );
+                status.setCodeStatus( daoUtil.getString( nIndex ) );
             }
 
             return Optional.ofNullable( status );

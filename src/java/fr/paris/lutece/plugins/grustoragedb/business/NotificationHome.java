@@ -99,6 +99,19 @@ public final class NotificationHome
     }
 
     /**
+     * Find the notifications by demand id, type id, customer id
+     * 
+     * @param strDemandId
+     * @param strDemandTypeId
+     * @param strCustomerId
+     * @return the notification list
+     */
+    public static List<Notification> getByDemandIdTypeIdCustomerId( String strDemandId, String strDemandTypeId, String strCustomerId )
+    {
+        return _dao.loadByDemandIdTypeIdCustomerId( strDemandId, strDemandTypeId, strCustomerId );
+    }
+    
+    /**
      * Find the notifications according to the filter
      * 
      * @param notificationFilter
@@ -151,5 +164,15 @@ public final class NotificationHome
     {
         _dao.delete( nKey );
     }
+    
+    /**
+     * Get last notification by demand id and demand type id
+     * @param strDemandId
+     * @param strDemandTypeId
+     * @return last notification 
+     */
+    public static Notification getLastNotifByDemandIdAndDemandTypeId( String strDemandId, String strDemandTypeId )
+    {
+        return _dao.loadLastNotifByDemandIdAndDemandTypeId( strDemandId, strDemandTypeId );
+    }
 }
-

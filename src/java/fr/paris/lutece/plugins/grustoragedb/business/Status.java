@@ -33,7 +33,6 @@
  */
 package fr.paris.lutece.plugins.grustoragedb.business;
 
-import javax.validation.constraints.Size;
 import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 /**
@@ -46,16 +45,10 @@ public class Status implements Serializable
     // Variables declarations 
     private int _nId;
     
-    @NotEmpty( message = "#i18n{grusupply.validation.status.StatusName.notEmpty}" )
-    private String _strStatusName;
+    @NotEmpty( message = "#i18n{grusupply.validation.status.Status.notEmpty}" )
+    private String _strStatus;
     
-    @NotEmpty( message = "#i18n{grusupply.validation.status.Label.notEmpty}" )
-    @Size( max = 255 , message = "#i18n{grusupply.validation.status.Label.size}" ) 
-    private String _strLabel;
-    
-    @NotEmpty( message = "#i18n{grusupply.validation.status.ColorCode.notEmpty}" )
-    @Size( max = 255 , message = "#i18n{grusupply.validation.status.ColorCode.size}" ) 
-    private String _strColorCode;
+    private String _strCodeStatus;
 
     /**
      * Returns the Id
@@ -74,61 +67,37 @@ public class Status implements Serializable
     {
         _nId = nId;
     }
-    
+
     /**
-     * Returns the StatusName
-     * @return The StatusName
+     * @return the _strStatus
      */
-    public String getStatusName( )
+    public String getStatus( )
     {
-        return _strStatusName;
+        return _strStatus;
     }
 
     /**
-     * Sets the StatusName
-     * @param strStatusName The StatusName
-     */ 
-    public void setStatusName( String strStatusName )
-    {
-        _strStatusName = strStatusName;
-    }
-    
-    
-    /**
-     * Returns the Label
-     * @return The Label
+     * @param strStatus the _strStatus to set
      */
-    public String getLabel( )
+    public void setStatus( String strStatus )
     {
-        return _strLabel;
+        this._strStatus = strStatus;
     }
 
     /**
-     * Sets the Label
-     * @param strLabel The Label
-     */ 
-    public void setLabel( String strLabel )
-    {
-        _strLabel = strLabel;
-    }
-    
-    
-    /**
-     * Returns the ColorCode
-     * @return The ColorCode
+     * @return the _strCodeStatus
      */
-    public String getColorCode( )
+    public String getCodeStatus( )
     {
-        return _strColorCode;
+        return _strCodeStatus;
     }
 
     /**
-     * Sets the ColorCode
-     * @param strColorCode The ColorCode
-     */ 
-    public void setColorCode( String strColorCode )
+     * @param strCodeStatus the _strCodeStatus to set
+     */
+    public void setCodeStatus( String strCodeStatus )
     {
-        _strColorCode = strColorCode;
+        this._strCodeStatus = strCodeStatus;
     }
-    
+
 }

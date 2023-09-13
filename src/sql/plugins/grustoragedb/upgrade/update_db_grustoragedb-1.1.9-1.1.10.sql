@@ -6,9 +6,8 @@
 DROP TABLE IF EXISTS grustoragedb_status;
 CREATE TABLE grustoragedb_status (
 id_status int AUTO_INCREMENT,
-status_name long varchar NOT NULL,
-label varchar(255) default '' NOT NULL,
-color_code varchar(255) default '' NOT NULL,
+status long varchar NOT NULL,
+status_code varchar(255) default '' NOT NULL,
 PRIMARY KEY (id_status)
 );
 
@@ -33,13 +32,12 @@ CREATE TABLE grustoragedb_notification_content (
 id_notification_content int AUTO_INCREMENT,
 notification_id int NOT NULL,
 notification_type varchar(255) default '' NOT NULL,
-status varchar(255) NULL,
+status_id int NULL,
 content mediumblob,
 PRIMARY KEY (id_notification_content)
 );
 
-CREATE INDEX index_notification_id ON grustoragedb_notification_content (notification_id);
-CREATE INDEX index_notification_type ON grustoragedb_notification_content (notification_type);
+CREATE INDEX index_notification_id_type ON grustoragedb_notification_content (notification_id,notification_type);
 
 --
 -- Structure for table grustoragedb_demand_category
@@ -85,12 +83,12 @@ INSERT INTO core_user_right (id_right,id_user) VALUES ('GRUSTORAGEDB_DEMANDTYPE_
 --
 
 ALTER TABLE grustoragedb_demand
-ADD COLUMN modify_date bigint NULL;
+ADD COLUMN modify_date bigint NULL,;
 
 update grustoragedb_demand  set modify_date = creation_date;
 
-ALTER TABLE grustoragedb_demand 
-ADD COLUMN is_read smallint(1) NOT NULL DEFAULT '0';
+CREATE INDEX index_demand_id_type_customer ON grustoragedb_demand (demand_id,type_id,customer_id);
+
 
 -- 
 -- Alter table grustoragedb_notification
@@ -110,3 +108,8 @@ DROP COLUMN has_mydashboard;
 
 ALTER TABLE grustoragedb_notification
 DROP COLUMN has_broadcast_email;
+
+ALTER TABLE grustoragedb_notification DROP FOREIGN KEY fk_grustoragedb_notification_demand_id;
+
+ALTER TABLE grustoragedb_notification ADD CONSTRAINT fk_grustoragedb_notification_demand_id FOREIGN KEY (demand_id, demand_type_id)
+      REFERENCES grustoragedb_demand (demand_id, type_id) ON DELETE CASCADE ON UPDATE RESTRICT;

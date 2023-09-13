@@ -90,6 +90,18 @@ public final class NotificationDAO implements INotificationDAO
     private static final String SQL_QUERY_DELETE = "DELETE FROM grustoragedb_notification WHERE id = ?";
     private static final String SQL_QUERY_DELETE_BY_DEMAND = "DELETE FROM grustoragedb_notification WHERE demand_id = ? AND demand_type_id = ?";
     private static final String SQL_QUERY_DISTINCT_DEMAND_TYPE_ID = " SELECT DISTINCT demand_type_id FROM grustoragedb_notification ORDER BY demand_type_id ";
+    private static final String SQL_QUERY_SELECT_BY_DEMAND_CUSTOMER_TYPE = " SELECT gn.* "
+            + " FROM grustoragedb_notification gn, grustoragedb_demand gd "
+            + " WHERE gn.demand_id = gd.demand_id "
+            + " AND gd.demand_id = ? "
+            + " AND gd.type_id = ? "
+            + " AND gd.customer_id = ? ";
+    
+    private static final String SQL_QUERY_SELECT_LAST_NOTIFICATION = "SELECT * FROM grustoragedb_notification "
+            + " WHERE demand_id = ?"
+            + " AND demand_type_id = ?"
+            + " ORDER BY date desc, id desc "
+            + " LIMIT 1";
     
     private static final String PROPERTY_DECOMPRESS_NOTIFICATION = "grustoragedb.notification.decompress";
     
@@ -310,7 +322,7 @@ public final class NotificationDAO implements INotificationDAO
 	        int nIndex = 1;
 	
 	        daoUtil.setInt( nIndex++, notification.getId( ) );
-	        daoUtil.setString( nIndex++, notification.getDemand( ).getId( ) );
+	        daoUtil.setString( nIndex++, String.valueOf( notification.getDemand( ).getDemandId( ) ) );
 	        daoUtil.setString( nIndex++, notification.getDemand( ).getTypeId( ) );
 	        daoUtil.setLong( nIndex++, notification.getDate( ) );
 	        
@@ -500,8 +512,6 @@ public final class NotificationDAO implements INotificationDAO
             if ( EnumNotificationType.MYDASHBOARD.name( ).equals( notifContent.getNotificationType( ) ) )
             {
                notif.setMyDashboardNotification( convertToObject( notif.getId( ), notifContent.getContent( ), new TypeReference<MyDashboardNotification>( ){ } ) );
-               //Status Mydashboard
-               notif.setSatusMyDashboard( notifContent.getStatus( ) );
             }
             if ( EnumNotificationType.SMS.name( ).equals( notifContent.getNotificationType( ) ) )
             {
@@ -539,5 +549,59 @@ public final class NotificationDAO implements INotificationDAO
         }
         
         return null;
+    }
+
+    @Override
+    public List<Notification> loadByDemandIdTypeIdCustomerId( String strDemandId, String strDemandTypeId, String strCustomerId )
+    {
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_DEMAND_CUSTOMER_TYPE, GruStorageDbPlugin.getPlugin( ) ) )
+        {
+            daoUtil.setString( 1, strDemandId );
+            daoUtil.setString( 2, strDemandTypeId );
+            daoUtil.setString( 3, strCustomerId );
+            
+            daoUtil.executeQuery( );
+            
+            List<Notification> listNotifications = new ArrayList<>();
+            
+            while ( daoUtil.next( ) )
+            {
+                Notification notification = new Notification( );
+                notification.setId( daoUtil.getInt( COLUMN_NOTIFICATION_ID ) );
+                notification.setDate( daoUtil.getLong( COLUMN_DATE ) );
+                           
+                notification.setDemand( DemandHome.findByPrimaryKey( strDemandId, strDemandTypeId ) );                
+                setNotificationContent( notification, new NotificationFilter( ) );
+                
+                listNotifications.add( notification );
+            }
+
+            return listNotifications;
+        }
+    }
+
+    @Override
+    public Notification loadLastNotifByDemandIdAndDemandTypeId( String strDemandId, String strDemandTypeId )
+    {
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_LAST_NOTIFICATION, GruStorageDbPlugin.getPlugin( ) ) )
+        {
+            daoUtil.setString( 1, strDemandId );
+            daoUtil.setString( 2, strDemandTypeId );
+            
+            daoUtil.executeQuery( );
+            
+            Notification notification = null;
+            
+            while ( daoUtil.next( ) )
+            {
+                notification = new Notification( );
+                notification.setId( daoUtil.getInt( COLUMN_NOTIFICATION_ID ) );
+                notification.setDate( daoUtil.getLong( COLUMN_DATE ) );                          
+                setNotificationContent( notification, new NotificationFilter( ) );
+                
+            }
+
+            return notification;
+        }
     }
 }

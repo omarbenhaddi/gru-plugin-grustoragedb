@@ -52,12 +52,12 @@ import java.sql.Statement;
 public final class NotificationContentDAO implements INotificationContentDAO
 {
     // Constants
-    private static final String SQL_QUERY_SELECT    = "SELECT id_notification_content, notification_id, notification_type, status, content FROM grustoragedb_notification_content WHERE id_notification_content = ?";
-    private static final String SQL_QUERY_INSERT    = "INSERT INTO grustoragedb_notification_content ( notification_id, notification_type, status, content ) VALUES ( ?, ?, ?, ? ) ";
+    private static final String SQL_QUERY_SELECT    = "SELECT id_notification_content, notification_id, notification_type, status_id, content FROM grustoragedb_notification_content WHERE id_notification_content = ?";
+    private static final String SQL_QUERY_INSERT    = "INSERT INTO grustoragedb_notification_content ( notification_id, notification_type, status_id, content ) VALUES ( ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE    = "DELETE FROM grustoragedb_notification_content WHERE id_notification_content = ? ";
-    private static final String SQL_QUERY_UPDATE    = "UPDATE grustoragedb_notification_content SET notification_type = ?, status = ?, content = ? WHERE id_notification_content = ?";
-    private static final String SQL_QUERY_SELECTALL = "SELECT id_notification_content, notification_id, notification_type, status, content FROM grustoragedb_notification_content";
-    private static final String SQL_QUERY_SELECT_BY_ID_NOTIF = "SELECT id_notification_content, notification_id, notification_type, status, content FROM grustoragedb_notification_content WHERE notification_id = ?";
+    private static final String SQL_QUERY_UPDATE    = "UPDATE grustoragedb_notification_content SET notification_type = ?, status_id = ?, content = ? WHERE id_notification_content = ?";
+    private static final String SQL_QUERY_SELECTALL = "SELECT id_notification_content, notification_id, notification_type, status_id, content FROM grustoragedb_notification_content";
+    private static final String SQL_QUERY_SELECT_BY_ID_NOTIF = "SELECT id_notification_content, notification_id, notification_type, status_id, content FROM grustoragedb_notification_content WHERE notification_id = ?";
     private static final String SQL_PARAM_QUERY_TYPE_NOTIF = " AND notification_type IN (";
 
     /**
@@ -71,7 +71,7 @@ public final class NotificationContentDAO implements INotificationContentDAO
             int nIndex = 0;
             daoUtil.setInt( ++nIndex, notificationContent.getIdNotification( ) );
             daoUtil.setString( ++nIndex, notificationContent.getNotificationType( ) );
-            daoUtil.setString( ++nIndex, notificationContent.getStatus( ) );
+            daoUtil.setInt( ++nIndex, notificationContent.getStatusId( ) );
             daoUtil.setBytes( ++nIndex, notificationContent.getContent( ) );
 
             daoUtil.executeUpdate( );
@@ -127,7 +127,7 @@ public final class NotificationContentDAO implements INotificationContentDAO
         {
             int nIndex = 0;
             daoUtil.setString( ++nIndex, notificationContent.getNotificationType( ) );
-            daoUtil.setString( ++nIndex, notificationContent.getStatus( ) );
+            daoUtil.setInt( ++nIndex, notificationContent.getStatusId( ) );
             daoUtil.setBytes( ++nIndex, notificationContent.getContent( ) );
             daoUtil.setInt( ++nIndex, notificationContent.getId( ) );
 
@@ -222,7 +222,7 @@ public final class NotificationContentDAO implements INotificationContentDAO
         notificationContent.setId( daoUtil.getInt( "id_notification_content" ) );
         notificationContent.setIdNotification( daoUtil.getInt( "notification_id" ) );
         notificationContent.setNotificationType( daoUtil.getString( "notification_type" ) );
-        notificationContent.setStatus( daoUtil.getString( "status" ) );
+        notificationContent.setStatusId( daoUtil.getInt( "status_id" ) );
         notificationContent.setContent( daoUtil.getBytes( "content" ) );
         
         return notificationContent;

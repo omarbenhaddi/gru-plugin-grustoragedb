@@ -53,8 +53,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
+
 import fr.paris.lutece.plugins.grustoragedb.business.Status;
 import fr.paris.lutece.plugins.grustoragedb.business.StatusHome;
+import fr.paris.lutece.plugins.grustoragedb.utils.GrustoragedbUtils;
 
 /**
  * This class provides the user interface to manage Status features ( manage, create, modify, remove )
@@ -82,6 +84,7 @@ public class StatusJspBean extends AbstractManageJspBean <Integer, Status>
     // Markers
     private static final String MARK_STATUS_LIST = "status_list";
     private static final String MARK_STATUS = "status";
+    private static final String MARK_GENERIC_STATUS_LIST = "generic_status_list";
 
     private static final String JSP_MANAGE_STATUS = "jsp/admin/plugins/grustoragedb/ManageStatus.jsp";
 
@@ -126,7 +129,7 @@ public class StatusJspBean extends AbstractManageJspBean <Integer, Status>
         
         if ( request.getParameter( AbstractPaginator.PARAMETER_PAGE_INDEX) == null || _listIdStatuss.isEmpty( ) )
         {
-        	_listIdStatuss = StatusHome.getIdStatussList(  );
+        	_listIdStatuss = StatusHome.getIdStatusList(  );
         }
         
         Map<String, Object> model = getPaginatedListModel( request, MARK_STATUS_LIST, _listIdStatuss, JSP_MANAGE_STATUS );
@@ -142,7 +145,7 @@ public class StatusJspBean extends AbstractManageJspBean <Integer, Status>
 	@Override
 	List<Status> getItemsFromIds( List<Integer> listIds ) 
 	{
-		List<Status> listStatus = StatusHome.getStatussListByIds( listIds );
+		List<Status> listStatus = StatusHome.getStatusListByIds( listIds );
 		
 		// keep original order
         return listStatus.stream()
@@ -171,6 +174,7 @@ public class StatusJspBean extends AbstractManageJspBean <Integer, Status>
 
         Map<String, Object> model = getModel(  );
         model.put( MARK_STATUS, _status );
+        model.put( MARK_GENERIC_STATUS_LIST, GrustoragedbUtils.getEnumGenericStatusRefList( ) );        
         model.put( SecurityTokenService.MARK_TOKEN, SecurityTokenService.getInstance( ).getToken( request, ACTION_CREATE_STATUS ) );
 
         return getPage( PROPERTY_PAGE_TITLE_CREATE_STATUS, TEMPLATE_CREATE_STATUS, model );
@@ -265,6 +269,7 @@ public class StatusJspBean extends AbstractManageJspBean <Integer, Status>
 
         Map<String, Object> model = getModel(  );
         model.put( MARK_STATUS, _status );
+        model.put( MARK_GENERIC_STATUS_LIST, GrustoragedbUtils.getEnumGenericStatusRefList( ) );
         model.put( SecurityTokenService.MARK_TOKEN, SecurityTokenService.getInstance( ).getToken( request, ACTION_MODIFY_STATUS ) );
 
         return getPage( PROPERTY_PAGE_TITLE_MODIFY_STATUS, TEMPLATE_MODIFY_STATUS, model );

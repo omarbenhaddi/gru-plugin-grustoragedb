@@ -13,22 +13,18 @@
     <div class="clearfix"></div>
     <@table>
         <tr>
-            <th>#i18n{grustoragedb.manage_status.columnStatusName}</th>
-            <th>#i18n{grustoragedb.manage_status.columnLabel}</th>
-            <th>#i18n{grustoragedb.manage_status.columnColorCode}</th>
+            <th>#i18n{grustoragedb.manage_status.columnStatus}</th>
+            <th>#i18n{grustoragedb.manage_status.columnStatusCode}</th>
             <th>#i18n{portal.util.labelActions}</th>
         </tr>
         <@tableHeadBodySeparator />
         <#list status_list as status >
         <tr>
             <td>
-				${status.statusName}
+				${status.status}
 			</td>
             <td>
-				${status.label}
-			</td>
-            <td>
-				${status.colorCode}
+				${status.codeStatus}
 			</td>
         	<td>
 				<@aButton href='jsp/admin/plugins/grustoragedb/ManageStatus.jsp?view=modifyStatus&id=${status.id}' title='#i18n{portal.util.labelModify}' hideTitle=['all'] buttonIcon='pencil' />

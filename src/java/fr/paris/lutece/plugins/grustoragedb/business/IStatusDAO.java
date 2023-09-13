@@ -82,7 +82,7 @@ public interface IStatusDAO
      * @param plugin the Plugin
      * @return The instance of the status
      */
-    Optional<Status> loadByStatusName( String strStatusName, Plugin plugin );
+    Optional<Status> loadByStatus( String strStatusName, Plugin plugin );
 
     /**
      * Load the data of all the status objects and returns them as a list

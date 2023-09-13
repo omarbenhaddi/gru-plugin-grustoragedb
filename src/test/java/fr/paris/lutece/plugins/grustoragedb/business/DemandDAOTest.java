@@ -36,6 +36,7 @@ package fr.paris.lutece.plugins.grustoragedb.business;
 import fr.paris.lutece.plugins.grubusiness.business.customer.Customer;
 import fr.paris.lutece.plugins.grubusiness.business.demand.Demand;
 import fr.paris.lutece.plugins.grubusiness.business.demand.IDemandDAO;
+import fr.paris.lutece.plugins.grubusiness.business.web.rs.EnumGenericStatus;
 import fr.paris.lutece.test.LuteceTestCase;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -90,7 +91,7 @@ public class DemandDAOTest extends LuteceTestCase
         demand.setTypeId( DEMAND_TYPE_ID_1 );
         demand.setSubtypeId( DEMAND_SUBTYPE_ID_1 );
         demand.setReference( DEMAND_REFERENCE_1 );
-        demand.setStatusId( Demand.STATUS_INPROGRESS );
+        demand.setStatusId( EnumGenericStatus.ENCOURS.getStatusId( ) );
 
         Customer customer = new Customer( );
         customer.setId( CUSTOMER_ID_1 );
@@ -119,7 +120,7 @@ public class DemandDAOTest extends LuteceTestCase
         demand.setTypeId( DEMAND_TYPE_ID_2 );
         demand.setSubtypeId( DEMAND_SUBTYPE_ID_2 );
         demand.setReference( DEMAND_REFERENCE_2 );
-        demand.setStatusId( Demand.STATUS_CLOSED );
+        demand.setStatusId( EnumGenericStatus.TERMINE.getStatusId( ) );
         customer = new Customer( );
         customer.setId( CUSTOMER_ID_2 );
         demand.setCustomer( customer );

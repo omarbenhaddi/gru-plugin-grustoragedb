@@ -112,13 +112,13 @@ public final class StatusHome
     /**
      * Returns an instance of a status
      * 
-     * @param strStatusName
+     * @param strStatus
      *            The status name
      * @return an instance of Status
      */
-    public static Optional<Status> findByStatusName( String strStatusName )
+    public static Optional<Status> findByStatus( String strStatus )
     {
-        return _dao.loadByStatusName( strStatusName, _plugin );
+        return _dao.loadByStatus( strStatus, _plugin );
     }
 
     /**
@@ -126,7 +126,7 @@ public final class StatusHome
      * 
      * @return the list which contains the data of all the status objects
      */
-    public static List<Status> getStatussList( )
+    public static List<Status> getStatusList( )
     {
         return _dao.selectStatussList( _plugin );
     }
@@ -136,7 +136,7 @@ public final class StatusHome
      * 
      * @return the list which contains the id of all the status objects
      */
-    public static List<Integer> getIdStatussList( )
+    public static List<Integer> getIdStatusList( )
     {
         return _dao.selectIdStatussList( _plugin );
     }
@@ -146,7 +146,7 @@ public final class StatusHome
      * 
      * @return the referenceList which contains the data of all the status objects
      */
-    public static ReferenceList getStatussReferenceList( )
+    public static ReferenceList getStatusReferenceList( )
     {
         return _dao.selectStatussReferenceList( _plugin );
     }
@@ -158,7 +158,7 @@ public final class StatusHome
      *            liste of ids
      * @return the list which contains the data of all the avant objects
      */
-    public static List<Status> getStatussListByIds( List<Integer> listIds )
+    public static List<Status> getStatusListByIds( List<Integer> listIds )
     {
         return _dao.selectStatussListByIds( _plugin, listIds );
     }
