@@ -47,6 +47,7 @@ import fr.paris.lutece.util.string.StringUtil;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -97,15 +98,15 @@ public final class NotificationContentHome
      * @return The  instance of notificationContent which has been created with its primary key.
      */
 
-    public static NotificationContent create( Notification notification )
+    public static List<NotificationContent>  create( Notification notification )
     {
-        NotificationContent notificationContent = getNotificationContent ( notification );
-        if( notificationContent != null )
+        List<NotificationContent> listNotificationContent = getListNotificationContent ( notification );
+        for( NotificationContent content : listNotificationContent )
         {
-            _dao.insert( notificationContent, GruStorageDbPlugin.getPlugin( ) );
+            _dao.insert( content, GruStorageDbPlugin.getPlugin( ) );
         }
 
-        return notificationContent;
+        return listNotificationContent;
     }
 
 
@@ -187,9 +188,9 @@ public final class NotificationContentHome
     }
     
     
-    private static NotificationContent getNotificationContent( Notification notification )
+    private static List<NotificationContent> getListNotificationContent( Notification notification )
     {
-        NotificationContent notificationContent = null;
+        List<NotificationContent> listNotificationContent = new ArrayList< >();
 
         try
         {
@@ -198,28 +199,28 @@ public final class NotificationContentHome
             
             if ( notification.getSmsNotification( ) != null )
             {
-                notificationContent = initNotificationContent( notification, EnumNotificationType.SMS, mapperr.writeValueAsString( notification.getSmsNotification( ) ) );
+                listNotificationContent.add( initNotificationContent( notification, EnumNotificationType.SMS, mapperr.writeValueAsString( notification.getSmsNotification( ) ) ) );
             }
 
             if ( notification.getBackofficeNotification( ) != null )
             {
-                notificationContent = initNotificationContent( notification, EnumNotificationType.BACKOFFICE, mapperr.writeValueAsString( notification.getBackofficeNotification( ) ) );
+                listNotificationContent.add( initNotificationContent( notification, EnumNotificationType.BACKOFFICE, mapperr.writeValueAsString( notification.getBackofficeNotification( ) ) ) );
             }
 
             if ( CollectionUtils.isNotEmpty( notification.getBroadcastEmail( ) ) )
             {
-                notificationContent = initNotificationContent( notification, EnumNotificationType.BROADCAST_EMAIL, mapperr.writeValueAsString( notification.getBroadcastEmail( ) ) );
+                listNotificationContent.add( initNotificationContent( notification, EnumNotificationType.BROADCAST_EMAIL, mapperr.writeValueAsString( notification.getBroadcastEmail( ) ) ) );
             }
 
             if ( notification.getMyDashboardNotification( ) != null )
             {
                 demand.setStatusId( getStatusNotification( notification ) );
-                notificationContent = initNotificationContent( notification, EnumNotificationType.MYDASHBOARD, mapperr.writeValueAsString( notification.getMyDashboardNotification( ) ) );
+                listNotificationContent.add( initNotificationContent( notification, EnumNotificationType.MYDASHBOARD, mapperr.writeValueAsString( notification.getMyDashboardNotification( ) ) ) );
             }
 
             if ( notification.getEmailNotification( ) != null )
             {
-                notificationContent = initNotificationContent( notification, EnumNotificationType.CUSTOMER_EMAIL, mapperr.writeValueAsString( notification.getEmailNotification( ) ) );
+                listNotificationContent.add( initNotificationContent( notification, EnumNotificationType.CUSTOMER_EMAIL, mapperr.writeValueAsString( notification.getEmailNotification( ) ) ) );
             }
             demand.setModifyDate( new Date( ).getTime( ) );
             DemandHome.update( demand );
@@ -234,7 +235,7 @@ public final class NotificationContentHome
             AppLogService.error( "Error while compressing or writing JSON of notification", e );
         }      
         
-        return notificationContent;
+        return listNotificationContent;
     }
     
     
