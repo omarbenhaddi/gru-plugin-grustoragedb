@@ -49,6 +49,10 @@ public class Status implements Serializable
     private String _strStatus;
     
     private String _strCodeStatus;
+    
+    private String _strLabelColorCode;
+    
+    private String _strBannerColorCode;
 
     /**
      * Returns the Id
@@ -98,6 +102,38 @@ public class Status implements Serializable
     public void setCodeStatus( String strCodeStatus )
     {
         this._strCodeStatus = strCodeStatus;
+    }
+
+    /**
+     * @return the _strLabelColorCode
+     */
+    public String getLabelColorCode( )
+    {
+        return _strLabelColorCode;
+    }
+
+    /**
+     * @param strLabelColorCode the _strLabelColorCode to set
+     */
+    public void setLabelColorCode( String strLabelColorCode )
+    {
+        this._strLabelColorCode = strLabelColorCode;
+    }
+
+    /**
+     * @return the _strBannerColorCode
+     */
+    public String getBannerColorCode( )
+    {
+        return _strBannerColorCode;
+    }
+
+    /**
+     * @param strBannerColorCode the _strBannerColorCode to set
+     */
+    public void setBannerColorCode( String strBannerColorCode )
+    {
+        this._strBannerColorCode = strBannerColorCode;
     }
 
 }

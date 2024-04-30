@@ -68,6 +68,8 @@ CREATE TABLE grustoragedb_status (
 id_status int AUTO_INCREMENT,
 status long varchar NOT NULL,
 status_code varchar(255) default '' NOT NULL,
+label_color_code varchar(255) default '' NOT NULL,
+banner_color_code varchar(255) default '' NOT NULL,
 PRIMARY KEY (id_status)
 );
 --

@@ -15,6 +15,12 @@
 		<@formGroup labelFor='code_status' labelKey='#i18n{grustoragedb.modify_status.labelStatusCode}' mandatory=true>
 			<@select name="code_status" id="code_status" items=generic_status_list default_value=status.codeStatus! />
 		</@formGroup>
+		<@formGroup labelFor='label_color_code' labelKey='#i18n{grustoragedb.modify_status.labelColorCode}' mandatory=true>
+			<@input type='text' id='label_color_code' name='label_color_code'  value='${status.labelColorCode!\'\'}' tabIndex='0' />
+		</@formGroup>
+		<@formGroup labelFor='banner_color_code' labelKey='#i18n{grustoragedb.modify_status.labelBannerColorCode}' mandatory=true>
+			<@input type='text' id='banner_color_code' name='banner_color_code'  value='${status.bannerColorCode!\'\'}' tabIndex='0' />
+		</@formGroup>
 				
 		<@actionButtons button1Name="action_createStatus" button2Name="view_manageStatus"/>
     </@tform>

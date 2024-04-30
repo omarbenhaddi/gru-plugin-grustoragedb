@@ -39,6 +39,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import fr.paris.lutece.plugins.grubusiness.business.web.rs.EnumGenericStatus;
+import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.util.ReferenceList;
 
 /**
@@ -83,7 +84,8 @@ public class GrustoragedbUtils
         
         for ( EnumGenericStatus status : EnumGenericStatus.values( ) )
         {
-            refList.addItem( status.name( ), status.getLabel( ) );
+            String strLabel = I18nService.getLocalizedString( status.getLabel( ), I18nService.getDefaultLocale( ) );
+            refList.addItem( status.name( ), strLabel );
         }        
         return refList;        
     }

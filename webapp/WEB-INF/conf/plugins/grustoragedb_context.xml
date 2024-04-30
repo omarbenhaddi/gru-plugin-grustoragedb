@@ -14,4 +14,6 @@
 	
  	<bean id="demandType.provider" class="fr.paris.lutece.plugins.grustoragedb.service.DemandTypeProvider" />
 
+	<!--  Status REST  -->
+ 	<bean id="grustoragedb.statusRest" class="fr.paris.lutece.plugins.grustoragedb.rs.service.StatusRest" />
 </beans>
